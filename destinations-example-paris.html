@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paris - Destination Highlights</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f9f9fa; color: #132968; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    .component { max-width: 800px; margin: 24px auto; background: #fff; border-radius: 16px; box-shadow: 0 1px 3px rgba(19,41,104,0.06); overflow: hidden; }
+    .comp-toggle { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; cursor: pointer; border: none; background: none; width: 100%; text-align: left; transition: background 0.15s; }
+    .comp-toggle:hover { background: #fafafc; }
+    .comp-toggle-left { display: flex; align-items: center; gap: 12px; }
+    .comp-toggle h2 { font-size: 20px; font-weight: 700; color: #132968; }
+    .comp-toggle .toggle-sub { font-size: 13px; color: #425486; }
+    .comp-toggle .comp-chev { width: 20px; height: 20px; color: #a1a9c3; transition: transform 0.25s; flex-shrink: 0; }
+    .comp-toggle.open .comp-chev { transform: rotate(180deg); }
+    .comp-body { display: none; }
+    .comp-body.open { display: block; }
+    .season-bar { display: flex; align-items: center; gap: 8px; padding: 4px 24px 12px; }
+    .season-badge { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+    .season-spring { color: #2e7d32; background: #e8f5e9; }
+    .season-note { font-size: 12px; color: #425486; }
+    .city-intro { padding: 0 24px 16px; }
+    .city-name { font-size: 20px; font-weight: 800; color: #132968; margin-bottom: 8px; }
+    .city-blurb { font-size: 14px; color: #425486; line-height: 1.7; }
+    .highlights { display: flex; gap: 12px; padding: 0 24px 20px; overflow-x: auto; }
+    .hl-card { flex: 0 0 200px; background: #f9f9fa; border-radius: 10px; padding: 14px; border: 1px solid #f0f0f2; }
+    .hl-card .hl-emoji { font-size: 20px; margin-bottom: 6px; }
+    .hl-card .hl-title { font-size: 13px; font-weight: 700; color: #132968; margin-bottom: 4px; }
+    .hl-card .hl-desc { font-size: 12px; color: #425486; line-height: 1.5; }
+    .expand { border-top: 1px solid #f0f0f2; }
+    .expand-btn { display: flex; align-items: center; gap: 10px; padding: 14px 24px; cursor: pointer; width: 100%; border: none; background: none; text-align: left; transition: background 0.15s; }
+    .expand-btn:hover { background: #fafafc; }
+    .expand-btn .e-icon { font-size: 16px; width: 24px; text-align: center; flex-shrink: 0; }
+    .expand-btn .e-title { flex: 1; font-size: 13px; font-weight: 600; color: #132968; }
+    .expand-btn .e-preview { font-size: 12px; color: #a1a9c3; margin-right: 8px; }
+    .expand-btn .e-chev { width: 16px; height: 16px; color: #a1a9c3; transition: transform 0.2s; flex-shrink: 0; }
+    .expand-btn.open .e-chev { transform: rotate(180deg); }
+    .expand-body { display: none; padding: 0 24px 16px 58px; }
+    .expand-body.open { display: block; }
+    .item { margin-bottom: 12px; }
+    .item .item-name { font-size: 13px; font-weight: 700; color: #132968; }
+    .item .item-detail { font-size: 12px; color: #425486; line-height: 1.5; margin-top: 2px; }
+    .item .item-meta { font-size: 11px; color: #a1a9c3; margin-top: 2px; }
+    .price { color: #0057b8; font-weight: 700; }
+    .sep { height: 1px; background: #f0f0f2; margin: 12px 0; }
+    .tip { font-size: 12px; color: #425486; background: #f9f9fa; padding: 8px 12px; border-radius: 6px; margin-top: 8px; }
+    .tip strong { color: #132968; }
+    .seasonal { background: #fffde7; border: 1px solid #fff9c4; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; font-size: 12px; color: #f57f17; }
+    .seasonal strong { color: #e65100; }
+    .internal-link { color: #0057b8; text-decoration: none; font-weight: 600; border-bottom: 1px dashed #0057b8; }
+    .internal-link:hover { color: #003d82; border-bottom-style: solid; }
+    @media (max-width: 600px) {
+      .hl-card { flex: 0 0 170px; }
+      .expand-body { padding-left: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="component">
+    <!-- Header Toggle -->
+    <button class="comp-toggle open" onclick="toggleComponent(this)">
+      <div class="comp-toggle-left">
+        <h2>Paris</h2>
+        <span class="toggle-sub">Spring 2026</span>
+      </div>
+      <svg class="comp-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </button>
+
+    <!-- Main Component Body -->
+    <div class="comp-body open">
+      <!-- Season Bar -->
+      <div class="season-bar">
+        <span class="season-badge season-spring">Spring 2026</span>
+        <span class="season-note">Peak season for blossoms and café culture</span>
+      </div>
+
+      <!-- City Intro -->
+      <div class="city-intro">
+        <div class="city-name">Paris</div>
+        <div class="city-blurb">Arriving at Gare du Nord, cherry blossoms, café terraces, the Seine at golden hour — Paris in spring is peak Paris</div>
+      </div>
+
+      <!-- Highlights -->
+      <div class="highlights">
+        <div class="hl-card">
+          <div class="hl-emoji">🗼</div>
+          <div class="hl-title">Eiffel Tower</div>
+          <div class="hl-desc">Iconic iron structure offering panoramic city views from three levels</div>
+        </div>
+        <div class="hl-card">
+          <div class="hl-emoji">🎨</div>
+          <div class="hl-title">Louvre Museum</div>
+          <div class="hl-desc">World's largest art museum housing the Mona Lisa and masterpieces</div>
+        </div>
+        <div class="hl-card">
+          <div class="hl-emoji">🏘️</div>
+          <div class="hl-title">Montmartre</div>
+          <div class="hl-desc">Charming bohemian neighborhood with Sacré-Cœur basilica and artist squares</div>
+        </div>
+        <div class="hl-card">
+          <div class="hl-emoji">🚤</div>
+          <div class="hl-title">Seine River Walks</div>
+          <div class="hl-desc">Stroll riverside paths with views of bridges, islands, and historic landmarks</div>
+        </div>
+      </div>
+
+      <!-- Attractions -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🏛️</span>
+          <span class="e-title">Attractions</span>
+          <span class="e-preview">7 top sites</span>
+          <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Eiffel Tower</div>
+            <div class="item-detail">The most visited paid monument in the world. Three-level iron lattice tower with restaurants, shops, and stunning city views. Best visited early morning or sunset.</div>
+            <div class="item-meta">📍 Champ de Mars | ⏱️ 1-2 hours | 💶 €11-17 entry</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Louvre Museum</div>
+            <div class="item-detail">The world's largest art museum home to over 35,000 works. The Mona Lisa and Venus de Milo are highlights. Plan at least 2-3 hours, or visit specific galleries to avoid crowds.</div>
+            <div class="item-meta">📍 Right Bank | ⏱️ 2-4 hours | 💶 €17 entry</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Musée d'Orsay</div>
+            <div class="item-detail">Housed in a converted Beaux-Arts railway station. World's finest Impressionist collection featuring Monet, Renoir, Van Gogh, and Degas. Less crowded than Louvre.</div>
+            <div class="item-meta">📍 Left Bank | ⏱️ 1.5-2.5 hours | 💶 €14 entry</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Sacré-Cœur & Montmartre</div>
+            <div class="item-detail">White-domed basilica perched on Montmartre hill overlooking the city. Stunning Romano-Byzantine interior. Surrounding neighborhood offers street artists, bistros, and village-like charm.</div>
+            <div class="item-meta">📍 Montmartre, 18th arr. | ⏱️ 1-2 hours | 💶 Free basilica entry, €6 dome</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Notre-Dame Cathedral</div>
+            <div class="item-detail">Iconic Gothic masterpiece currently undergoing restoration and reopening in 2024. Stunning rose windows and architectural details. External view worth the visit even during renovation.</div>
+            <div class="item-meta">📍 Île de la Cité | ⏱️ 45 min - 1 hour | 💶 Reopened with new entry details</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Sainte-Chapelle</div>
+            <div class="item-detail">Stunning 13th-century Gothic chapel famous for 15 stained-glass windows depicting biblical scenes. Breathtaking interior light, especially at sunset. Often less crowded than major sites.</div>
+            <div class="item-meta">📍 Île de la Cité | ⏱️ 45 min | 💶 €11 entry</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Panthéon</div>
+            <div class="item-detail">Neoclassical monument housing tombs of notable French figures like Voltaire and Rousseau. Dome interior with frescoes depicting Saint Genevieve. Stunning views from the top.</div>
+            <div class="item-meta">📍 Latin Quarter | ⏱️ 1-1.5 hours | 💶 €11 entry</div>
+          </div>
+          <div class="tip"><strong>Pro tip:</strong> Buy the Paris Museum Pass (€54 for 2 days, €69 for 4 days) for unlimited entry to 60+ sites including Louvre, Musée d'Orsay, and Sainte-Chapelle.</div>
+        </div>
+      </div>
+
+      <!-- Activities -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🎭</span>
+          <span class="e-title">Activities</span>
+          <span class="e-preview">6 experiences</span>
+          <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Seine River Cruise</div>
+            <div class="item-detail">Classic 1-hour cruise under the city's bridges with views of Eiffel Tower, Notre-Dame, Louvre, and riverside monuments. Perfect at sunset for romantic experience or golden-hour photography.</div>
+            <div class="item-meta">🚤 Multiple operators | 💶 €12-18 | ⏱️ 1 hour</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">French Cooking Classes</div>
+            <div class="item-detail">Learn traditional French cuisine from local chefs. Classes typically include market shopping, preparation, and a multi-course meal. Half-day and full-day options available in various neighborhoods.</div>
+            <div class="item-meta">👨‍🍳 Marais, Latin Quarter | 💶 €80-180 | ⏱️ 3-4 hours</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Wine Tasting in Le Marais</div>
+            <div class="item-detail">Explore Le Marais' historic wine bars and contemporary wine shops. Guided tastings available or self-guided bar hopping. Learn about French wine regions while sampling local varieties.</div>
+            <div class="item-meta">🍷 Le Marais, 4th arr. | 💶 €15-30 per tasting | ⏱️ 2-3 hours</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Flea Markets (Clignancourt)</div>
+            <div class="item-detail">Marché aux Puces de Saint-Ouen is one of Europe's largest flea markets. Browse vintage furniture, antiques, clothing, and curiosities across 100+ vendor stalls. Haggle is expected.</div>
+            <div class="item-meta">🏪 Saint-Ouen, north of Paris | 💶 Prices vary | ⏱️ 2-4 hours</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Cycling Along Canal Saint-Martin</div>
+            <div class="item-detail">Rent a bike or Vélib' and pedal the scenic 4.5km canal path. Stop at cafés, picnic areas, and view charming lock bridges. Relaxing alternative to crowded tourist sites.</div>
+            <div class="item-meta">🚴 Canal Saint-Martin, 10th arr. | 💶 €2-5 bike rental | ⏱️ 1.5-2 hours</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Moulin Rouge Cabaret Show</div>
+            <div class="item-detail">Iconic can-can dance hall established in 1889. Spectacular musical production with elaborate costumes, dancers, and live orchestra. Book in advance, especially for evening shows.</div>
+            <div class="item-meta">🎪 Pigalle, 18th arr. | 💶 €87-187 | ⏱️ 2 hours</div>
+          </div>
+          <div class="tip"><strong>Spring bonus:</strong> Flowering parks like Luxembourg Gardens and Tuileries are stunning during April-May. Free entry, perfect for picnics and people-watching.</div>
+        </div>
+      </div>
+
+      <!-- Day Trips -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🚂</span>
+          <span class="e-title">Day Trips</span>
+          <span class="e-preview">5 destinations</span>
+          <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Versailles Palace</div>
+            <div class="item-detail">Opulent former royal residence with stunning Hall of Mirrors, ornate gardens, and fountains. UNESCO World Heritage site. Plan a full day to explore palace, gardens, and Trianons.</div>
+            <div class="item-meta">🚊 <a href="https://www.omio.com/trains/paris/versailles" class="internal-link">Versailles</a> | ⏱️ 30 min by RER | 💶 €18 entry</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Giverny Gardens</div>
+            <div class="item-detail">Monet's former home and water lily pond gardens that inspired his masterpieces. Japanese bridge, weeping willows, and flower beds in full bloom during spring. Small village charm.</div>
+            <div class="item-meta">🚂 <a href="https://www.omio.com/trains/paris/vernon" class="internal-link">Vernon (Giverny)</a> | ⏱️ 45 min by train | 💶 €11 entry</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Reims & Champagne Region</div>
+            <div class="item-detail">UNESCO-listed Reims Cathedral and surrounding champagne houses. Tour prestigious champagne producers like Veuve Clicquot or Taittinger. Lunch in charming Reims town center.</div>
+            <div class="item-meta">🚄 <a href="https://www.omio.com/trains/paris/reims" class="internal-link">Reims</a> | ⏱️ 45 min by TGV | 💶 €10-25 tours</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Fontainebleau Palace & Forest</div>
+            <div class="item-detail">Renaissance château surrounded by ancient forest. Famous for royal hunting grounds and art collections. Combine palace tour with hiking or picnicking in the stunning forest.</div>
+            <div class="item-meta">🚂 <a href="https://www.omio.com/trains/paris/fontainebleau" class="internal-link">Fontainebleau</a> | ⏱️ 40 min by train | 💶 €12 entry</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Chartres Cathedral</div>
+            <div class="item-detail">Masterpiece of French Gothic architecture famous for stunning stained-glass windows and intricate rose windows. Located in charming Chartres town. Less crowded than Paris attractions.</div>
+            <div class="item-meta">🚂 <a href="https://www.omio.com/trains/paris/chartres" class="internal-link">Chartres</a> | ⏱️ 1 hour by train | 💶 €15 entry</div>
+          </div>
+          <div class="tip"><strong>Spring tip:</strong> Giverny's gardens are at their peak in May. Book tickets online to skip queues. Consider visiting mid-week to avoid weekend crowds.</div>
+        </div>
+      </div>
+
+      <!-- Dining -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🍽️</span>
+          <span class="e-title">Dining</span>
+          <span class="e-preview">Bistros & terraces</span>
+          <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Croissants & Pastries</div>
+            <div class="item-detail">Paris croissants are incomparable. Buttery, flaky, authentic croissants au beurre from local boulangeries cost €1-2. Try pain au chocolat, pain aux amandes, and fruit tarts. Breakfast tradition.</div>
+            <div class="item-meta">☕ Local boulangeries everywhere | 💶 €1-3 | ⏱️ Quick morning stop</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Bistro Culture</div>
+            <div class="item-detail">Classic French bistros serve traditional dishes: coq au vin, beef bourguignon, duck confit, sole meunière. Three-course menus with wine often better value than à la carte. Lunch menus typically cheaper than dinner.</div>
+            <div class="item-meta">🍷 Throughout Paris | 💶 €15-35 lunch, €25-50 dinner | ⏱️ 1.5-2 hours</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Le Marais Food Scene</div>
+            <div class="item-detail">Historic Jewish quarter turned trendy neighborhood with diverse dining. Falafels, artisanal sandwiches, contemporary French fusion restaurants, concept cafés, and wine bars.</div>
+            <div class="item-meta">🥗 Le Marais, 4th arr. | 💶 €8-30 | ⏱️ Variable</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Rue des Rosiers Falafel</div>
+            <div class="item-detail">Famous street in Le Marais serving Mediterranean and Middle Eastern cuisine. L'As du Fallafel and Chez Marianne are legendary spots. Casual, quick, authentic, and budget-friendly.</div>
+            <div class="item-meta">🌯 Le Marais, 4th arr. | 💶 €6-12 | ⏱️ 20-30 min</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Market Street Dining</div>
+            <div class="item-detail">Rue Mouffetard (Latin Quarter) and Rue Cler (7th arr.) are lively market streets filled with fruit vendors, cheese stalls, charcuterie, wine shops, and casual eateries. Perfect for building a picnic.</div>
+            <div class="item-meta">🏪 Latin Quarter & 7th arr. | 💶 €2-15 per item | ⏱️ 1-2 hours browsing</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Wine Bars (Caves à Vin)</div>
+            <div class="item-detail">Small neighborhood wine bars offering natural wines, by-the-glass pours, and charcuterie/cheese boards. Informal, social atmosphere. Perfect for evening aperitif or casual dinner.</div>
+            <div class="item-meta">🍷 Throughout Paris | 💶 €5-15 per glass, €20-30 boards | ⏱️ 1-2 hours</div>
+          </div>
+          <div class="tip"><strong>Parisian dining tip:</strong> Lunch is typically 12-2pm, dinner 7-10pm. Many restaurants close between services. Dress smartly for dinner reservations. Always greet servers with "Bonjour" or "Bonsoir".</div>
+        </div>
+      </div>
+
+      <!-- Budget -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">💰</span>
+          <span class="e-title">Budget</span>
+          <span class="e-preview">Expensive city</span>
+          <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Accommodation Costs</div>
+            <div class="item-detail"><span class="price">Budget:</span> €50-80 per night (hostels, shared rooms). <span class="price">Mid-range:</span> €100-200 per night (3-star hotels). <span class="price">Luxury:</span> €250-600+ per night (4-5 star hotels). Spring season drives prices up 20-30%.</div>
+            <div class="item-meta">🏨 Prices vary by arr. | ⏱️ Book 1-2 months ahead for spring</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Meal Costs</div>
+            <div class="item-detail"><span class="price">Budget meal:</span> €8-12 (falafel, crêpes, sandwich). <span class="price">Bistro lunch:</span> €15-25. <span class="price">Bistro dinner:</span> €25-50. <span class="price">Fine dining:</span> €60-150+. Breakfast croissants/coffee €3-5.</div>
+            <div class="item-meta">🍽️ Lunch menus better value | ⏱️ Budget €30-50/day food</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Metro & Transport</div>
+            <div class="item-detail"><span class="price">T+ single ticket:</span> €2.25. <span class="price">Carnet (10 tickets):</span> €17.10 (€1.71 per trip). <span class="price">Navigo Découverte:</span> €81.60 per week unlimited access to métro, bus, RER. <span class="price">Vélib' bikes:</span> €5/day or €25/month.</div>
+            <div class="item-meta">🚇 16 métro lines | ⏱️ Buy carnet to save 25%</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Museum & Attraction Prices</div>
+            <div class="item-detail"><span class="price">Eiffel Tower:</span> €11-17. <span class="price">Louvre:</span> €17. <span class="price">Musée d'Orsay:</span> €14. <span class="price">Sainte-Chapelle:</span> €11. Many museums free first Sunday of month.</div>
+            <div class="item-meta">🏛️ Budget €50-100 for museums | ⏱️ Check free hours</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Paris Museum Pass</div>
+            <div class="item-detail">2-day pass: €54 (entry to 60+ sites including Louvre, Musée d'Orsay, Sainte-Chapelle, Versailles, Fontainebleau). 4-day pass: €69. Pays for itself after 3-4 major museums.</div>
+            <div class="item-meta">💳 Buy at airports or museums | ⏱️ Consecutive or not days</div>
+          </div>
+          <div class="tip"><strong>Budget strategy:</strong> Stay in outer arrondissements (11th, 13th) for cheaper hotels. Use Museum Pass. Lunch at bistros instead of dinner. Picnic from markets. Walk neighborhoods instead of tours.</div>
+        </div>
+      </div>
+
+      <!-- Neighborhoods -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🗺️</span>
+          <span class="e-title">Neighborhoods</span>
+          <span class="e-preview">6 key areas</span>
+          <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Le Marais (4th arr.)</div>
+            <div class="item-detail">Historic Jewish quarter turned vibrant neighborhood. Narrow medieval streets, boutiques, galleries, vintage shops, wine bars, and diverse dining. Home to Place des Vosges arcaded square. Charming, walkable, central location.</div>
+            <div class="item-meta">🏘️ 4th arr. | 🚇 Métro: Saint-Paul, Bastille | 💰 Mid-to-upscale</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Montmartre (18th arr.)</div>
+            <div class="item-detail">Hilltop bohemian village with Sacré-Cœur basilica, artist studios, street performers, white-draped streets. Historic cabarets like Moulin Rouge. More touristy but undeniably charming, especially lower slopes.</div>
+            <div class="item-meta">🏘️ 18th arr. | 🚇 Métro: Pigalle, Abbesses | 💰 Budget to mid-range</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Saint-Germain-des-Prés (6th arr.)</div>
+            <div class="item-detail">Sophisticated Left Bank neighborhood famous for intellectual heritage, cafés (Café de Flore, Les Deux Magots), art galleries, and bookshops. Expensive but elegant. Boulevard Saint-Germain is central.</div>
+            <div class="item-meta">🏘️ 6th arr. | 🚇 Métro: Saint-Germain, Odéon | 💰 Upscale</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Latin Quarter (5th arr.)</div>
+            <div class="item-detail">Student-filled neighborhood with Sorbonne University, Panthéon, Rue Mouffetard market street, and bookshop alleys. More budget-friendly despite central location. Lively nightlife and casual dining.</div>
+            <div class="item-meta">🏘️ 5th arr. | 🚇 Métro: Cluny-Sorbonne, Cardinal Lemoine | 💰 Budget</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Canal Saint-Martin (10th arr.)</div>
+            <div class="item-detail">Emerging trendy area with 4.5km scenic canal, lock bridges, cafés along waterfront, contemporary restaurants, and arts venues. Less touristy than central areas. Perfect for cycling, picnics, evening walks.</div>
+            <div class="item-meta">🏘️ 10th arr. | 🚇 Métro: République, Jacques Bonsergent | 💰 Mid-range</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Belleville (11th-20th arr.)</div>
+            <div class="item-detail">Multicultural neighborhood with street art, vintage shops, hole-in-the-wall eateries, and local neighborhood feel. Less polished than tourist areas but authentic and affordable. Great for street food and evening aperitifs.</div>
+            <div class="item-meta">🏘️ 11th-20th arr. | 🚇 Métro: Belleville, Parmentier | 💰 Budget</div>
+          </div>
+          <div class="tip"><strong>Neighborhood insight:</strong> Right Bank (1st-4th, 8th) more upscale and touristy. Left Bank (5th-7th) intellectual and bohemian. Outer arr. (10th, 11th, 13th, 20th) more local and affordable. Walk between neighborhoods for authentic discovery.</div>
+        </div>
+      </div>
+
+      <!-- Accommodation -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🛏️</span>
+          <span class="e-title">Accommodation</span>
+          <span class="e-preview">Budget to luxury</span>
+          <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Budget Hostels</div>
+            <div class="item-detail">Dormitory beds €25-40, private rooms €50-80. Popular options: St Christopher's Inn (Belleville), Le Village Hostellerie (Marais area). Good for meeting travelers. Clean, social, but limited privacy.</div>
+            <div class="item-meta">🏢 Various arr. | 💶 €25-80/night | ⏱️ Book online</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Mid-Range Hotels (3-star)</div>
+            <div class="item-detail"><span class="price">€100-200 per night</span>. Comfortable rooms with private bathroom and basic amenities. Location matters: central arr. (1-6) more expensive; outer arr. (10-13, 20) cheaper. Spring season add 20-30% to prices.</div>
+            <div class="item-meta">🏨 Throughout Paris | 💶 €100-200/night | ⏱️ Book 2 months ahead spring</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Luxury Hotels (4-5 star)</div>
+            <div class="item-detail"><span class="price">€250-600+ per night</span>. High-end properties with premium service, dining, and location. Famous options: Le Meurice, Ritz, Peninsula. Often in 1st, 6th, 8th arr. Spring significantly raises rates.</div>
+            <div class="item-meta">🏰 Prime locations | 💶 €250-600+/night | ⏱️ Book well ahead</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Airbnb & Vacation Rentals</div>
+            <div class="item-detail">Studio apartments €60-120, one-bedroom €80-200. Offers kitchen access and local living experience. Reading reviews essential. Note: Paris has strict short-term rental regulations; verify legitimacy.</div>
+            <div class="item-meta">🏠 Throughout Paris | 💶 €60-200/night | ⏱️ Filter by location</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Location Strategy</div>
+            <div class="item-detail">Central arr. (1-6) pricier but walkable. Save money in 10th, 11th, 13th, 20th: métro-connected, local feel, better value. Avoid 8th, 16th unless budget allows—expensive, less character.</div>
+            <div class="item-meta">💡 Outer arr. closer to République, Gare du Nord, Belleville | 🚇 Good métro access</div>
+          </div>
+          <div class="tip"><strong>Spring booking tip:</strong> Easter holiday (April) drives occupancy high. Book 6-8 weeks ahead for decent rates. Weekday rates often 10-20% cheaper than weekends.</div>
+        </div>
+      </div>
+
+      <!-- Safety -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🛡️</span>
+          <span class="e-title">Safety</span>
+          <span class="e-preview">Smart precautions</span>
+          <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Pickpocket Awareness</div>
+            <div class="item-detail">Pickpocketing is common in tourist hotspots: Eiffel Tower lines, métro during rush hour, crowded train stations. Never leave bag unattended. Wear backpack in front on crowded métro. Keep valuables in inside pockets.</div>
+            <div class="item-meta">⚠️ Métro, tourist sites | 💡 Use money belt, crossbody bag</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Scam Awareness</div>
+            <div class="item-detail">Common scams: fake bracelet sellers (resist firmly), petition scammers asking you to sign then demand donations, fake police checking documents. Don't engage, walk away politely. Verify restaurants before entering.</div>
+            <div class="item-meta">⚠️ Tourist areas, parks | 💡 Ignore solicitors, trust instinct</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">General Safety</div>
+            <div class="item-detail">Paris is generally safe. Central and tourist areas well-policed. Outer arr. 13th, 19th, 20th have rougher neighborhoods—avoid late night. Woman travelers generally safe; use common sense alone at night. Avoid carrying large amounts of cash.</div>
+            <div class="item-meta">✅ Generally safe | 🚫 Avoid deserted streets late night</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Emergency Numbers</div>
+            <div class="item-detail">Police: 17 | Fire: 18 | Ambulance: 15 | General emergency: 112. Learn basic French phrases for help. Most police speak some English. Carry a copy of passport separately from original.</div>
+            <div class="item-meta">📞 Police, fire, ambulance numbers | 💡 Have phone with local SIM</div>
+          </div>
+          <div class="tip"><strong>Safety summary:</strong> Paris is safe for tourists who use basic precautions. Stay aware in crowded tourist spots and on métro. Keep valuables secure. Avoid late-night solo travel in outer arr. Trust your instinct.</div>
+        </div>
+      </div>
+
+      <!-- Useful Apps -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">📱</span>
+          <span class="e-title">Useful Apps</span>
+          <span class="e-preview">Essential downloads</span>
+          <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Omio (Formerly GoEuro)</div>
+            <div class="item-detail">Book train tickets, buses, and flights across Europe. Compare prices and journey times. Essential for day trips from Paris to Versailles, Giverny, Reims. Direct booking integration with SNCF trains.</div>
+            <div class="item-meta">🚂 iOS & Android | 💡 Download before trip</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Île-de-France Mobilités</div>
+            <div class="item-detail">Official Paris transit app for métro, bus, and RER. Real-time arrival information, trip planner, and ticket purchasing. Essential for navigating the 16-line métro system efficiently.</div>
+            <div class="item-meta">🚇 iOS & Android | 💡 Best for local transit</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Citymapper</div>
+            <div class="item-detail">Multi-modal journey planning across métro, bus, bike, and walking. Real-time delays, alternative routes, and journey notifications. User-friendly interface for non-French speakers.</div>
+            <div class="item-meta">🗺️ iOS & Android | 💡 English-friendly interface</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Google Translate</div>
+            <div class="item-detail">Translation app for restaurant menus, street signs, and conversations. Camera translation feature for instant text translation. Essential since not all Parisians speak English.</div>
+            <div class="item-meta">🔤 iOS & Android | 💡 Camera translation feature</div>
+          </div>
+          <div class="tip"><strong>App strategy:</strong> Download metro and translate apps before arrival. Have Omio ready for day trip bookings. Bring portable charger—heavy app usage drains batteries in sightseeing mode.</div>
+        </div>
+      </div>
+
+      <!-- Packing Tips -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🎒</span>
+          <span class="e-title">Packing Tips</span>
+          <span class="e-preview">Spring essentials</span>
+          <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Layers & Clothing</div>
+            <div class="item-detail">Spring weather unpredictable: 10-18°C (50-64°F). Pack light sweaters, cardigans, light jacket. Layers allow flexibility. Comfortable walking shoes (cobblestones hard on feet). One dressier outfit for restaurants/shows.</div>
+            <div class="item-meta">👕 Layers + light jacket | 👟 Comfortable walking shoes</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Weather Essentials</div>
+            <div class="item-detail">Umbrella or lightweight rain jacket essential—spring showers frequent. Sunscreen for longer sightseeing days. Sunglasses for bright spring days. Hat optional but useful for sun and rain protection.</div>
+            <div class="item-meta">☔ Compact umbrella | 🧴 SPF 30+ sunscreen</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Footwear</div>
+            <div class="item-detail">Comfortable walking shoes absolutely essential—expect 10,000+ steps daily exploring neighborhoods. Cobblestones and uneven pavement hard on feet. Break in shoes before trip. Backup pair helpful.</div>
+            <div class="item-meta">👟 Quality walking shoes | 💡 Worn-in before arrival</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Dressy Outfit</div>
+            <div class="item-detail">Parisians dress well, especially for dinner. Pack one nicer outfit for restaurants, theaters, or shows. Avoid athletic wear for evening dining. Comfortable dressier shoes or flats helpful.</div>
+            <div class="item-meta">👗 Neat casual dress + flats or heels | 💡 Respectful appearance</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Electronics & Adapters</div>
+            <div class="item-detail">France uses Type E/F plugs (European standard). Universal adapter required. Bring portable charger—sightseeing drains phones. Phone with data plan or local SIM for navigation and transit apps.</div>
+            <div class="item-meta">🔌 Type E/F adapter | 🔋 Power bank</div>
+          </div>
+          <div class="tip"><strong>Packing strategy:</strong> Pack light—you'll buy souvenirs. Carry reusable water bottle (fountains throughout Paris). Day pack/crossbody bag for sightseeing. Leave oversized luggage at accommodation.</div>
+        </div>
+      </div>
+
+      <!-- Currency & Payments -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">💳</span>
+          <span class="e-title">Currency & Payments</span>
+          <span class="e-preview">Euro payments</span>
+          <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Currency: Euro (€)</div>
+            <div class="item-detail">France uses the Euro (EUR). Current exchange rates ~€1 = $1.10 USD. ATMs widely available for cash withdrawal. Most transactions card-based. No need to carry large amounts of cash.</div>
+            <div class="item-meta">💱 €1 ≈ $1.10 USD | 🏧 ATMs everywhere</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Card Payments</div>
+            <div class="item-detail">Debit and credit cards (Visa, Mastercard, Amex) widely accepted. Contactless payments very common. Some small vendors (tiny cafés, street vendors) cash-only. Chip-and-PIN or contactless standard; signatures rarely requested.</div>
+            <div class="item-meta">💳 Visa/Mastercard/Amex | 📱 Contactless payments</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">ATM & Cash Withdrawals</div>
+            <div class="item-detail">ATMs (Distributeurs) on every major street. Most major cards work (Visa, Mastercard). Withdraw €200-300 in chunks to minimize bank fees. Notify your bank of travel dates to avoid card blocks.</div>
+            <div class="item-meta">🏧 Widespread ATMs | ☎️ Notify bank before travel</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Tipping Culture</div>
+            <div class="item-detail">Tipping not mandatory. Service included in restaurant bills. Rounding up (€2 on €18 bill) or 5-10% appreciated but optional. Tip more for exceptional service. Café staff rarely tipped. Tour guides/hotel staff: €2-5 appreciated.</div>
+            <div class="item-meta">💡 Service included | 💶 Round up or 5-10% optional</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Exchange Rates</div>
+            <div class="item-detail">Airport exchanges charge high fees. Use ATMs for best rates. Credit cards offer decent exchange rates with possible small fee. Avoid currency exchange booths—overcharged. Check bank rates before traveling.</div>
+            <div class="item-meta">💱 ATMs best rates | ✅ Credit card acceptable | ❌ Avoid exchanges</div>
+          </div>
+          <div class="tip"><strong>Money strategy:</strong> Use debit card at ATMs for cash. Pay by card when possible. Keep €50-100 cash for small vendors. Inform bank before travel. Set daily withdrawal limit if ATM offers option.</div>
+        </div>
+      </div>
+
+      <!-- Getting Around Paris -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🚇</span>
+          <span class="e-title">Getting Around Paris</span>
+          <span class="e-preview">Métro, buses, bikes</span>
+          <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Paris Métro</div>
+            <div class="item-detail">16-line subway system covering entire city. Trains run 5:30am-1:15am (2:15am Fri-Sat). Most efficient transport for longer distances. Color-coded lines make navigation intuitive. Métro map available at stations or in apps.</div>
+            <div class="item-meta">🚇 16 lines | ⏱️ Every 2-5 min frequency | 💶 €2.25 single ticket</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">T+ Tickets & Carnet</div>
+            <div class="item-detail">Single ticket valid for 1 journey (any distance) on métro, bus, or RER. Buy individual tickets €2.25 or carnet (10 tickets) €17.10 for 24% savings. Tickets valid unlimited time once inserted.</div>
+            <div class="item-meta">🎫 €2.25 single | €17.10 carnet (10) | ⏱️ Buy at stations</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Navigo Découverte Pass</div>
+            <div class="item-detail">Weekly unlimited pass: €81.60. Valid Monday-Sunday on all métro, bus, and RER within Île-de-France. Good for longer stays (1+ week). Requires photo ID and is personal to cardholder.</div>
+            <div class="item-meta">💳 €81.60/week | ✅ Unlimited all transport | 📷 Requires photo</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Buses</div>
+            <div class="item-detail">Extensive bus network covering areas métro doesn't. Uses same T+ tickets. Slower than métro but better for sightseeing. Night buses (N lines) run after métro closes. Less crowded than métro at most times.</div>
+            <div class="item-meta">🚌 Same T+ tickets | ⏱️ Variable frequency | 🌙 Night buses available</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">RER Regional Trains</div>
+            <div class="item-detail">Faster regional trains connecting central Paris to outer areas and airports. 5 lines (A-E). Used for day trips to Versailles, Giverny, and airports. Same T+ tickets valid but watch zone pricing for longer trips.</div>
+            <div class="item-meta">🚊 5 lines A-E | ⏱️ Every 10-15 min | 🎫 T+ or zone tickets</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Vélib' Bikes</div>
+            <div class="item-detail">Self-service bike-sharing system with 1,400+ stations across Paris. Day pass €5, 7-day €25. First 30 min free each trip. Excellent for Canal Saint-Martin, parks, and leisurely exploration. Helmets rare but recommended.</div>
+            <div class="item-meta">🚴 €5/day or €25/week | 🗺️ 1,400+ stations | ⏱️ First 30 min free</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Taxis & Ride-Share</div>
+            <div class="item-detail">Taxis licensed, meter-required. Typical metro ride €8-15. Uber and Bolt available but often more expensive than métro. Taxis useful late night when métro closed or heavy luggage. Airport taxis fixed-rate ~€35.</div>
+            <div class="item-meta">🚕 Métro more economical | 📱 Uber/Bolt available | ✅ Taxis safe</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Walking</div>
+            <div class="item-detail">Many attractions within walking distance. Central arr. (1-6) walkable between areas. Great for neighborhood discovery and soaking in Parisian street life. Wear comfortable shoes—cobblestones tiring after hours.</div>
+            <div class="item-meta">👟 Best for short distances | 🗺️ Use Google Maps | ⏱️ Allow extra time</div>
+          </div>
+          <div class="tip"><strong>Transport strategy:</strong> Buy carnet for flexibility without daily pass commitment. Use métro for longer distances, walk for neighborhoods. Rent Vélib' for scenic routes. Save day trips for RER/trains. Avoid taxis unless necessary—métro/bus sufficient and cheaper.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function toggleComponent(btn) {
+      btn.classList.toggle('open');
+      btn.nextElementSibling.classList.toggle('open');
+    }
+    function toggle(btn) {
+      btn.classList.toggle('open');
+      btn.nextElementSibling.classList.toggle('open');
+    }
+  </script>
+</body>
+</html>
