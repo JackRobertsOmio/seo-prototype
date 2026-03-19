@@ -5,57 +5,65 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Compare Train Providers — Barcelona → Madrid</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f6f8; color: #1a1a2e; line-height: 1.5; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f9f9fa; color: #132968; line-height: 1.5; -webkit-font-smoothing: antialiased; }
 
-  .component { max-width: 960px; margin: 24px auto; background: #fff; border-radius: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; }
+  .component { max-width: 960px; margin: 24px auto; background: #fff; border-radius: 16px; box-shadow: 0 1px 3px rgba(19,41,104,0.06); overflow: hidden; }
 
-  .comp-header { padding: 20px 24px 16px; }
-  .comp-header h2 { font-size: 20px; font-weight: 700; }
-  .comp-header p { font-size: 13px; color: #666; margin-top: 2px; }
+  .comp-header { padding: 24px 24px 16px; }
+  .comp-header h2 { font-size: 22px; font-weight: 700; color: #132968; }
+  .comp-header p { font-size: 13px; color: #425486; margin-top: 4px; }
 
-  /* Provider cards */
-  .providers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 0 24px 16px; }
-  .pcard { border: 1px solid #e8e8e8; border-radius: 12px; padding: 14px; text-align: center; transition: box-shadow 0.2s; cursor: default; }
-  .pcard:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
-  .pcard img { width: 40px; height: 40px; border-radius: 8px; object-fit: contain; margin-bottom: 8px; background: #f5f5f5; }
-  .pcard .pname { font-size: 14px; font-weight: 700; }
-  .pcard .pdesc { font-size: 11px; color: #777; margin: 4px 0 8px; line-height: 1.4; }
-  .pcard .pprice { font-size: 18px; font-weight: 800; color: #0074e8; }
-  .pcard .pprice span { font-size: 11px; font-weight: 400; color: #888; }
+  /* Provider intro cards */
+  .providers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 0 24px 20px; }
+  .pcard { border: 1px solid #e9e9e9; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; align-items: center; text-align: center; transition: box-shadow 0.2s; }
+  .pcard:hover { box-shadow: 0 4px 16px rgba(19,41,104,0.08); }
+  .pcard img { height: 32px; object-fit: contain; margin-bottom: 10px; }
+  .pcard .pname { font-size: 14px; font-weight: 700; color: #132968; }
+  .pcard .pdesc { font-size: 11px; color: #425486; margin: 4px 0 10px; line-height: 1.45; }
+  .pcard .pprice { font-size: 20px; font-weight: 800; color: #0057b8; }
+  .pcard .pprice span { font-size: 11px; font-weight: 400; color: #a1a9c3; }
 
   /* Tabs */
-  .tabs { display: flex; gap: 0; padding: 0 24px; border-bottom: 2px solid #eee; overflow-x: auto; }
-  .tab { padding: 11px 16px; font-size: 13px; font-weight: 600; color: #666; background: none; border: none; cursor: pointer; position: relative; white-space: nowrap; }
-  .tab:hover { color: #0074e8; }
-  .tab.on { color: #0074e8; }
-  .tab.on::after { content:''; position: absolute; bottom: -2px; left: 0; right: 0; height: 2px; background: #0074e8; }
+  .tabs { display: flex; gap: 0; padding: 0 24px; border-bottom: 2px solid #e9e9e9; overflow-x: auto; }
+  .tab { padding: 12px 18px; font-size: 13px; font-weight: 600; color: #425486; background: none; border: none; cursor: pointer; position: relative; white-space: nowrap; transition: color 0.15s; }
+  .tab:hover { color: #0057b8; }
+  .tab.on { color: #0057b8; }
+  .tab.on::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 2px; background: #0057b8; border-radius: 1px 1px 0 0; }
 
   .panel { display: none; }
   .panel.on { display: block; }
 
   /* Column header */
-  .colhead { display: grid; grid-template-columns: 180px repeat(4, 1fr); background: #f8f9fb; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 2; }
-  .colhead .ch { padding: 8px 12px; text-align: center; font-size: 12px; font-weight: 700; color: #444; display: flex; align-items: center; justify-content: center; gap: 6px; }
-  .colhead .ch img { width: 18px; height: 18px; border-radius: 4px; }
-  .colhead .ch:first-child { text-align: left; color: #999; font-weight: 400; }
+  .colhead { display: grid; grid-template-columns: 170px repeat(4, 1fr); background: #f9f9fa; border-bottom: 1px solid #e9e9e9; }
+  .colhead .ch { padding: 10px 12px; text-align: center; font-size: 12px; font-weight: 700; color: #132968; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .colhead .ch img { width: 20px; height: 20px; border-radius: 4px; }
+  .colhead .ch:first-child { text-align: left; color: #a1a9c3; font-weight: 500; font-size: 11px; }
+
+  /* Section titles */
+  .stitle { padding: 8px 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #a1a9c3; background: #f9f9fa; border-bottom: 1px solid #f0f0f2; border-top: 1px solid #f0f0f2; }
 
   /* Data rows */
-  .section-title { padding: 10px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #999; background: #fafbfc; border-bottom: 1px solid #f0f0f0; border-top: 1px solid #f0f0f0; }
-  .row { display: grid; grid-template-columns: 180px repeat(4, 1fr); border-bottom: 1px solid #f5f5f5; }
+  .row { display: grid; grid-template-columns: 170px repeat(4, 1fr); border-bottom: 1px solid #f0f0f2; }
   .row:last-child { border-bottom: none; }
-  .row .rl { padding: 10px 16px; font-size: 12px; font-weight: 600; color: #555; display: flex; align-items: flex-start; gap: 6px; }
-  .row .rv { padding: 10px 12px; font-size: 12px; color: #333; text-align: center; line-height: 1.5; }
-  .row:hover { background: #fafbfc; }
-  .g { color: #2e7d32; font-weight: 600; }
-  .w { color: #e65100; }
-  .x { color: #ccc; }
-  .new { display: inline-block; background: #e8f5e9; color: #2e7d32; font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.3px; vertical-align: middle; margin-left: 3px; }
+  .row .rl { padding: 10px 20px; font-size: 12px; font-weight: 600; color: #425486; }
+  .row .rv { padding: 10px 12px; font-size: 12px; color: #132968; text-align: center; line-height: 1.5; }
+  .row:hover { background: #fafafc; }
 
-  @media (max-width: 700px) {
+  /* Value states */
+  .g { color: #0a8a3e; font-weight: 600; }
+  .w { color: #c75300; }
+  .x { color: #c4c4c4; }
+  .price-val { font-weight: 800; font-size: 16px; color: #0057b8; }
+  .new { display: inline-block; background: #e3f5e8; color: #0a8a3e; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.3px; margin-left: 4px; vertical-align: middle; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
     .providers { grid-template-columns: repeat(2, 1fr); }
-    .colhead, .row { grid-template-columns: 140px repeat(4, minmax(120px, 1fr)); }
+    .colhead, .row { grid-template-columns: 130px repeat(4, minmax(110px, 1fr)); }
     .panel { overflow-x: auto; }
+    .tab { padding: 10px 14px; font-size: 12px; }
   }
 </style>
 </head>
@@ -71,25 +79,25 @@
     <div class="pcard">
       <img src="https://static.omio.design/web/logos/42/RenfeAVE.png" alt="Renfe AVE">
       <div class="pname">Renfe AVE</div>
-      <div class="pdesc">Spain's flagship high-speed service. Up to 310 km/h with premium classes, lounge access, and at-seat dining.</div>
+      <div class="pdesc">Spain's flagship high-speed service. Up to 310 km/h with premium classes and lounge access.</div>
       <div class="pprice"><span>from </span>€30</div>
     </div>
     <div class="pcard">
       <img src="https://static.omio.design/web/logos/42/iryo.png" alt="Iryo">
       <div class="pname">Iryo</div>
-      <div class="pdesc">Italy's Trenitalia-backed competitor. Free WiFi on all classes, flexible fares, and modern Frecciarossa 1000 trains.</div>
+      <div class="pdesc">Trenitalia-backed competitor. Free WiFi on all classes, flexible fares on Frecciarossa 1000 trains.</div>
       <div class="pprice"><span>from </span>€22</div>
     </div>
     <div class="pcard">
       <img src="https://static.omio.design/web/logos/42/sncf-ouigo.png" alt="OUIGO">
       <div class="pname">OUIGO</div>
-      <div class="pdesc">SNCF's low-cost high-speed brand. No-frills travel with pay-as-you-go extras. No WiFi — download entertainment ahead.</div>
+      <div class="pdesc">SNCF's low-cost high-speed brand. No-frills travel with pay-as-you-go extras. No WiFi onboard.</div>
       <div class="pprice"><span>from </span>€22</div>
     </div>
     <div class="pcard">
       <img src="https://static.omio.design/web/logos/42/RenfeAVLO.png" alt="Avlo">
       <div class="pname">Avlo</div>
-      <div class="pdesc">Renfe's budget brand on AVE infrastructure. Same speed, fewer frills. No weight limit on hand luggage.</div>
+      <div class="pdesc">Renfe's budget brand on AVE infrastructure. Same speed, fewer frills. No weight limit on luggage.</div>
       <div class="pprice"><span>from </span>€22</div>
     </div>
   </div>
@@ -110,16 +118,16 @@
       <div class="ch"><img src="https://static.omio.design/web/logos/21/RenfeAVE.png" alt=""> Renfe AVE</div>
       <div class="ch"><img src="https://static.omio.design/web/logos/21/iryo.png" alt=""> Iryo</div>
       <div class="ch"><img src="https://static.omio.design/web/logos/21/sncf-ouigo.png" alt=""> OUIGO</div>
-      <div class="ch"><img src="https://static.omio.design/web/logos/42/RenfeAVLO.png" alt="" style="width:18px;height:18px;border-radius:4px"> Avlo</div>
+      <div class="ch"><img src="https://static.omio.design/web/logos/21/RenfeAVLO.png" alt=""> Avlo</div>
     </div>
-    <div class="section-title">Journey</div>
+    <div class="stitle">Journey</div>
     <div class="row"><div class="rl">Duration</div><div class="rv g">2h 30m</div><div class="rv g">2h 30m</div><div class="rv">2h 36m</div><div class="rv g">2h 30m</div></div>
     <div class="row"><div class="rl">Daily departures</div><div class="rv">~20</div><div class="rv">~16</div><div class="rv">~5</div><div class="rv">~8</div></div>
     <div class="row"><div class="rl">First / last</div><div class="rv">05:50 / 21:15</div><div class="rv">06:15 / 21:30</div><div class="rv">06:25 / 19:55</div><div class="rv">06:30 / 20:40</div></div>
     <div class="row"><div class="rl">Stations</div><div class="rv" style="font-size:11px">Sants → Atocha</div><div class="rv" style="font-size:11px">Sants → Chamartín</div><div class="rv" style="font-size:11px">Sants → Chamartín</div><div class="rv" style="font-size:11px">Sants → Atocha</div></div>
     <div class="row"><div class="rl">Transfers</div><div class="rv g">Direct</div><div class="rv g">Direct</div><div class="rv g">Direct</div><div class="rv g">Direct</div></div>
-    <div class="section-title">Price</div>
-    <div class="row"><div class="rl">Starting from</div><div class="rv" style="font-weight:700;font-size:16px;color:#0074e8">€30</div><div class="rv" style="font-weight:700;font-size:16px;color:#0074e8">€22</div><div class="rv" style="font-weight:700;font-size:16px;color:#0074e8">€22</div><div class="rv" style="font-weight:700;font-size:16px;color:#0074e8">€22</div></div>
+    <div class="stitle">Price</div>
+    <div class="row"><div class="rl">Starting from</div><div class="rv price-val">€30</div><div class="rv price-val">€22</div><div class="rv price-val">€22</div><div class="rv price-val">€22</div></div>
     <div class="row"><div class="rl">Advance booking</div><div class="rv">Up to 4 months</div><div class="rv">Up to 4 months</div><div class="rv">Up to 4 months</div><div class="rv">Up to 4 months</div></div>
   </div>
 
@@ -130,20 +138,20 @@
       <div class="ch"><img src="https://static.omio.design/web/logos/21/RenfeAVE.png" alt=""> Renfe AVE</div>
       <div class="ch"><img src="https://static.omio.design/web/logos/21/iryo.png" alt=""> Iryo</div>
       <div class="ch"><img src="https://static.omio.design/web/logos/21/sncf-ouigo.png" alt=""> OUIGO</div>
-      <div class="ch"><img src="https://static.omio.design/web/logos/42/RenfeAVLO.png" alt="" style="width:18px;height:18px;border-radius:4px"> Avlo</div>
+      <div class="ch"><img src="https://static.omio.design/web/logos/21/RenfeAVLO.png" alt=""> Avlo</div>
     </div>
-    <div class="section-title">Connectivity</div>
+    <div class="stitle">Connectivity</div>
     <div class="row"><div class="rl">WiFi <span class="new">enhanced</span></div><div class="rv g">Free · All classes</div><div class="rv g">Free · All classes</div><div class="rv x">Not available</div><div class="rv w">Paid add-on</div></div>
     <div class="row"><div class="rl">Power outlets <span class="new">enhanced</span></div><div class="rv g">Every seat · USB + plug</div><div class="rv g">Every seat · USB + plug</div><div class="rv">Every seat · USB only</div><div class="rv g">Every seat · USB + plug</div></div>
-    <div class="section-title">Food & Drink</div>
-    <div class="row"><div class="rl">Dining <span class="new">new</span></div><div class="rv">Café car · At-seat service in Prémium</div><div class="rv">Café car · At-seat service in Infinita</div><div class="rv">Vending machines only</div><div class="rv">Vending machines only</div></div>
-    <div class="section-title">Comfort</div>
+    <div class="stitle">Food & Drink</div>
+    <div class="row"><div class="rl">Dining <span class="new">new</span></div><div class="rv">Café car · At-seat in Prémium</div><div class="rv">Café car · At-seat in Infinita</div><div class="rv">Vending machines only</div><div class="rv">Vending machines only</div></div>
+    <div class="stitle">Comfort</div>
     <div class="row"><div class="rl">Seat comfort <span class="new">new</span></div><div class="rv g">Generous · Full recline</div><div class="rv g">Generous · Full recline</div><div class="rv">Standard · Limited recline</div><div class="rv">Standard · Limited recline</div></div>
     <div class="row"><div class="rl">Quiet zone <span class="new">new</span></div><div class="rv g">Coach 1 (Prémium)</div><div class="rv g">Café Silencio car</div><div class="rv x">Not available</div><div class="rv x">Not available</div></div>
     <div class="row"><div class="rl">Entertainment <span class="new">new</span></div><div class="rv">PlayRenfe portal</div><div class="rv">Iryo Play portal</div><div class="rv x">None</div><div class="rv x">None</div></div>
-    <div class="section-title">Travelling with</div>
-    <div class="row"><div class="rl">Pets <span class="new">new</span></div><div class="rv">Small in carrier free · Dogs under 10 kg €10</div><div class="rv">Small in carrier free · Max 10 kg</div><div class="rv x">Not permitted</div><div class="rv x">Not permitted</div></div>
-    <div class="row"><div class="rl">Bicycles <span class="new">new</span></div><div class="rv">Folding free · Full-size €3 (book ahead)</div><div class="rv">Folding free · Full-size not available</div><div class="rv">Folding free · Full-size not available</div><div class="rv">Folding free · Full-size not available</div></div>
+    <div class="stitle">Travelling with</div>
+    <div class="row"><div class="rl">Pets <span class="new">new</span></div><div class="rv">Small in carrier free · Dogs &lt;10 kg €10</div><div class="rv">Small in carrier free · Max 10 kg</div><div class="rv x">Not permitted</div><div class="rv x">Not permitted</div></div>
+    <div class="row"><div class="rl">Bicycles <span class="new">new</span></div><div class="rv">Folding free · Full-size €3</div><div class="rv">Folding free only</div><div class="rv">Folding free only</div><div class="rv">Folding free only</div></div>
   </div>
 
   <!-- LUGGAGE -->
@@ -153,14 +161,14 @@
       <div class="ch"><img src="https://static.omio.design/web/logos/21/RenfeAVE.png" alt=""> Renfe AVE</div>
       <div class="ch"><img src="https://static.omio.design/web/logos/21/iryo.png" alt=""> Iryo</div>
       <div class="ch"><img src="https://static.omio.design/web/logos/21/sncf-ouigo.png" alt=""> OUIGO</div>
-      <div class="ch"><img src="https://static.omio.design/web/logos/42/RenfeAVLO.png" alt="" style="width:18px;height:18px;border-radius:4px"> Avlo</div>
+      <div class="ch"><img src="https://static.omio.design/web/logos/21/RenfeAVLO.png" alt=""> Avlo</div>
     </div>
-    <div class="section-title">Included allowance</div>
+    <div class="stitle">Included allowance</div>
     <div class="row"><div class="rl">Carry-on</div><div class="rv">2 bags included</div><div class="rv">1 bag included</div><div class="rv">1 cabin + 1 handbag</div><div class="rv">1 backpack + 1 hand luggage</div></div>
     <div class="row"><div class="rl">Max size</div><div class="rv" style="font-size:11px">55×35×25 cm (cabin)<br>85×55×35 cm (checked)</div><div class="rv" style="font-size:11px">55×35×25 cm (cabin)<br>70×50×35 cm (overhead)</div><div class="rv" style="font-size:11px">55×35×25 cm (cabin)<br>36×27×15 cm (handbag)</div><div class="rv" style="font-size:11px">55×35×25 cm<br>(no weight limit)</div></div>
     <div class="row"><div class="rl">Weight limit</div><div class="rv">25 kg per bag</div><div class="rv">25 kg per bag</div><div class="rv">No limit</div><div class="rv">No limit</div></div>
     <div class="row"><div class="rl">Extra bag</div><div class="rv g">1 included (Elige+)</div><div class="rv w">From €5 online</div><div class="rv w">€5 online / €20 at station</div><div class="rv w">Paid add-on</div></div>
-    <div class="section-title">Special items</div>
+    <div class="stitle">Special items</div>
     <div class="row"><div class="rl">Sports equipment</div><div class="rv">Ski/snowboard free · Golf €12</div><div class="rv">Contact customer service</div><div class="rv x">Not accepted</div><div class="rv x">Not accepted</div></div>
     <div class="row"><div class="rl">Musical instruments</div><div class="rv">Small free · Large needs seat</div><div class="rv">Small free · Large needs seat</div><div class="rv">Small only (cabin size)</div><div class="rv">Small only (cabin size)</div></div>
   </div>
@@ -172,16 +180,16 @@
       <div class="ch"><img src="https://static.omio.design/web/logos/21/RenfeAVE.png" alt=""> Renfe AVE</div>
       <div class="ch"><img src="https://static.omio.design/web/logos/21/iryo.png" alt=""> Iryo</div>
       <div class="ch"><img src="https://static.omio.design/web/logos/21/sncf-ouigo.png" alt=""> OUIGO</div>
-      <div class="ch"><img src="https://static.omio.design/web/logos/42/RenfeAVLO.png" alt="" style="width:18px;height:18px;border-radius:4px"> Avlo</div>
+      <div class="ch"><img src="https://static.omio.design/web/logos/21/RenfeAVLO.png" alt=""> Avlo</div>
     </div>
-    <div class="section-title">Cancellations & Changes <span class="new">new</span></div>
+    <div class="stitle">Cancellations & Changes <span class="new">new</span></div>
     <div class="row"><div class="rl">Cancellation</div><div class="rv"><strong>Prémium:</strong> Full refund<br><strong>Elige:</strong> 80%<br><strong>Básico:</strong> Non-refundable</div><div class="rv"><strong>Infinita:</strong> Free cancel<br><strong>Singular:</strong> €10 fee<br><strong>Initial:</strong> Non-refundable</div><div class="rv">Non-refundable<br>Flex add-on €5</div><div class="rv">Non-refundable<br>Flex add-on available</div></div>
     <div class="row"><div class="rl">Ticket changes</div><div class="rv">Free (Prémium/Elige)<br>€20 (Básico)</div><div class="rv">Free (Infinita)<br>€10 (Singular)</div><div class="rv">Flex add-on required</div><div class="rv">Flex add-on required</div></div>
-    <div class="section-title">Delay compensation <span class="new">new</span></div>
+    <div class="stitle">Delay compensation <span class="new">new</span></div>
     <div class="row"><div class="rl">15–30 min late</div><div class="rv">—</div><div class="rv g">25% refund</div><div class="rv">—</div><div class="rv">—</div></div>
     <div class="row"><div class="rl">30–60 min late</div><div class="rv g">50% refund</div><div class="rv g">50% refund</div><div class="rv g">25% refund</div><div class="rv g">50% refund</div></div>
     <div class="row"><div class="rl">60+ min late</div><div class="rv g">100% refund</div><div class="rv g">100% refund</div><div class="rv g">50% refund</div><div class="rv g">100% refund</div></div>
-    <div class="section-title">Payment <span class="new">new</span></div>
+    <div class="stitle">Payment <span class="new">new</span></div>
     <div class="row"><div class="rl">Methods (via Omio)</div><div class="rv" style="font-size:11px">Visa, Mastercard, PayPal, Apple Pay, Google Pay, Klarna</div><div class="rv" style="font-size:11px">Visa, Mastercard, PayPal, Apple Pay, Google Pay, Klarna</div><div class="rv" style="font-size:11px">Visa, Mastercard, PayPal, Apple Pay, Google Pay, Klarna</div><div class="rv" style="font-size:11px">Visa, Mastercard, PayPal, Apple Pay, Google Pay, Klarna</div></div>
   </div>
 
@@ -192,13 +200,13 @@
       <div class="ch"><img src="https://static.omio.design/web/logos/21/RenfeAVE.png" alt=""> Renfe AVE</div>
       <div class="ch"><img src="https://static.omio.design/web/logos/21/iryo.png" alt=""> Iryo</div>
       <div class="ch"><img src="https://static.omio.design/web/logos/21/sncf-ouigo.png" alt=""> OUIGO</div>
-      <div class="ch"><img src="https://static.omio.design/web/logos/42/RenfeAVLO.png" alt="" style="width:18px;height:18px;border-radius:4px"> Avlo</div>
+      <div class="ch"><img src="https://static.omio.design/web/logos/21/RenfeAVLO.png" alt=""> Avlo</div>
     </div>
-    <div class="section-title">Fare classes</div>
+    <div class="stitle">Fare classes</div>
     <div class="row"><div class="rl">Budget tier</div><div class="rv"><strong>Básico</strong> from €30<br>Seat · No changes</div><div class="rv"><strong>Initial</strong> from €22<br>Seat · No changes</div><div class="rv"><strong>Standard</strong> from €22<br>Seat · Optional Flex €5</div><div class="rv"><strong>Básico</strong> from €22<br>Seat · Optional Flex</div></div>
     <div class="row"><div class="rl">Mid tier</div><div class="rv"><strong>Elige</strong> from €48<br>Seat choice · 80% refund</div><div class="rv"><strong>Singular</strong> from €35<br>Seat choice · Changes €10</div><div class="rv"><strong>Plus</strong> from €39<br>Extra bag · Flex included</div><div class="rv x">Single fare only</div></div>
     <div class="row"><div class="rl">Premium tier</div><div class="rv"><strong>Prémium</strong> from €75<br>Lounge · Meal · Full refund</div><div class="rv"><strong>Infinita</strong> from €55<br>Lounge · At-seat dining</div><div class="rv x">No premium class</div><div class="rv x">No premium class</div></div>
-    <div class="section-title">Discounts <span class="new">new</span></div>
+    <div class="stitle">Discounts <span class="new">new</span></div>
     <div class="row"><div class="rl">Children</div><div class="rv">Under 4 free<br>4–13 yrs 40% off</div><div class="rv">Under 4 free<br>4–13 yrs 40% off</div><div class="rv">Under 4 free (on lap)</div><div class="rv">Under 4 free (on lap)</div></div>
     <div class="row"><div class="rl">Youth / Student</div><div class="rv g">+Renfe Joven 50: 50% off (14–25)</div><div class="rv x">No youth discount</div><div class="rv x">No youth discount</div><div class="rv x">No youth discount</div></div>
     <div class="row"><div class="rl">Senior</div><div class="rv g">Gold Card: 25–40% off (60+)</div><div class="rv x">No senior discount</div><div class="rv x">No senior discount</div><div class="rv x">No senior discount</div></div>
@@ -212,12 +220,12 @@
       <div class="ch"><img src="https://static.omio.design/web/logos/21/RenfeAVE.png" alt=""> Renfe AVE</div>
       <div class="ch"><img src="https://static.omio.design/web/logos/21/iryo.png" alt=""> Iryo</div>
       <div class="ch"><img src="https://static.omio.design/web/logos/21/sncf-ouigo.png" alt=""> OUIGO</div>
-      <div class="ch"><img src="https://static.omio.design/web/logos/42/RenfeAVLO.png" alt="" style="width:18px;height:18px;border-radius:4px"> Avlo</div>
+      <div class="ch"><img src="https://static.omio.design/web/logos/21/RenfeAVLO.png" alt=""> Avlo</div>
     </div>
-    <div class="section-title">Accessibility <span class="new">enhanced</span></div>
+    <div class="stitle">Accessibility <span class="new">enhanced</span></div>
     <div class="row"><div class="rl">Wheelchair spaces</div><div class="rv g">Yes · Book in advance</div><div class="rv g">Yes · Book in advance</div><div class="rv g">Yes · Limited</div><div class="rv g">Yes · Limited</div></div>
     <div class="row"><div class="rl">Accessible toilets</div><div class="rv g">Available</div><div class="rv g">Available</div><div class="rv g">Available</div><div class="rv g">Available</div></div>
-    <div class="row"><div class="rl">Assistance service</div><div class="rv">Atendo service · Book 48h ahead</div><div class="rv">Book via customer service</div><div class="rv">Request at booking</div><div class="rv">Request at booking</div></div>
+    <div class="row"><div class="rl">Assistance service</div><div class="rv">Atendo · Book 48h ahead</div><div class="rv">Book via customer service</div><div class="rv">Request at booking</div><div class="rv">Request at booking</div></div>
     <div class="row"><div class="rl">Guide dogs</div><div class="rv g">Free</div><div class="rv g">Free</div><div class="rv g">Free</div><div class="rv g">Free</div></div>
   </div>
 </div>
