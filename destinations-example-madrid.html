@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Destination Highlights — Madrid</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f9f9fa; color: #132968; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .component { max-width: 800px; margin: 24px auto; background: #fff; border-radius: 16px; box-shadow: 0 1px 3px rgba(19,41,104,0.06); overflow: hidden; }
+
+  /* Collapsed wrapper */
+  .comp-toggle { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; cursor: pointer; border: none; background: none; width: 100%; text-align: left; transition: background 0.15s; }
+  .comp-toggle:hover { background: #fafafc; }
+  .comp-toggle-left { display: flex; align-items: center; gap: 12px; }
+  .comp-toggle h2 { font-size: 20px; font-weight: 700; color: #132968; }
+  .comp-toggle .toggle-sub { font-size: 13px; color: #425486; }
+  .comp-toggle .comp-chev { width: 20px; height: 20px; color: #a1a9c3; transition: transform 0.25s; flex-shrink: 0; }
+  .comp-toggle.open .comp-chev { transform: rotate(180deg); }
+  .comp-body { display: none; }
+  .comp-body.open { display: block; }
+
+  /* Season badge */
+  .season-bar { display: flex; align-items: center; gap: 8px; padding: 4px 24px 12px; }
+  .season-badge { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+  .season-spring { color: #2e7d32; background: #e8f5e9; }
+  .season-note { font-size: 12px; color: #425486; }
+
+  /* City intro */
+  .city-intro { padding: 0 24px 16px; }
+  .city-name { font-size: 20px; font-weight: 800; color: #132968; margin-bottom: 8px; }
+  .city-blurb { font-size: 14px; color: #425486; line-height: 1.7; }
+
+  /* Highlights strip */
+  .highlights { display: flex; gap: 12px; padding: 0 24px 20px; overflow-x: auto; }
+  .hl-card { flex: 0 0 200px; background: #f9f9fa; border-radius: 10px; padding: 14px; border: 1px solid #f0f0f2; }
+  .hl-card .hl-emoji { font-size: 20px; margin-bottom: 6px; }
+  .hl-card .hl-title { font-size: 13px; font-weight: 700; color: #132968; margin-bottom: 4px; }
+  .hl-card .hl-desc { font-size: 12px; color: #425486; line-height: 1.5; }
+
+  /* Expandable sections */
+  .expand { border-top: 1px solid #f0f0f2; }
+  .expand-btn { display: flex; align-items: center; gap: 10px; padding: 14px 24px; cursor: pointer; width: 100%; border: none; background: none; text-align: left; transition: background 0.15s; }
+  .expand-btn:hover { background: #fafafc; }
+  .expand-btn .e-icon { font-size: 16px; width: 24px; text-align: center; flex-shrink: 0; }
+  .expand-btn .e-title { flex: 1; font-size: 13px; font-weight: 600; color: #132968; }
+  .expand-btn .e-preview { font-size: 12px; color: #a1a9c3; margin-right: 8px; }
+  .expand-btn .e-chev { width: 16px; height: 16px; color: #a1a9c3; transition: transform 0.2s; flex-shrink: 0; }
+  .expand-btn.open .e-chev { transform: rotate(180deg); }
+  .expand-body { display: none; padding: 0 24px 16px 58px; }
+  .expand-body.open { display: block; }
+
+  /* Items */
+  .item { margin-bottom: 12px; }
+  .item .item-name { font-size: 13px; font-weight: 700; color: #132968; }
+  .item .item-detail { font-size: 12px; color: #425486; line-height: 1.5; margin-top: 2px; }
+  .item .item-meta { font-size: 11px; color: #a1a9c3; margin-top: 2px; }
+  .price { color: #0057b8; font-weight: 700; }
+  .g { color: #0a8a3e; font-weight: 600; }
+  .sep { height: 1px; background: #f0f0f2; margin: 12px 0; }
+  .tip { font-size: 12px; color: #425486; background: #f9f9fa; padding: 8px 12px; border-radius: 6px; margin-top: 8px; }
+  .tip strong { color: #132968; }
+  .seasonal { background: #fffde7; border: 1px solid #fff9c4; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; font-size: 12px; color: #f57f17; }
+  .seasonal strong { color: #e65100; }
+
+  /* Internal link styling for day trips */
+  .internal-link { color: #0057b8; text-decoration: none; font-weight: 600; border-bottom: 1px dashed #0057b8; }
+  .internal-link:hover { color: #003d82; border-bottom-style: solid; }
+
+  @media (max-width: 600px) {
+    .hl-card { flex: 0 0 170px; }
+    .expand-body { padding-left: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="component">
+
+  <!-- ======= COLLAPSED HEADER ======= -->
+  <button class="comp-toggle" onclick="toggleComponent(this)">
+    <div class="comp-toggle-left">
+      <h2>Destination Highlights</h2>
+      <span class="toggle-sub">Madrid · Attractions, day trips, dining & more</span>
+    </div>
+    <svg class="comp-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+
+  <!-- ======= COLLAPSIBLE BODY ======= -->
+  <div class="comp-body">
+
+    <div class="season-bar">
+      <span class="season-badge season-spring">Spring 2026</span>
+      <span class="season-note">Content updated for March – May. Best time to visit.</span>
+    </div>
+
+    <div class="city-intro">
+      <div class="city-name">Madrid</div>
+      <div class="city-blurb">Step off the train at Atocha and you're already in the heart of it — Retiro Park is a 5-minute walk, the Prado 10. Madrid is a city that rewards wandering: tapas in La Latina, sunset from Templo de Debod, churros at 3am at Chocolatería San Ginés. Spring is perfect — warm days, terrace season, and the San Isidro festival in May fills the streets with music and food.</div>
+    </div>
+
+    <!-- Top highlights strip -->
+    <div class="highlights">
+      <div class="hl-card">
+        <div class="hl-emoji">🎨</div>
+        <div class="hl-title">Golden Triangle of Art</div>
+        <div class="hl-desc">Prado, Reina Sofía, and Thyssen — all within a 10-minute walk of each other.</div>
+      </div>
+      <div class="hl-card">
+        <div class="hl-emoji">🍺</div>
+        <div class="hl-title">La Latina Sundays</div>
+        <div class="hl-desc">El Rastro flea market in the morning, then tapas-hopping along Calle de la Cava Baja.</div>
+      </div>
+      <div class="hl-card">
+        <div class="hl-emoji">🌳</div>
+        <div class="hl-title">Retiro Park</div>
+        <div class="hl-desc">Row a boat on the lake, find the Crystal Palace, then grab horchata at a terrace.</div>
+      </div>
+      <div class="hl-card">
+        <div class="hl-emoji">🏰</div>
+        <div class="hl-title">Royal Palace</div>
+        <div class="hl-desc">Europe's largest royal palace. Free entry for EU citizens in the last 2 hours.</div>
+      </div>
+    </div>
+
+    <!-- 1. ATTRACTIONS -->
+    <div class="expand">
+      <button class="expand-btn" onclick="toggle(this)">
+        <span class="e-icon">🎨</span>
+        <span class="e-title">Attractions</span>
+        <span class="e-preview">Prado · Reina Sofía · Royal Palace · Retiro</span>
+        <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="expand-body">
+        <div class="item">
+          <div class="item-name">Museo del Prado</div>
+          <div class="item-detail">Spain's national art museum. Velázquez's Las Meninas, Goya's dark paintings, and Bosch's Garden of Earthly Delights. Allow 2–3 hours minimum.</div>
+          <div class="item-meta">Free Mon–Sat 6–8pm, Sun 5–7pm · Full ticket <span class="price">€15</span></div>
+        </div>
+        <div class="item">
+          <div class="item-name">Reina Sofía</div>
+          <div class="item-detail">Home to Picasso's Guernica — the most powerful anti-war painting ever made. The 20th-century collection is world-class.</div>
+          <div class="item-meta">Free Mon, Wed–Sat 7–9pm, Sun 12:30–2:30pm · Full ticket <span class="price">€12</span></div>
+        </div>
+        <div class="item">
+          <div class="item-name">Royal Palace (Palacio Real)</div>
+          <div class="item-detail">Europe's largest royal palace with 3,418 rooms. The Throne Room and the Royal Armoury are standout highlights.</div>
+          <div class="item-meta">Free for EU citizens last 2 hours · Full ticket <span class="price">€12</span></div>
+        </div>
+        <div class="item">
+          <div class="item-name">Retiro Park</div>
+          <div class="item-detail">125 hectares in the city center. Row a boat on the lake, visit the Crystal Palace, or just people-watch along the promenades.</div>
+          <div class="item-meta">Free · Open 6am–midnight</div>
+        </div>
+        <div class="item">
+          <div class="item-name">Templo de Debod</div>
+          <div class="item-detail">An actual Egyptian temple, gifted to Spain in 1968. The best sunset spot in Madrid — locals gather here every evening.</div>
+          <div class="item-meta">Free · Closed Mondays</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. ACTIVITIES -->
+    <div class="expand">
+      <button class="expand-btn" onclick="toggle(this)">
+        <span class="e-icon">⚡</span>
+        <span class="e-title">Activities</span>
+        <span class="e-preview">Flamenco · Tapas tours · Football · Cooking classes</span>
+        <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="expand-body">
+        <div class="item">
+          <div class="item-name">Flamenco show</div>
+          <div class="item-detail">Corral de la Morería and Cardamomo are the top tablaos. Intimate venues where you're a metre from the dancers. Book ahead.</div>
+          <div class="item-meta">From <span class="price">€25–45</span> with a drink</div>
+        </div>
+        <div class="item">
+          <div class="item-name">Football at Santiago Bernabéu</div>
+          <div class="item-detail">Real Madrid's newly renovated stadium seats 80,000. Match tickets start around €50; stadium tours available on non-match days.</div>
+          <div class="item-meta">Tour from <span class="price">€25</span> · Match tickets from <span class="price">€50</span></div>
+        </div>
+        <div class="item">
+          <div class="item-name">Tapas walking tour</div>
+          <div class="item-detail">Guided walking tours through La Latina and Lavapiés neighborhoods. A great way to discover hidden local bars you'd never find on your own.</div>
+          <div class="item-meta">From <span class="price">€35–60</span> per person, food included</div>
+        </div>
+        <div class="item">
+          <div class="item-name">Spanish cooking class</div>
+          <div class="item-detail">Learn to make paella, tortilla española, or gazpacho. Most classes include a market visit to pick up ingredients.</div>
+          <div class="item-meta">From <span class="price">€50–80</span> per person</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. DAY TRIPS (internal linking opportunity) -->
+    <div class="expand">
+      <button class="expand-btn" onclick="toggle(this)">
+        <span class="e-icon">🚆</span>
+        <span class="e-title">Day trips from Madrid by train</span>
+        <span class="e-preview">Toledo 30 min · Segovia 27 min · Ávila 1h30</span>
+        <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="expand-body">
+        <div class="seasonal"><strong>Spring tip:</strong> Toledo and Segovia are ideal in April–May before summer heat. Book AVE tickets a few days ahead for the best prices.</div>
+        <div class="item">
+          <div class="item-name"><a href="https://www.omio.com/trains/madrid/toledo" class="internal-link">Toledo</a> — The "City of Three Cultures"</div>
+          <div class="item-detail">Medieval walled city with a cathedral, Alcázar, and El Greco paintings around every corner. Compact enough to explore in half a day.</div>
+          <div class="item-meta">🚆 30 min by AVE from Atocha · From <span class="price">€13</span> return</div>
+        </div>
+        <div class="item">
+          <div class="item-name"><a href="https://www.omio.com/trains/madrid/segovia" class="internal-link">Segovia</a> — Roman Aqueduct & Roast Suckling Pig</div>
+          <div class="item-detail">The 2,000-year-old aqueduct is jaw-dropping. Walk to the Alcázar (which inspired Disney's castle), then eat cochinillo at a local mesón.</div>
+          <div class="item-meta">🚆 27 min by AVE from Chamartín · From <span class="price">€12</span> return</div>
+        </div>
+        <div class="item">
+          <div class="item-name"><a href="https://www.omio.com/trains/madrid/avila" class="internal-link">Ávila</a> — Medieval Walls You Can Walk On</div>
+          <div class="item-detail">The best-preserved medieval walls in Europe. Walk the full circuit for panoramic views. Quieter and more atmospheric than Toledo.</div>
+          <div class="item-meta">🚆 1h 30m by Media Distancia · From <span class="price">€16</span> return</div>
+        </div>
+        <div class="item">
+          <div class="item-name"><a href="https://www.omio.com/trains/madrid/el-escorial" class="internal-link">El Escorial</a> — Philip II's Royal Monastery</div>
+          <div class="item-detail">A massive Renaissance monastery-palace in the foothills of the Sierra de Guadarrama. The library alone is worth the trip.</div>
+          <div class="item-meta">🚆 1h by Cercanías from Atocha · From <span class="price">€7</span> return</div>
+        </div>
+        <div class="item">
+          <div class="item-name"><a href="https://www.omio.com/trains/madrid/aranjuez" class="internal-link">Aranjuez</a> — Royal Gardens by the River</div>
+          <div class="item-detail">The Versailles of Spain. Stunning formal gardens, a royal palace, and strawberry fields. The historic Strawberry Train runs in spring.</div>
+          <div class="item-meta">🚆 45 min by Cercanías from Atocha · From <span class="price">€6</span> return</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. DINING -->
+    <div class="expand">
+      <button class="expand-btn" onclick="toggle(this)">
+        <span class="e-icon">🍽</span>
+        <span class="e-title">Dining</span>
+        <span class="e-preview">Tapas · Cocido · Bocadillo de calamares · Churros</span>
+        <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="expand-body">
+        <div class="item">
+          <div class="item-name">Must-try dishes</div>
+          <div class="item-detail">Cocido madrileño (hearty chickpea stew, served in courses) · Bocadillo de calamares (fried squid sandwich — a Madrid thing) · Churros con chocolate at San Ginés (open since 1894, busiest at 3am) · Patatas bravas · Tortilla española</div>
+        </div>
+        <div class="sep"></div>
+        <div class="item">
+          <div class="item-name">La Latina — Tapas capital</div>
+          <div class="item-detail">Calle de la Cava Baja is wall-to-wall tapas bars. Try Casa Lucas for patatas bravas or Juana La Loca for their famous tortilla pintxo.</div>
+        </div>
+        <div class="item">
+          <div class="item-name">Mercado de San Miguel</div>
+          <div class="item-detail">Gourmet tapas market right off Plaza Mayor. Pricier than neighborhood bars but great for a first-night sampler of Spanish food.</div>
+        </div>
+        <div class="item">
+          <div class="item-name">Mercado de San Fernando (Lavapiés)</div>
+          <div class="item-detail">The local alternative — multicultural food stalls, natural wines, and a crowd that's 90% madrileños. Thursday and Friday evenings are best.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. BUDGET -->
+    <div class="expand">
+      <button class="expand-btn" onclick="toggle(this)">
+        <span class="e-icon">💰</span>
+        <span class="e-title">Budget</span>
+        <span class="e-preview">Meals €8–45 · Metro €1.50 · Museums free evenings</span>
+        <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="expand-body">
+        <div class="item">
+          <div class="item-name">Eating</div>
+          <div class="item-detail">A casual meal with a drink: <span class="price">€8–12</span>. A sit-down dinner: <span class="price">€25–45</span>. Menú del día (set lunch) is the best deal at <span class="price">€12–16</span> for 3 courses + drink.</div>
+        </div>
+        <div class="item">
+          <div class="item-name">Transport</div>
+          <div class="item-detail">Metro single: <span class="price">€1.50</span>. 10-trip pass: <span class="price">€12.20</span>. Tourist day pass from <span class="price">€8.40</span>.</div>
+        </div>
+        <div class="item">
+          <div class="item-name">Sightseeing</div>
+          <div class="item-detail">Major museums offer free evening hours. Retiro Park, Templo de Debod, and many churches are always free. Budget <span class="price">€30–50/day</span> for a comfortable visit with attractions.</div>
+        </div>
+        <div class="tip"><strong>Money-saving tip:</strong> The menú del día is available at most restaurants Mon–Fri lunchtime. It's how locals eat well on a budget — 3 courses, bread, drink, and sometimes dessert for <span class="price">€12–16</span>.</div>
+      </div>
+    </div>
+
+    <!-- 6. NEIGHBORHOODS -->
+    <div class="expand">
+      <button class="expand-btn" onclick="toggle(this)">
+        <span class="e-icon">🏘</span>
+        <span class="e-title">Neighborhoods</span>
+        <span class="e-preview">La Latina · Malasaña · Chueca · Lavapiés</span>
+        <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="expand-body">
+        <div class="item">
+          <div class="item-name">La Latina</div>
+          <div class="item-detail">The tapas heart of Madrid. Go on Sunday for El Rastro flea market, then spend the afternoon bar-hopping along Cava Baja and Cava Alta.</div>
+        </div>
+        <div class="item">
+          <div class="item-name">Malasaña</div>
+          <div class="item-detail">Madrid's creative and vintage quarter. Plaza del Dos de Mayo for weekend vermú, independent shops, street art, and late-night bars.</div>
+        </div>
+        <div class="item">
+          <div class="item-name">Chueca</div>
+          <div class="item-detail">Madrid's LGBTQ+ neighborhood — stylish boutiques, rooftop bars, and the liveliest terrace scene in the city. Especially vibrant during Pride in July.</div>
+        </div>
+        <div class="item">
+          <div class="item-name">Lavapiés</div>
+          <div class="item-detail">Madrid's most multicultural barrio. Indian, Senegalese, and Chinese restaurants next to traditional Spanish bars. The Tabacalera art center is worth a look.</div>
+        </div>
+        <div class="item">
+          <div class="item-name">Salamanca</div>
+          <div class="item-detail">Upscale Madrid. Designer shopping on Calle Serrano, fine dining, and beautiful 19th-century architecture. A different side of the city.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. ACCOMMODATION -->
+    <div class="expand">
+      <button class="expand-btn" onclick="toggle(this)">
+        <span class="e-icon">🏨</span>
+        <span class="e-title">Accommodation</span>
+        <span class="e-preview">Where to stay by budget & style</span>
+        <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="expand-body">
+        <div class="item">
+          <div class="item-name">Budget — Hostels & budget hotels</div>
+          <div class="item-detail">Madrid has excellent hostels in the center. The Hat, Way Hostel, and Cats Hostel are highly rated and right by Sol/La Latina. Dorm beds from <span class="price">€18–30</span>/night.</div>
+        </div>
+        <div class="item">
+          <div class="item-name">Mid-range — Boutique hotels</div>
+          <div class="item-detail">Gran Vía and Malasaña have great 3–4 star options. Expect <span class="price">€80–140</span>/night. Look for hotels near Sol or Atocha for easy access to trains and sights.</div>
+        </div>
+        <div class="item">
+          <div class="item-name">Upscale — Luxury & design hotels</div>
+          <div class="item-detail">The Salamanca district and Paseo del Prado area have Madrid's best luxury hotels, including the new Four Seasons and the Mandarin Oriental Ritz. From <span class="price">€250</span>/night.</div>
+        </div>
+        <div class="tip"><strong>Best area to stay:</strong> Sol/La Latina for nightlife and tapas. Near Atocha if you're arriving/departing by train. Malasaña for a local, creative vibe. Salamanca for upscale and quiet.</div>
+      </div>
+    </div>
+
+    <!-- 8. SAFETY -->
+    <div class="expand">
+      <button class="expand-btn" onclick="toggle(this)">
+        <span class="e-icon">🛡</span>
+        <span class="e-title">Safety</span>
+        <span class="e-preview">Generally very safe · Pickpocket tips</span>
+        <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="expand-body">
+        <div class="item">
+          <div class="item-name">Overall safety</div>
+          <div class="item-detail">Madrid is one of Europe's safest capital cities. The city center is busy and well-lit at night, and public transport feels safe even late. Emergency number: 112.</div>
+        </div>
+        <div class="item">
+          <div class="item-name">Pickpockets</div>
+          <div class="item-detail">The main risk for tourists. Watch your belongings around Sol, Gran Vía, Plaza Mayor, and on the metro during rush hour. Use a front pocket or crossbody bag. Be wary of people approaching with clipboards or "petitions."</div>
+        </div>
+        <div class="item">
+          <div class="item-name">Late-night safety</div>
+          <div class="item-detail">Madrid is famously a late-night city — restaurants are full at 11pm, bars at 1am. Most central neighborhoods feel safe late. Stick to busier streets in Lavapiés and around Atocha after dark.</div>
+        </div>
+        <div class="tip"><strong>Tip:</strong> Pharmacies (look for the green cross) are everywhere and can advise on minor health issues without needing a doctor. Most have English-speaking staff.</div>
+      </div>
+    </div>
+
+    <!-- 9. USEFUL APPS -->
+    <div class="expand">
+      <button class="expand-btn" onclick="toggle(this)">
+        <span class="e-icon">📱</span>
+        <span class="e-title">Useful apps</span>
+        <span class="e-preview">Omio · Citymapper · Google Translate</span>
+        <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="expand-body">
+        <div class="item">
+          <div class="item-name">Omio</div>
+          <div class="item-detail">Book trains, buses, and flights across Europe. Handy for booking day trips to Toledo, Segovia, and other nearby cities directly from Madrid.</div>
+        </div>
+        <div class="item">
+          <div class="item-name">Citymapper or Google Maps</div>
+          <div class="item-detail">Both work well for Madrid metro/bus routing. Citymapper includes real-time departures and tells you which carriage to board.</div>
+        </div>
+        <div class="item">
+          <div class="item-name">Google Translate</div>
+          <div class="item-detail">Download the Spanish language pack for offline use. The camera mode is great for reading menus and signs.</div>
+        </div>
+        <div class="item">
+          <div class="item-name">Free Now / Cabify</div>
+          <div class="item-detail">Ride-hailing apps that work in Madrid. Useful for late-night trips or getting to/from the train station with luggage.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10. PACKING -->
+    <div class="expand">
+      <button class="expand-btn" onclick="toggle(this)">
+        <span class="e-icon">🎒</span>
+        <span class="e-title">Packing tips</span>
+        <span class="e-preview">Spring: layers · Comfortable shoes · Sun protection</span>
+        <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="expand-body">
+        <div class="seasonal"><strong>Spring packing:</strong> Madrid in March–May means warm days (18–25°C) and cooler evenings (8–12°C). Layers are essential.</div>
+        <div class="item">
+          <div class="item-name">Clothing</div>
+          <div class="item-detail">Light layers for daytime, a jacket for evenings. Madrid is a walking city — comfortable shoes are non-negotiable. A light scarf is handy for cooler evenings and visiting churches.</div>
+        </div>
+        <div class="item">
+          <div class="item-name">Sun protection</div>
+          <div class="item-detail">Even in spring, Madrid sun is strong (altitude 650m). Pack sunglasses and sunscreen. A hat is useful for day trips to Toledo/Segovia where shade is scarce.</div>
+        </div>
+        <div class="item">
+          <div class="item-name">Extras</div>
+          <div class="item-detail">A refillable water bottle (Madrid's tap water is excellent). A small daypack for day trips. A portable charger if you're using your phone for navigation all day.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 11. CURRENCY & PAYMENTS -->
+    <div class="expand">
+      <button class="expand-btn" onclick="toggle(this)">
+        <span class="e-icon">💳</span>
+        <span class="e-title">Currency & payments</span>
+        <span class="e-preview">Euro (€) · Cards widely accepted · Tipping optional</span>
+        <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="expand-body">
+        <div class="item">
+          <div class="item-name">Currency</div>
+          <div class="item-detail">Euro (€). Spain uses the euro, so no currency exchange needed if you're coming from another eurozone country.</div>
+        </div>
+        <div class="item">
+          <div class="item-name">Cards & cash</div>
+          <div class="item-detail">Credit and debit cards (Visa, Mastercard) are accepted almost everywhere, including small tapas bars and metro ticket machines. Contactless payments are standard. Keep some small cash (€20–30) for market stalls and very small bars.</div>
+        </div>
+        <div class="item">
+          <div class="item-name">ATMs</div>
+          <div class="item-detail">Widely available. Use bank ATMs (Santander, BBVA, CaixaBank) to avoid fees. Decline "dynamic currency conversion" — always pay in euros.</div>
+        </div>
+        <div class="item">
+          <div class="item-name">Tipping</div>
+          <div class="item-detail">Not expected in Spain. Locals might round up or leave a euro for good service. In upscale restaurants, 5–10% is generous. Never expected in bars or taxis.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Getting around (kept from original) -->
+    <div class="expand">
+      <button class="expand-btn" onclick="toggle(this)">
+        <span class="e-icon">🗺</span>
+        <span class="e-title">Getting around Madrid</span>
+        <span class="e-preview">Metro €1.50 · 10-trip €12.20 · Taxi base €2.50</span>
+        <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="expand-body">
+        <div class="item">
+          <div class="item-name">Metro</div>
+          <div class="item-detail">13 lines covering the whole city. Single ticket <span class="price">€1.50</span>. 10-trip pass <span class="price">€12.20</span>. Runs 6am–1:30am.</div>
+        </div>
+        <div class="item">
+          <div class="item-name">Tourist card</div>
+          <div class="item-detail">Madrid Tourist Transport Pass: unlimited metro, bus, and Cercanías. Zone A from <span class="price">€8.40/day</span>.</div>
+        </div>
+        <div class="item">
+          <div class="item-name">Taxi</div>
+          <div class="item-detail">Base fare <span class="price">€2.50</span> + <span class="price">€1.05/km</span>. Uber and Cabify also available. Fixed airport fare <span class="price">€30</span>.</div>
+        </div>
+        <div class="tip"><strong>Tip:</strong> Madrid's center is very walkable. From Atocha to Puerta del Sol is 20 minutes on foot, and you'll pass the Prado, Neptune fountain, and Plaza de Cibeles on the way.</div>
+      </div>
+    </div>
+
+  </div><!-- /comp-body -->
+</div><!-- /component -->
+
+<script>
+// Component-level toggle (collapsed by default)
+function toggleComponent(btn) {
+  btn.classList.toggle('open');
+  btn.nextElementSibling.classList.toggle('open');
+}
+
+// Section-level toggle
+function toggle(btn) {
+  btn.classList.toggle('open');
+  btn.nextElementSibling.classList.toggle('open');
+}
+</script>
+</body>
+</html>
