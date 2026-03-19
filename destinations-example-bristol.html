@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Destination Highlights - Bristol</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f9f9fa; color: #132968; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    .component { max-width: 800px; margin: 24px auto; background: #fff; border-radius: 16px; box-shadow: 0 1px 3px rgba(19,41,104,0.06); overflow: hidden; }
+    .comp-toggle { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; cursor: pointer; border: none; background: none; width: 100%; text-align: left; transition: background 0.15s; }
+    .comp-toggle:hover { background: #fafafc; }
+    .comp-toggle-left { display: flex; align-items: center; gap: 12px; }
+    .comp-toggle h2 { font-size: 20px; font-weight: 700; color: #132968; }
+    .comp-toggle .toggle-sub { font-size: 13px; color: #425486; }
+    .comp-toggle .comp-chev { width: 20px; height: 20px; color: #a1a9c3; transition: transform 0.25s; flex-shrink: 0; }
+    .comp-toggle.open .comp-chev { transform: rotate(180deg); }
+    .comp-body { display: none; }
+    .comp-body.open { display: block; }
+    .season-bar { display: flex; align-items: center; gap: 8px; padding: 4px 24px 12px; }
+    .season-badge { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+    .season-spring { color: #2e7d32; background: #e8f5e9; }
+    .season-note { font-size: 12px; color: #425486; }
+    .city-intro { padding: 0 24px 16px; }
+    .city-name { font-size: 20px; font-weight: 800; color: #132968; margin-bottom: 8px; }
+    .city-blurb { font-size: 14px; color: #425486; line-height: 1.7; }
+    .highlights { display: flex; gap: 12px; padding: 0 24px 20px; overflow-x: auto; }
+    .hl-card { flex: 0 0 200px; background: #f9f9fa; border-radius: 10px; padding: 14px; border: 1px solid #f0f0f2; }
+    .hl-card .hl-emoji { font-size: 20px; margin-bottom: 6px; }
+    .hl-card .hl-title { font-size: 13px; font-weight: 700; color: #132968; margin-bottom: 4px; }
+    .hl-card .hl-desc { font-size: 12px; color: #425486; line-height: 1.5; }
+    .expand { border-top: 1px solid #f0f0f2; }
+    .expand-btn { display: flex; align-items: center; gap: 10px; padding: 14px 24px; cursor: pointer; width: 100%; border: none; background: none; text-align: left; transition: background 0.15s; }
+    .expand-btn:hover { background: #fafafc; }
+    .expand-btn .e-icon { font-size: 16px; width: 24px; text-align: center; flex-shrink: 0; }
+    .expand-btn .e-title { flex: 1; font-size: 13px; font-weight: 600; color: #132968; }
+    .expand-btn .e-preview { font-size: 12px; color: #a1a9c3; margin-right: 8px; }
+    .expand-btn .e-chev { width: 16px; height: 16px; color: #a1a9c3; transition: transform 0.2s; flex-shrink: 0; }
+    .expand-btn.open .e-chev { transform: rotate(180deg); }
+    .expand-body { display: none; padding: 0 24px 16px 58px; }
+    .expand-body.open { display: block; }
+    .item { margin-bottom: 12px; }
+    .item .item-name { font-size: 13px; font-weight: 700; color: #132968; }
+    .item .item-detail { font-size: 12px; color: #425486; line-height: 1.5; margin-top: 2px; }
+    .item .item-meta { font-size: 11px; color: #a1a9c3; margin-top: 2px; }
+    .price { color: #0057b8; font-weight: 700; }
+    .sep { height: 1px; background: #f0f0f2; margin: 12px 0; }
+    .tip { font-size: 12px; color: #425486; background: #f9f9fa; padding: 8px 12px; border-radius: 6px; margin-top: 8px; }
+    .tip strong { color: #132968; }
+    .seasonal { background: #fffde7; border: 1px solid #fff9c4; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; font-size: 12px; color: #f57f17; }
+    .seasonal strong { color: #e65100; }
+    .internal-link { color: #0057b8; text-decoration: none; font-weight: 600; border-bottom: 1px dashed #0057b8; }
+    .internal-link:hover { color: #003d82; border-bottom-style: solid; }
+    @media (max-width: 600px) {
+      .hl-card { flex: 0 0 170px; }
+      .expand-body { padding-left: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="component">
+    <button class="comp-toggle open" onclick="toggleComponent(this)">
+      <div class="comp-toggle-left">
+        <h2>Bristol</h2>
+        <span class="toggle-sub">Destination Highlights</span>
+      </div>
+      <svg class="comp-chev" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+      </svg>
+    </button>
+    <div class="comp-body open">
+      <div class="season-bar">
+        <span class="season-badge season-spring">Spring 2026</span>
+        <span class="season-note">Best time to explore outdoor attractions</span>
+      </div>
+      <div class="city-intro">
+        <div class="city-name">Bristol</div>
+        <div class="city-blurb">A vibrant, creative city famous as Banksy's hometown and the birthplace of iconic street art. Bristol blends cutting-edge culture with Georgian architecture, a thriving harbourside, and an independent spirit. From world-class museums to a legendary music scene, this is where tradition meets innovation.</div>
+      </div>
+      <div class="highlights">
+        <div class="hl-card">
+          <div class="hl-emoji">🎨</div>
+          <div class="hl-title">Street Art</div>
+          <div class="hl-desc">Banksy's hometown with constantly evolving murals and galleries</div>
+        </div>
+        <div class="hl-card">
+          <div class="hl-emoji">🌉</div>
+          <div class="hl-title">Clifton Suspension Bridge</div>
+          <div class="hl-desc">Iconic Victorian engineering over Avon Gorge</div>
+        </div>
+        <div class="hl-card">
+          <div class="hl-emoji">⛵</div>
+          <div class="hl-title">SS Great Britain</div>
+          <div class="hl-desc">Brunel's historic ship and museum in the harbour</div>
+        </div>
+        <div class="hl-card">
+          <div class="hl-emoji">🏘️</div>
+          <div class="hl-title">Harbourside</div>
+          <div class="hl-desc">Waterfront promenade with cafes, galleries, and culture</div>
+        </div>
+      </div>
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🏛️</span>
+          <span class="e-title">Attractions</span>
+          <span class="e-preview">6 must-see sites</span>
+          <svg class="e-chev" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M4.293 6.293a1 1 0 011.414 0L8 8.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Clifton Suspension Bridge</div>
+            <div class="item-detail">Isambard Kingdom Brunel's masterpiece spanning the Avon Gorge. Walk across for panoramic views, visit the exhibition centre for engineering history.</div>
+            <div class="item-meta">Admission: £8 | Open daily 9am-6pm</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">SS Great Britain</div>
+            <div class="item-detail">Brunel's revolutionary iron ship, now a museum. Explore the historic vessel, engine rooms, and interactive exhibits about Victorian innovation.</div>
+            <div class="item-meta">Admission: £18.95 | Open daily 10am-5:30pm</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Bristol Museum & Art Gallery</div>
+            <div class="item-detail">World-class collection spanning Egyptian mummies, natural history, and contemporary art. Free entry to permanent collections.</div>
+            <div class="item-meta">Free admission | Open daily 10am-6pm</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">M Shed</div>
+            <div class="item-detail">Waterfront museum in a Georgian warehouse. Explore Bristol's history from slavery to street art, with interactive displays.</div>
+            <div class="item-meta">Free admission | Open daily 10am-5pm</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Banksy Trail</div>
+            <div class="item-detail">Self-guided or guided tours of famous street art including the Girl with the Pierced Eardrum, Mild Mild West, and ever-changing murals.</div>
+            <div class="item-meta">Free (self-guided) | Guided tours from £12</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Cabot Tower</div>
+            <div class="item-detail">16th-century tower in Brandon Hill Park offering 360-degree views over Bristol. Climb the 98 steps for stunning vistas.</div>
+            <div class="item-meta">Free admission | Open daily 10am-4pm</div>
+          </div>
+        </div>
+      </div>
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🎯</span>
+          <span class="e-title">Activities</span>
+          <span class="e-preview">5 experiences</span>
+          <svg class="e-chev" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M4.293 6.293a1 1 0 011.414 0L8 8.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Street Art Walking Tour</div>
+            <div class="item-detail">Guided exploration of Bristol's famous murals and graffiti art. Learn the stories behind iconic pieces and emerging artists in Stokes Croft.</div>
+            <div class="item-meta">£12-15 per person | 2-3 hours</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Harbour Boat Trip</div>
+            <div class="item-detail">Scenic cruise on the Avon harbour. See the city from the water, pass historic vessels, and enjoy commentary on local landmarks.</div>
+            <div class="item-meta">£8-10 per person | 30-45 minutes</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Climbing at The Climbing Academy</div>
+            <div class="item-detail">Indoor climbing gym with routes for all levels. State-of-the-art facility with bouldering walls, ropes, and instruction available.</div>
+            <div class="item-meta">Day pass: £14 | Open daily</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Live Music</div>
+            <div class="item-detail">Catch live gigs at iconic venues. Thekla (world music on a cargo ship), The Fleece (indie and alternative), and many intimate clubs.</div>
+            <div class="item-meta">Tickets: £8-30 depending on artist</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Hot Air Balloon Rides</div>
+            <div class="item-detail">Float over the Avon Gorge and Bristol countryside at sunrise or sunset. Champagne toast and flight certificate included.</div>
+            <div class="item-meta">From £150 per person | 2 hours total</div>
+          </div>
+        </div>
+      </div>
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🚂</span>
+          <span class="e-title">Day Trips</span>
+          <span class="e-preview">5 destinations</span>
+          <svg class="e-chev" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M4.293 6.293a1 1 0 011.414 0L8 8.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name"><a href="https://www.omio.com/trains/bristol/bath" class="internal-link">Bath</a></div>
+            <div class="item-detail">Georgian honey-stone architecture, Roman Baths, and literary heritage. Compact city perfect for a half-day excursion.</div>
+            <div class="item-meta">12 minutes by train | £4-8 return</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name"><a href="https://www.omio.com/trains/bristol/cardiff" class="internal-link">Cardiff</a></div>
+            <div class="item-detail">Welsh capital with Cardiff Castle, vibrant bay area, and Caerphilly Castle nearby. Rich culture and friendly atmosphere.</div>
+            <div class="item-meta">50 minutes by train | £8-12 return</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name"><a href="https://www.omio.com/trains/bristol/exeter" class="internal-link">Exeter</a></div>
+            <div class="item-detail">Devon's historic city with cathedral, river walks, and access to the coast. Charming market town with Roman heritage.</div>
+            <div class="item-meta">1 hour 15 minutes by train | £12-18 return</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name"><a href="https://www.omio.com/trains/bristol/glastonbury" class="internal-link">Glastonbury</a></div>
+            <div class="item-detail">Mystical hilltop town with Glastonbury Tor, historic abbey, and spiritual atmosphere. Gateway to Somerset Levels.</div>
+            <div class="item-meta">1 hour by train/bus | £8-12 return</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name"><a href="https://www.omio.com/trains/bristol/wells" class="internal-link">Wells</a></div>
+            <div class="item-detail">England's smallest city with stunning medieval cathedral, picturesque high street, and Mendip Hills nearby.</div>
+            <div class="item-meta">50 minutes by bus | £6-10 return</div>
+          </div>
+        </div>
+      </div>
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🍽️</span>
+          <span class="e-title">Dining</span>
+          <span class="e-preview">5 recommendations</span>
+          <svg class="e-chev" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M4.293 6.293a1 1 0 011.414 0L8 8.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">St. Nicholas Market</div>
+            <div class="item-detail">Historic covered market with global street food stalls. Authentic cuisines from Thai to Mexican, all under one roof. Great for lunch on a budget.</div>
+            <div class="item-meta">Meals from £8-15 | Open daily</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Stokes Croft Food Scene</div>
+            <div class="item-detail">Bohemian neighbourhood full of independent cafes, vegan restaurants, and quirky eateries. Heart of Bristol's creative culinary culture.</div>
+            <div class="item-meta">Budget-friendly | £12-20 per meal</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Independent Restaurants</div>
+            <div class="item-detail">Bristol boasts excellent independent dining. Look for harbourside bistros, farm-to-table concepts, and award-winning chefs in converted warehouses.</div>
+            <div class="item-meta">Mains: £14-24 | Advance booking recommended</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Cider Culture</div>
+            <div class="item-detail">Bristol is cider country. Visit cider bars like The Hive and order local West Country ciders paired with traditional pub food.</div>
+            <div class="item-meta">Ciders: £4-6 per pint | Food: £10-16</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Wapping Wharf</div>
+            <div class="item-detail">Trendy harbour development with shipping container restaurants, craft beer bars, and fine dining options. Waterfront dining experience.</div>
+            <div class="item-meta">£15-35 per meal | Atmosphere: casual to upscale</div>
+          </div>
+          <div class="tip"><strong>Tip:</strong> Bristol has excellent vegetarian and vegan options. Many restaurants cater to dietary requirements; ask ahead.</div>
+        </div>
+      </div>
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">💰</span>
+          <span class="e-title">Budget</span>
+          <span class="e-preview">Mid-range UK city</span>
+          <svg class="e-chev" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M4.293 6.293a1 1 0 011.414 0L8 8.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Accommodation</div>
+            <div class="item-detail"><span class="price">Budget:</span> £35-60/night | <span class="price">Mid-range:</span> £70-120/night | <span class="price">Luxury:</span> £150-300/night</div>
+            <div class="item-meta">Hostels to boutique hotels available</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Meals</div>
+            <div class="item-detail"><span class="price">Budget meal:</span> £7-12 | <span class="price">Mid-range dinner:</span> £18-28 | <span class="price">Street food:</span> £6-10</div>
+            <div class="item-meta">St. Nicholas Market offers best value</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Transport</div>
+            <div class="item-detail"><span class="price">Bus single ticket:</span> £2.10 | <span class="price">Day pass:</span> £5 | <span class="price">Weekly ticket:</span> £18.50</div>
+            <div class="item-meta">Contactless payment available. Ferries: £2.50</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Attractions</div>
+            <div class="item-detail">Many museums free (Bristol Museum, M Shed). Paid attractions £8-20 each. Multi-attraction discounts available.</div>
+            <div class="item-meta">Plan free museum days to save</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Typical Daily Budget</div>
+            <div class="item-detail"><span class="price">Budget traveller:</span> £50-75/day | <span class="price">Comfortable:</span> £100-150/day</div>
+            <div class="item-meta">Excludes accommodation; includes food and attractions</div>
+          </div>
+          <div class="tip"><strong>Tip:</strong> Bristol offers many free activities: walk the harbourside, explore street art, visit parks, and browse independent shops.</div>
+        </div>
+      </div>
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🏘️</span>
+          <span class="e-title">Neighborhoods</span>
+          <span class="e-preview">6 areas to explore</span>
+          <svg class="e-chev" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M4.293 6.293a1 1 0 011.414 0L8 8.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Clifton</div>
+            <div class="item-detail">Upscale village-like neighbourhood with Georgian townhouses, antique shops, and the Suspension Bridge. Great for fine dining and leisurely walks.</div>
+            <div class="item-meta">Elegant, quieter, worth visiting</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Harbourside</div>
+            <div class="item-detail">Waterfront district with cafes, galleries, restaurants, and museums. Vibrant atmosphere with street performers and cultural events.</div>
+            <div class="item-meta">Central, lively, family-friendly</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Stokes Croft</div>
+            <div class="item-detail">Bristol's creative heart. Street art, independent shops, vegan restaurants, bookstores, and live music venues. Bohemian and artistic vibe.</div>
+            <div class="item-meta">Eclectic, budget-friendly, essential</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Bedminster</div>
+            <div class="item-detail">South Bristol neighbourhood with independent shops, cafes, and restaurants. More residential but increasingly trendy with cool bars and communities.</div>
+            <div class="item-meta">Up-and-coming, authentic, local</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Gloucester Road</div>
+            <div class="item-detail">One of Europe's longest independent shopping streets. Vintage shops, world food stores, quirky cafes, and music venues. Eclectic and colourful.</div>
+            <div class="item-meta">Unique, walkable, great for browsing</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Montpelier</div>
+            <div class="item-detail">Creative neighbourhood with street art, independent restaurants, yoga studios, and cultural venues. Young, diverse, and increasingly fashionable.</div>
+            <div class="item-meta">Hip, diverse, family-friendly</div>
+          </div>
+        </div>
+      </div>
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🛏️</span>
+          <span class="e-title">Accommodation</span>
+          <span class="e-preview">3 price ranges</span>
+          <svg class="e-chev" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M4.293 6.293a1 1 0 011.414 0L8 8.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Budget Accommodation</div>
+            <div class="item-detail">Hostels: SYHA Bristol, St. Pauls Backpackers. Basic private rooms and shared dorms with good communal facilities. Central locations.</div>
+            <div class="item-meta">£35-60 per night | Social atmosphere</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Mid-Range Hotels</div>
+            <div class="item-detail">3-star properties near Harbourside or city centre. Comfort Inn, Travelodge, independent boutique hotels. Good value with modern amenities.</div>
+            <div class="item-meta">£70-120 per night | Reliable comfort</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Luxury Accommodation</div>
+            <div class="item-detail">5-star hotels like Avon Gorge Hotel (Clifton), Harbour Hotel, and luxury Airbnbs. Fine dining, spa facilities, premium service.</div>
+            <div class="item-meta">£150-300+ per night | Premium experience</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Apartment Rentals</div>
+            <div class="item-detail">Airbnb and local platforms offer furnished flats across neighbourhoods. Good option for longer stays and families seeking kitchen facilities.</div>
+            <div class="item-meta">£60-150 per night depending on location</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Best Areas to Stay</div>
+            <div class="item-detail">Harbourside for central location and events. Clifton for quiet luxury. Stokes Croft for independent vibe. Bedminster for local authenticity.</div>
+            <div class="item-meta">Choose based on your travel style</div>
+          </div>
+          <div class="tip"><strong>Tip:</strong> Book accommodation early, especially during spring events, music festivals, and weekends when rates increase significantly.</div>
+        </div>
+      </div>
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🔒</span>
+          <span class="e-title">Safety</span>
+          <span class="e-preview">Standard UK city guidance</span>
+          <svg class="e-chev" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M4.293 6.293a1 1 0 011.414 0L8 8.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">General Safety</div>
+            <div class="item-detail">Bristol is generally safe for tourists. Central areas like Harbourside, city centre, and main shopping streets are well-populated and secure.</div>
+            <div class="item-meta">Low crime rate in tourist zones</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Petty Crime</div>
+            <div class="item-detail">Watch for pickpockets in crowded areas and on public transport. Keep valuables secure, avoid leaving belongings unattended, don't flash expensive items.</div>
+            <div class="item-meta">Standard urban precautions apply</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Night Safety</div>
+            <div class="item-detail">The city centre is safe at night with good street lighting and police presence. Avoid isolated areas. Use licensed taxis or Uber; avoid unmarked cabs.</div>
+            <div class="item-meta">Stay aware, travel in groups when possible</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Areas to Avoid</div>
+            <div class="item-detail">Some outer neighbourhoods are less touristy but generally safe. Stick to main streets and well-lit areas. Avoid very late-night walks alone.</div>
+            <div class="item-meta">Neighbourhoods are generally friendly</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Emergency Contacts</div>
+            <div class="item-detail">Police, Fire, Ambulance: 999 | Non-emergency police: 101 | NHS Direct: 111</div>
+            <div class="item-meta">Free calls from any phone</div>
+          </div>
+          <div class="tip"><strong>Tip:</strong> Bristol is a very welcoming city. Locals are friendly and helpful. Don't hesitate to ask for directions or advice from residents.</div>
+        </div>
+      </div>
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">📱</span>
+          <span class="e-title">Useful Apps</span>
+          <span class="e-preview">5 essential apps</span>
+          <svg class="e-chev" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M4.293 6.293a1 1 0 011.414 0L8 8.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Omio</div>
+            <div class="item-detail">Book train and coach tickets across the UK and Europe. Find best prices for day trips to Bath, Cardiff, and beyond.</div>
+            <div class="item-meta">Essential for transport planning</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">First Bus App</div>
+            <div class="item-detail">Real-time bus tracking, route planning, and ticket booking for Bristol's main bus operator. Check arrivals and plan journeys.</div>
+            <div class="item-meta">Required for local public transport</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Google Maps</div>
+            <div class="item-detail">Navigation, walking routes, restaurant reviews, and live traffic updates. Works brilliantly in Bristol for getting around.</div>
+            <div class="item-meta">Download offline maps before visiting</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Voi Scooters</div>
+            <div class="item-detail">Electric scooter sharing for quick journeys around the city. Affordable and eco-friendly alternative to taxis for short distances.</div>
+            <div class="item-meta">£0.50 unlock + £0.20/minute</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">TripAdvisor & Google Reviews</div>
+            <div class="item-detail">Restaurant recommendations, attraction reviews, and traveller photos. Read recent reviews to find authentic Bristol experiences.</div>
+            <div class="item-meta">Research before booking</div>
+          </div>
+        </div>
+      </div>
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🎒</span>
+          <span class="e-title">Packing Tips</span>
+          <span class="e-preview">Essentials for Bristol</span>
+          <svg class="e-chev" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M4.293 6.293a1 1 0 011.414 0L8 8.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Rain Jacket</div>
+            <div class="item-detail">ESSENTIAL. Bristol gets rain year-round, especially in spring. A lightweight, packable waterproof jacket is invaluable for outdoor exploring.</div>
+            <div class="item-meta">Non-negotiable item</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Layers</div>
+            <div class="item-detail">Spring weather is changeable. Bring a mix of t-shirts, jumpers, and a cardigan. Layer up for unpredictable temperatures throughout the day.</div>
+            <div class="item-meta">Pack versatile, flexible clothing</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Comfortable Walking Shoes</div>
+            <div class="item-detail">Bristol is best explored on foot. Bring supportive trainers or walking shoes for traversing hills, cobblestones, and long urban walks.</div>
+            <div class="item-meta">Quality shoes essential</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Umbrella</div>
+            <div class="item-detail">Compact umbrella for sudden showers. Many locals use lightweight travel umbrellas given Bristol's rainy climate.</div>
+            <div class="item-meta">Small and practical</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Sunscreen & Sunglasses</div>
+            <div class="item-detail">Spring sun can be deceptive. Bring SPF 30+ and shades for sunny days exploring harbourside and street art areas.</div>
+            <div class="item-meta">Health and comfort</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Power Bank</div>
+            <div class="item-detail">Keep your phone charged for navigation, apps, and photos. Public charging points are available but a power bank is convenient.</div>
+            <div class="item-meta">Practical for day trips</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Reusable Water Bottle</div>
+            <div class="item-detail">Tap water is excellent in Bristol. Bring a refillable bottle to stay hydrated, save money, and reduce plastic waste.</div>
+            <div class="item-meta">Eco-friendly and economical</div>
+          </div>
+          <div class="tip"><strong>Tip:</strong> Pack light and smart. Bristol is walkable and hilly; unnecessary luggage becomes a burden. Leave bulky items in accommodation and explore with a day backpack.</div>
+        </div>
+      </div>
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">💷</span>
+          <span class="e-title">Currency & Payments</span>
+          <span class="e-preview">GBP, contactless everywhere</span>
+          <svg class="e-chev" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M4.293 6.293a1 1 0 011.414 0L8 8.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Currency</div>
+            <div class="item-detail">British Pound Sterling (GBP). £1 = 100 pence. Coins: 1p, 2p, 5p, 10p, 20p, 50p, £1, £2. Notes: £5, £10, £20, £50.</div>
+            <div class="item-meta">Official currency</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Contactless Payment</div>
+            <div class="item-detail">Everywhere accepts contactless cards and mobile payments (Apple Pay, Google Pay). Minimum spend limits rarely enforced. Preferred method across Bristol.</div>
+            <div class="item-meta">Standard payment method</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">ATMs</div>
+            <div class="item-detail">ATMs widely available throughout Bristol. Withdraw GBP cash at any Barclays, HSBC, or Link ATM. No fees at major banks.</div>
+            <div class="item-meta">Multiple locations, fee-free</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Currency Exchange</div>
+            <div class="item-detail">Exchange currency at airport, train station, or banks. Avoid tourist exchange booths with poor rates. Use ATMs for better exchange rates.</div>
+            <div class="item-meta">ATMs offer best rates</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Tipping</div>
+            <div class="item-detail">10% at restaurants for good service (optional). 10-15% for excellent service. Tipping is appreciated but not mandatory in the UK. Tip in cash or add to card payment.</div>
+            <div class="item-meta">Cultural norm but optional</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Credit Cards</div>
+            <div class="item-detail">Visa and Mastercard widely accepted. American Express less common but increasingly accepted. Notify your bank of travel to avoid card blocks.</div>
+            <div class="item-meta">Essential to carry</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Costs Summary</div>
+            <div class="item-detail">Budget: £50-75/day | Comfortable: £100-150/day | Luxury: £200+/day (excludes accommodation)</div>
+            <div class="item-meta">Mid-range UK city pricing</div>
+          </div>
+          <div class="tip"><strong>Tip:</strong> Most Bristol businesses are cashless now. Bring cards, but keep some cash for markets, small independent vendors, and tips.</div>
+        </div>
+      </div>
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🚌</span>
+          <span class="e-title">Getting Around Bristol</span>
+          <span class="e-preview">Bus, ferry, cycling, rail</span>
+          <svg class="e-chev" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M4.293 6.293a1 1 0 011.414 0L8 8.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Public Buses</div>
+            <div class="item-detail">Comprehensive network operated by First Bus and other providers. Reliable, frequent service across the city. Pay contactless or with a Day Rider ticket (£5 for 24-hour travel).</div>
+            <div class="item-meta">£2.10 per journey | Day pass: £5</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Harbour Ferry Boats</div>
+            <div class="item-detail">Historic floating harbour system. Water ferries connect Bathurst Basin to SS Great Britain and beyond. Scenic alternative to buses, fun for sightseeing.</div>
+            <div class="item-meta">£2.50-4 per journey | Scenic route</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Walking</div>
+            <div class="item-detail">Bristol's city centre is compact and walkable. Most attractions within 20-30 minutes on foot. Harbourside, Stokes Croft, and Clifton are excellent walking areas.</div>
+            <div class="item-meta">Free, healthy, most rewarding</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Cycling</div>
+            <div class="item-detail">Bike-friendly city with cycle paths and quiet routes. Cycle hire available (Voi and Citybike schemes). Great for exploring neighbourhoods and riverside paths.</div>
+            <div class="item-meta">Voi scooters: £0.50 + £0.20/min</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Taxis & Ride-Sharing</div>
+            <div class="item-detail">Licensed black cabs and Uber available. Reliable and affordable, especially at night. Book through apps for safety and traceable journeys.</div>
+            <div class="item-meta">£5-15 typical journey</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Train Connections</div>
+            <div class="item-detail">Bristol Temple Meads is the main railway station. Direct trains to Bath (12 min), London Paddington (1.5 hrs), Cardiff (50 min), and many UK cities.</div>
+            <div class="item-meta">Central location, modern station</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Tips for Getting Around</div>
+            <div class="item-detail">Get a contactless card or use your phone for payment. Download the First Bus app for route planning. Most journeys within the city take 15-25 minutes. Plan travel for off-peak to save time.</div>
+            <div class="item-meta">Preparation makes travel easy</div>
+          </div>
+          <div class="tip"><strong>Tip:</strong> Bristol is hilly; wear comfortable shoes and allow extra time when walking. Spring weather changes quickly—check forecasts for each day and bring layers.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function toggleComponent(btn) {
+      btn.classList.toggle('open');
+      btn.nextElementSibling.classList.toggle('open');
+    }
+    function toggle(btn) {
+      btn.classList.toggle('open');
+      btn.nextElementSibling.classList.toggle('open');
+    }
+  </script>
+</body>
+</html>
