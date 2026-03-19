@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Station Information — Barcelona → Madrid</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f9f9fa; color: #132968; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+  .component { max-width: 800px; margin: 24px auto; background: #fff; border-radius: 16px; box-shadow: 0 1px 3px rgba(19,41,104,0.06); overflow: hidden; }
+
+  .comp-header { padding: 24px 24px 20px; }
+  .comp-header h2 { font-size: 22px; font-weight: 700; color: #132968; }
+  .comp-header p { font-size: 13px; color: #425486; margin-top: 4px; }
+
+  /* Departure / Arrival group */
+  .group { border-top: 1px solid #e9e9e9; }
+  .group-header { padding: 20px 24px 6px; }
+  .group-header h3 { font-size: 16px; font-weight: 700; color: #132968; display: flex; align-items: center; gap: 8px; }
+  .group-header h3 .tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 3px 10px; border-radius: 4px; }
+  .group-header h3 .tag.dep { color: #0057b8; background: #e8f0fe; }
+  .group-header h3 .tag.arr { color: #0a8a3e; background: #e3f5e8; }
+  .group-intro { padding: 0 24px 16px; font-size: 13px; color: #425486; line-height: 1.6; }
+
+  /* Station block */
+  .station-block { border-top: 1px solid #f0f0f2; }
+  .station-block:first-child { border-top: none; }
+  .station-head { display: flex; align-items: center; gap: 14px; padding: 16px 24px; cursor: pointer; transition: background 0.15s; }
+  .station-head:hover { background: #fafafc; }
+  .station-head .info { flex: 1; }
+  .station-head .sname { font-size: 15px; font-weight: 700; color: #132968; }
+  .station-head .saddr { font-size: 12px; color: #425486; }
+  .station-head .providers { display: flex; gap: 4px; align-items: center; }
+  .station-head .providers img { height: 16px; }
+  .station-head .chevron { width: 20px; height: 20px; color: #a1a9c3; transition: transform 0.2s; flex-shrink: 0; }
+  .station-head.open .chevron { transform: rotate(180deg); }
+
+  /* FAQ items */
+  .station-body { display: none; padding: 0 24px 12px; }
+  .station-body.open { display: block; }
+
+  .faq { border: 1px solid #e9e9e9; border-radius: 10px; margin-bottom: 8px; overflow: hidden; }
+  .faq-q { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; transition: background 0.15s; }
+  .faq-q:hover { background: #fafafc; }
+  .faq-q .icon { font-size: 16px; flex-shrink: 0; width: 24px; text-align: center; }
+  .faq-q .question { flex: 1; font-size: 13px; font-weight: 600; color: #132968; }
+  .faq-q .qchev { width: 16px; height: 16px; color: #a1a9c3; transition: transform 0.2s; flex-shrink: 0; }
+  .faq-q.open .qchev { transform: rotate(180deg); }
+
+  .faq-a { display: none; padding: 0 16px 16px 50px; }
+  .faq-a.open { display: block; }
+
+  .fact { display: flex; gap: 8px; margin-bottom: 8px; font-size: 13px; color: #132968; align-items: flex-start; }
+  .fact .label { color: #425486; font-weight: 600; min-width: 100px; flex-shrink: 0; }
+  .fact .val { flex: 1; }
+  .g { color: #0a8a3e; font-weight: 600; }
+  .w { color: #c75300; font-weight: 500; }
+  .x { color: #c4c4c4; }
+  .price { color: #0057b8; font-weight: 700; }
+  .new { display: inline-block; background: #e3f5e8; color: #0a8a3e; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.3px; margin-left: 4px; vertical-align: middle; }
+  .sep { height: 1px; background: #f0f0f2; margin: 10px 0; }
+  .tip { font-size: 12px; color: #425486; background: #f9f9fa; padding: 8px 12px; border-radius: 6px; margin-top: 8px; }
+  .tip strong { color: #132968; }
+
+  @media (max-width: 600px) {
+    .station-head { flex-wrap: wrap; gap: 8px; }
+    .fact .label { min-width: 80px; }
+    .faq-a { padding-left: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="component">
+  <div class="comp-header">
+    <h2>Station information</h2>
+    <p>Barcelona → Madrid · 4 stations on this route</p>
+  </div>
+
+  <!-- ======= DEPARTURE ======= -->
+  <div class="group">
+    <div class="group-header">
+      <h3><span class="tag dep">Departure</span> Stations in Barcelona</h3>
+    </div>
+    <p class="group-intro">The major train station for departures in Barcelona is Barcelona Sants. Find all the information you need to know about services, amenities and connections at Barcelona Sants for your trip from Barcelona to Madrid.</p>
+
+    <!-- BARCELONA SANTS -->
+    <div class="station-block">
+      <div class="station-head open" onclick="toggleStation(this)">
+        <div class="info">
+          <div class="sname">Barcelona Sants</div>
+          <div class="saddr">Plaça dels Països Catalans, 1-7 · 08014 Barcelona</div>
+        </div>
+        <div class="providers">
+          <img src="https://static.omio.design/web/logos/21/RenfeAVE.png" alt="">
+          <img src="https://static.omio.design/web/logos/21/iryo.png" alt="">
+          <img src="https://static.omio.design/web/logos/21/sncf-ouigo.png" alt="">
+          <img src="https://static.omio.design/web/logos/21/RenfeAVLO.png" alt="">
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="station-body open">
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">🚇</span>
+            <span class="question">How do I get to Barcelona Sants?</span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">Metro</span><span class="val"><span class="g">L3 (Green)</span> and <span class="g">L5 (Blue)</span> · Sants Estació stop</span></div>
+            <div class="fact"><span class="label">Cercanías</span><span class="val">Lines R1, R3, R4 · Barcelona Sants stop</span></div>
+            <div class="fact"><span class="label">City bus</span><span class="val">Multiple lines stop outside the station</span></div>
+            <div class="sep"></div>
+            <div class="fact"><span class="label">Taxi to station</span><span class="val"><span class="price">€8–12</span> from Plaça Catalunya · ~15 min</span></div>
+            <div class="fact"><span class="label">Uber / Cabify</span><span class="val"><span class="g">Available</span> · Pick-up at main entrance</span></div>
+            <div class="sep"></div>
+            <div class="fact"><span class="label">From airport</span><span class="val">Cercanías R2 Nord · ~25 min · <span class="price">€4.60</span></span></div>
+            <div class="fact"><span class="label"></span><span class="val">Aerobús A1/A2 to Sants area · ~35 min · <span class="price">€7.75</span></span></div>
+            <div class="fact"><span class="label"></span><span class="val">Taxi from El Prat · <span class="price">€35–45</span> · ~30 min</span></div>
+          </div>
+        </div>
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">🏙</span>
+            <span class="question">How far is Barcelona Sants from the city center? <span class="new">new</span></span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">Distance</span><span class="val">2.5 km to Plaça Catalunya</span></div>
+            <div class="fact"><span class="label">Metro</span><span class="val">L3 · 10 min · <span class="price">€2.40</span></span></div>
+            <div class="fact"><span class="label">Walk</span><span class="val">~30 min along Avinguda de Roma</span></div>
+            <div class="fact"><span class="label">Taxi</span><span class="val"><span class="price">€8–12</span> · ~15 min</span></div>
+          </div>
+        </div>
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">⏰</span>
+            <span class="question">How early should I arrive at Barcelona Sants? <span class="new">new</span></span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">Recommended</span><span class="val"><span class="w">30 minutes before departure</span></span></div>
+            <div class="fact"><span class="label">Security</span><span class="val">Barcelona Sants has airport-style security screening · Queues can build at peak times</span></div>
+            <div class="fact"><span class="label">Platform access</span><span class="val">Platforms open ~30 min before departure</span></div>
+            <div class="tip"><strong>Tip:</strong> Allow extra time for the security check at Barcelona Sants — you'll need to pass through scanners before reaching the platforms. Morning departures (7–9am) tend to be busiest.</div>
+          </div>
+        </div>
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">🧳</span>
+            <span class="question">Can I store luggage at Barcelona Sants? <span class="new">new</span></span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">Lockers</span><span class="val"><span class="g">Available</span> · Near platforms on the lower level</span></div>
+            <div class="fact"><span class="label">Cost</span><span class="val"><span class="price">€4.50/day</span> (small) · <span class="price">€6/day</span> (medium) · <span class="price">€8/day</span> (large)</span></div>
+            <div class="fact"><span class="label">Hours</span><span class="val">05:30–23:00 daily</span></div>
+            <div class="fact"><span class="label">Payment</span><span class="val">Card and cash accepted</span></div>
+          </div>
+        </div>
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">♿</span>
+            <span class="question">Is Barcelona Sants wheelchair accessible? <span class="new">new</span></span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">Wheelchair</span><span class="val"><span class="g">Full access</span> · Ramps at all entrances</span></div>
+            <div class="fact"><span class="label">Elevators</span><span class="val"><span class="g">To all platforms</span></span></div>
+            <div class="fact"><span class="label">Assistance</span><span class="val">Atendo service · Book 48h ahead · <strong>900 41 00 04</strong></span></div>
+            <div class="fact"><span class="label">Toilets</span><span class="val"><span class="g">Accessible toilets available</span></span></div>
+            <div class="fact"><span class="label">Guide dogs</span><span class="val"><span class="g">Permitted</span></span></div>
+          </div>
+        </div>
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">🅿️</span>
+            <span class="question">Is there parking at Barcelona Sants? <span class="new">new</span></span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">Parking</span><span class="val"><span class="g">Yes</span> · Multi-storey car park</span></div>
+            <div class="fact"><span class="label">Cost</span><span class="val">From <span class="price">€18/day</span></span></div>
+            <div class="fact"><span class="label">Book online</span><span class="val"><span class="g">Available</span> · Reserve in advance for guaranteed spot</span></div>
+          </div>
+        </div>
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">🍽</span>
+            <span class="question">What facilities and services are at Barcelona Sants? <span class="new">new</span></span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">WiFi</span><span class="val"><span class="g">Free</span></span></div>
+            <div class="fact"><span class="label">ATM</span><span class="val">Multiple in main hall</span></div>
+            <div class="fact"><span class="label">Currency</span><span class="val">Exchange available</span></div>
+            <div class="fact"><span class="label">Dining</span><span class="val">Cafés, restaurants, fast food</span></div>
+            <div class="fact"><span class="label">Shops</span><span class="val">Press, convenience stores, pharmacy</span></div>
+            <div class="fact"><span class="label">Lounges</span><span class="val">Sala Club AVE (Renfe Prémium ticket holders)</span></div>
+            <div class="fact"><span class="label">Ticket office</span><span class="val">05:30–23:30 daily · Self-service machines (card + cash)</span></div>
+          </div>
+        </div>
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">📍</span>
+            <span class="question">What is there to see near Barcelona Sants? <span class="new">new</span></span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">Plaça d'Espanya</span><span class="val">10 min walk · Magic Fountain, MNAC art museum, Montjuïc cable car</span></div>
+            <div class="fact"><span class="label">Montjuïc</span><span class="val">15 min walk · Castle, gardens, Olympic stadium, panoramic views</span></div>
+            <div class="fact"><span class="label">Hotels</span><span class="val">Multiple within 5 min walk</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PASSEIG DE GRÀCIA -->
+    <div class="station-block">
+      <div class="station-head" onclick="toggleStation(this)">
+        <div class="info">
+          <div class="sname">Passeig de Gràcia</div>
+          <div class="saddr">Passeig de Gràcia · 08007 Barcelona</div>
+        </div>
+        <div class="providers">
+          <img src="https://static.omio.design/web/logos/21/RenfeAVE.png" alt="">
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="station-body">
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">🚇</span>
+            <span class="question">How do I get to Passeig de Gràcia?</span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">Metro</span><span class="val"><span class="g">L2, L3, L4</span> · Passeig de Gràcia stop (directly at station)</span></div>
+            <div class="fact"><span class="label">Location</span><span class="val"><span class="g">City center</span> · Right on Barcelona's main shopping boulevard</span></div>
+            <div class="fact"><span class="label">Taxi</span><span class="val"><span class="price">€5–8</span> from most central locations</span></div>
+            <div class="fact"><span class="label">From airport</span><span class="val">R2 Nord to Sants, then transfer · ~35 min total</span></div>
+            <div class="tip"><strong>Tip:</strong> This is an underground station with no security check — quicker boarding than Sants. Casa Batlló is a 2-minute walk.</div>
+          </div>
+        </div>
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">🧳</span>
+            <span class="question">Can I store luggage at Passeig de Gràcia? <span class="new">new</span></span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">Lockers</span><span class="val"><span class="x">Not available at this station</span></span></div>
+            <div class="fact"><span class="label">Nearest</span><span class="val">Locker Barcelona on Carrer d'Estruc (5 min walk) · From <span class="price">€6/day</span></span></div>
+          </div>
+        </div>
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">♿</span>
+            <span class="question">Is Passeig de Gràcia accessible? <span class="new">new</span></span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">Wheelchair</span><span class="val"><span class="g">Accessible</span> · Lifts to platforms</span></div>
+            <div class="fact"><span class="label">Assistance</span><span class="val">Atendo service · Book 48h ahead</span></div>
+            <div class="fact"><span class="label">Toilets</span><span class="val"><span class="g">Accessible toilets available</span></span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= ARRIVAL ======= -->
+  <div class="group">
+    <div class="group-header">
+      <h3><span class="tag arr">Arrival</span> Stations in Madrid</h3>
+    </div>
+    <p class="group-intro">Trains from Barcelona arrive at Madrid-Puerta de Atocha or Madrid Chamartín, depending on the provider. Iryo, OUIGO, and Avlo serve Atocha, while Renfe AVE arrives at Chamartín. Find all the information you need about services, amenities and onward connections at each station.</p>
+
+    <!-- MADRID ATOCHA -->
+    <div class="station-block">
+      <div class="station-head" onclick="toggleStation(this)">
+        <div class="info">
+          <div class="sname">Madrid-Puerta de Atocha</div>
+          <div class="saddr">Glorieta Emperador Carlos V · 28045 Madrid</div>
+        </div>
+        <div class="providers">
+          <img src="https://static.omio.design/web/logos/21/iryo.png" alt="">
+          <img src="https://static.omio.design/web/logos/21/sncf-ouigo.png" alt="">
+          <img src="https://static.omio.design/web/logos/21/RenfeAVLO.png" alt="">
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="station-body">
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">🚇</span>
+            <span class="question">How do I get from Madrid Atocha to the city center?</span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">Metro</span><span class="val"><span class="g">L1 (Light Blue)</span> · Atocha Renfe stop</span></div>
+            <div class="fact"><span class="label">Cercanías</span><span class="val">Lines C1, C3, C4 · Sol in 7 min</span></div>
+            <div class="fact"><span class="label">On foot</span><span class="val">~20 min walk to Puerta del Sol (1.5 km)</span></div>
+            <div class="sep"></div>
+            <div class="fact"><span class="label">Taxi to center</span><span class="val"><span class="price">€6–10</span> · ~10 min to Puerta del Sol</span></div>
+            <div class="fact"><span class="label">Uber / Cabify</span><span class="val"><span class="g">Available</span></span></div>
+            <div class="sep"></div>
+            <div class="fact"><span class="label">To airport</span><span class="val">Cercanías C1 · ~25 min · <span class="price">€2.60</span></span></div>
+            <div class="fact"><span class="label"></span><span class="val">Airport Express bus · ~40 min · <span class="price">€5</span></span></div>
+            <div class="fact"><span class="label"></span><span class="val">Taxi to Barajas · <span class="price">€30–40</span> · ~25 min</span></div>
+            <div class="tip"><strong>Don't miss:</strong> The old Atocha terminal houses a stunning tropical garden with over 7,000 plants — worth a look while you wait.</div>
+          </div>
+        </div>
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">⏰</span>
+            <span class="question">How early should I arrive at Madrid Atocha? <span class="new">new</span></span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">Recommended</span><span class="val">15–20 minutes before departure</span></div>
+            <div class="fact"><span class="label">Security</span><span class="val">Standard access — no airport-style screening</span></div>
+            <div class="fact"><span class="label">Platform access</span><span class="val">Displayed ~20 min before departure on screens in the main hall</span></div>
+          </div>
+        </div>
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">🧳</span>
+            <span class="question">Can I store luggage at Madrid Atocha? <span class="new">new</span></span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">Consigna</span><span class="val"><span class="g">Available</span> · Automated lockers in the station</span></div>
+            <div class="fact"><span class="label">Cost</span><span class="val"><span class="price">€4/day</span> (small) · <span class="price">€5/day</span> (medium) · <span class="price">€6/day</span> (large)</span></div>
+            <div class="fact"><span class="label">Hours</span><span class="val">06:00–22:00 daily</span></div>
+          </div>
+        </div>
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">♿</span>
+            <span class="question">Is Madrid Atocha wheelchair accessible? <span class="new">new</span></span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">Wheelchair</span><span class="val"><span class="g">Full access</span> · Ramps at all entrances</span></div>
+            <div class="fact"><span class="label">Elevators</span><span class="val"><span class="g">To all platforms</span></span></div>
+            <div class="fact"><span class="label">Assistance</span><span class="val">Atendo service · Book 48h ahead · <strong>900 41 00 04</strong></span></div>
+            <div class="fact"><span class="label">Toilets</span><span class="val"><span class="g">Accessible toilets available</span></span></div>
+          </div>
+        </div>
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">🅿️</span>
+            <span class="question">Is there parking at Madrid Atocha? <span class="new">new</span></span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">Parking</span><span class="val"><span class="g">Yes</span> · Underground car park</span></div>
+            <div class="fact"><span class="label">Cost</span><span class="val">From <span class="price">€22/day</span></span></div>
+            <div class="fact"><span class="label">Book online</span><span class="val"><span class="g">Available</span></span></div>
+          </div>
+        </div>
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">🍽</span>
+            <span class="question">What facilities and services are at Madrid Atocha? <span class="new">new</span></span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">WiFi</span><span class="val"><span class="g">Free</span></span></div>
+            <div class="fact"><span class="label">ATM</span><span class="val">Multiple in main hall</span></div>
+            <div class="fact"><span class="label">Currency</span><span class="val">Exchange available</span></div>
+            <div class="fact"><span class="label">Dining</span><span class="val">Cafés, restaurants, food court in new terminal</span></div>
+            <div class="fact"><span class="label">Shops</span><span class="val">Press, convenience stores, souvenirs</span></div>
+            <div class="fact"><span class="label">Lounges</span><span class="val">Sala Club (Renfe Prémium) · Iryo Lounge (Infinita)</span></div>
+            <div class="fact"><span class="label">Ticket office</span><span class="val">06:00–22:30 daily · Self-service machines (card + cash)</span></div>
+          </div>
+        </div>
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">📍</span>
+            <span class="question">What is there to see near Madrid Atocha? <span class="new">new</span></span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">Retiro Park</span><span class="val">5 min walk · Crystal Palace, rowing lake, rose garden</span></div>
+            <div class="fact"><span class="label">Prado Museum</span><span class="val">10 min walk · Velázquez, Goya, El Greco</span></div>
+            <div class="fact"><span class="label">Reina Sofía</span><span class="val">3 min walk · Picasso's Guernica</span></div>
+            <div class="fact"><span class="label">Hotels</span><span class="val">Multiple within 5 min walk</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- MADRID CHAMARTÍN -->
+    <div class="station-block">
+      <div class="station-head" onclick="toggleStation(this)">
+        <div class="info">
+          <div class="sname">Madrid Chamartín</div>
+          <div class="saddr">C/ Agustín de Foxá · 28036 Madrid</div>
+        </div>
+        <div class="providers">
+          <img src="https://static.omio.design/web/logos/21/RenfeAVE.png" alt="">
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="station-body">
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">🚇</span>
+            <span class="question">How do I get from Madrid Chamartín to the city center?</span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">Metro</span><span class="val"><span class="g">L1, L10</span> · Chamartín stop</span></div>
+            <div class="fact"><span class="label">Cercanías</span><span class="val">Lines C3, C4, C7, C8, C10 · Sol in 12 min</span></div>
+            <div class="fact"><span class="label">On foot</span><span class="val">~45 min walk to Puerta del Sol (4 km)</span></div>
+            <div class="sep"></div>
+            <div class="fact"><span class="label">Taxi to center</span><span class="val"><span class="price">€8–14</span> · ~15 min to Puerta del Sol</span></div>
+            <div class="fact"><span class="label">Uber / Cabify</span><span class="val"><span class="g">Available</span></span></div>
+            <div class="sep"></div>
+            <div class="fact"><span class="label">To airport</span><span class="val">Cercanías C3/C4 · ~20 min · <span class="price">€2.60</span></span></div>
+            <div class="fact"><span class="label"></span><span class="val">Taxi to Barajas · <span class="price">€35–50</span> · ~30 min</span></div>
+          </div>
+        </div>
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">⏰</span>
+            <span class="question">How early should I arrive at Madrid Chamartín? <span class="new">new</span></span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">Recommended</span><span class="val">15–20 minutes before departure</span></div>
+            <div class="fact"><span class="label">Security</span><span class="val">Standard access — no airport-style screening</span></div>
+            <div class="fact"><span class="label">Platform access</span><span class="val">Displayed ~20 min before departure on screens</span></div>
+          </div>
+        </div>
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">🧳</span>
+            <span class="question">Can I store luggage at Madrid Chamartín? <span class="new">new</span></span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">Consigna</span><span class="val"><span class="g">Available</span> · Automated lockers</span></div>
+            <div class="fact"><span class="label">Cost</span><span class="val"><span class="price">€4–6/day</span></span></div>
+            <div class="fact"><span class="label">Hours</span><span class="val">06:30–22:30 daily</span></div>
+          </div>
+        </div>
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">♿</span>
+            <span class="question">Is Madrid Chamartín wheelchair accessible? <span class="new">new</span></span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">Wheelchair</span><span class="val"><span class="g">Full access</span> · Ramps at all entrances</span></div>
+            <div class="fact"><span class="label">Elevators</span><span class="val"><span class="g">To all platforms</span></span></div>
+            <div class="fact"><span class="label">Assistance</span><span class="val">Atendo service · Book 48h ahead · <strong>900 41 00 04</strong></span></div>
+          </div>
+        </div>
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">🅿️</span>
+            <span class="question">Is there parking at Madrid Chamartín? <span class="new">new</span></span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">Parking</span><span class="val"><span class="g">Yes</span> · Multi-storey car park</span></div>
+            <div class="fact"><span class="label">Cost</span><span class="val">From <span class="price">€20/day</span></span></div>
+            <div class="fact"><span class="label">Book online</span><span class="val"><span class="g">Available</span></span></div>
+          </div>
+        </div>
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">🍽</span>
+            <span class="question">What facilities and services are at Madrid Chamartín? <span class="new">new</span></span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">WiFi</span><span class="val"><span class="g">Free</span></span></div>
+            <div class="fact"><span class="label">ATM</span><span class="val">Multiple in main hall</span></div>
+            <div class="fact"><span class="label">Dining</span><span class="val">Cafés, restaurants, fast food</span></div>
+            <div class="fact"><span class="label">Shops</span><span class="val">Press, convenience stores, pharmacy</span></div>
+            <div class="fact"><span class="label">Lounges</span><span class="val">Sala Club AVE (Renfe Prémium ticket holders)</span></div>
+            <div class="fact"><span class="label">Ticket office</span><span class="val">06:30–22:30 daily · Self-service machines (card + cash)</span></div>
+          </div>
+        </div>
+
+        <div class="faq">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="icon">📍</span>
+            <span class="question">What is there to see near Madrid Chamartín? <span class="new">new</span></span>
+            <svg class="qchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a">
+            <div class="fact"><span class="label">Bernabéu</span><span class="val">15 min walk · Santiago Bernabéu stadium (Real Madrid)</span></div>
+            <div class="fact"><span class="label">Paseo de la Castellana</span><span class="val">5 min walk · Madrid's grand north-south boulevard</span></div>
+            <div class="fact"><span class="label">Hotels</span><span class="val">Multiple within 5 min walk</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function toggleStation(el) {
+  el.classList.toggle('open');
+  el.nextElementSibling.classList.toggle('open');
+}
+function toggleFaq(el) {
+  el.classList.toggle('open');
+  el.nextElementSibling.classList.toggle('open');
+}
+</script>
+
+</body>
+</html>
