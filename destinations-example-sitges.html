@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sitges - Destination Highlights</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f9f9fa; color: #132968; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    .component { max-width: 800px; margin: 24px auto; background: #fff; border-radius: 16px; box-shadow: 0 1px 3px rgba(19,41,104,0.06); overflow: hidden; }
+    .comp-toggle { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; cursor: pointer; border: none; background: none; width: 100%; text-align: left; transition: background 0.15s; }
+    .comp-toggle:hover { background: #fafafc; }
+    .comp-toggle-left { display: flex; align-items: center; gap: 12px; }
+    .comp-toggle h2 { font-size: 20px; font-weight: 700; color: #132968; }
+    .comp-toggle .toggle-sub { font-size: 13px; color: #425486; }
+    .comp-toggle .comp-chev { width: 20px; height: 20px; color: #a1a9c3; transition: transform 0.25s; flex-shrink: 0; }
+    .comp-toggle.open .comp-chev { transform: rotate(180deg); }
+    .comp-body { display: none; }
+    .comp-body.open { display: block; }
+    .season-bar { display: flex; align-items: center; gap: 8px; padding: 4px 24px 12px; }
+    .season-badge { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+    .season-spring { color: #2e7d32; background: #e8f5e9; }
+    .season-note { font-size: 12px; color: #425486; }
+    .city-intro { padding: 0 24px 16px; }
+    .city-name { font-size: 20px; font-weight: 800; color: #132968; margin-bottom: 8px; }
+    .city-blurb { font-size: 14px; color: #425486; line-height: 1.7; }
+    .highlights { display: flex; gap: 12px; padding: 0 24px 20px; overflow-x: auto; }
+    .hl-card { flex: 0 0 200px; background: #f9f9fa; border-radius: 10px; padding: 14px; border: 1px solid #f0f0f2; }
+    .hl-card .hl-emoji { font-size: 20px; margin-bottom: 6px; }
+    .hl-card .hl-title { font-size: 13px; font-weight: 700; color: #132968; margin-bottom: 4px; }
+    .hl-card .hl-desc { font-size: 12px; color: #425486; line-height: 1.5; }
+    .expand { border-top: 1px solid #f0f0f2; }
+    .expand-btn { display: flex; align-items: center; gap: 10px; padding: 14px 24px; cursor: pointer; width: 100%; border: none; background: none; text-align: left; transition: background 0.15s; }
+    .expand-btn:hover { background: #fafafc; }
+    .expand-btn .e-icon { font-size: 16px; width: 24px; text-align: center; flex-shrink: 0; }
+    .expand-btn .e-title { flex: 1; font-size: 13px; font-weight: 600; color: #132968; }
+    .expand-btn .e-preview { font-size: 12px; color: #a1a9c3; margin-right: 8px; }
+    .expand-btn .e-chev { width: 16px; height: 16px; color: #a1a9c3; transition: transform 0.2s; flex-shrink: 0; }
+    .expand-btn.open .e-chev { transform: rotate(180deg); }
+    .expand-body { display: none; padding: 0 24px 16px 58px; }
+    .expand-body.open { display: block; }
+    .item { margin-bottom: 12px; }
+    .item .item-name { font-size: 13px; font-weight: 700; color: #132968; }
+    .item .item-detail { font-size: 12px; color: #425486; line-height: 1.5; margin-top: 2px; }
+    .item .item-meta { font-size: 11px; color: #a1a9c3; margin-top: 2px; }
+    .price { color: #0057b8; font-weight: 700; }
+    .sep { height: 1px; background: #f0f0f2; margin: 12px 0; }
+    .tip { font-size: 12px; color: #425486; background: #f9f9fa; padding: 8px 12px; border-radius: 6px; margin-top: 8px; }
+    .tip strong { color: #132968; }
+    .seasonal { background: #fffde7; border: 1px solid #fff9c4; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; font-size: 12px; color: #f57f17; }
+    .seasonal strong { color: #e65100; }
+    .internal-link { color: #0057b8; text-decoration: none; font-weight: 600; border-bottom: 1px dashed #0057b8; }
+    .internal-link:hover { color: #003d82; border-bottom-style: solid; }
+    @media (max-width: 600px) {
+      .hl-card { flex: 0 0 170px; }
+      .expand-body { padding-left: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="component">
+    <!-- Header with toggle -->
+    <button class="comp-toggle open" onclick="toggleComponent(this)">
+      <div class="comp-toggle-left">
+        <h2>Destination Highlights</h2>
+        <span class="toggle-sub">Sitges</span>
+      </div>
+      <svg class="comp-chev" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+      </svg>
+    </button>
+
+    <!-- Content body -->
+    <div class="comp-body open">
+      <!-- Season bar -->
+      <div class="season-bar">
+        <span class="season-badge season-spring">Spring 2026</span>
+        <span class="season-note">Best time to visit</span>
+      </div>
+
+      <!-- City intro -->
+      <div class="city-intro">
+        <h3 class="city-name">Sitges</h3>
+        <p class="city-blurb">A charming coastal town just 35 minutes from Barcelona, Sitges captivates visitors with its pristine beaches, colorful modernista architecture, vibrant LGBTQ+ friendly culture, and legendary Carnival celebrations. Perfect for a beach escape or cultural weekend.</p>
+      </div>
+
+      <!-- Highlight cards -->
+      <div class="highlights">
+        <div class="hl-card">
+          <div class="hl-emoji">🏖️</div>
+          <div class="hl-title">Beautiful Beaches</div>
+          <div class="hl-desc">Golden sandy beaches with calm waters, lifeguards, and beach bars perfect for swimming and relaxation.</div>
+        </div>
+        <div class="hl-card">
+          <div class="hl-emoji">🏛️</div>
+          <div class="hl-title">Old Town</div>
+          <div class="hl-desc">Narrow winding streets lined with galleries, boutiques, and cafés in the charming Casco Antiguo historic district.</div>
+        </div>
+        <div class="hl-card">
+          <div class="hl-emoji">🎨</div>
+          <div class="hl-title">Maricel Museum</div>
+          <div class="hl-desc">Stunning modernista palace housing an impressive collection of Catalan and Mediterranean art and sculpture.</div>
+        </div>
+        <div class="hl-card">
+          <div class="hl-emoji">🎭</div>
+          <div class="hl-title">Carnival & Festivals</div>
+          <div class="hl-desc">Vibrant Carnival in February and International Film Festival in October bring energy and celebration year-round.</div>
+        </div>
+      </div>
+
+      <!-- Attractions section -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🏛️</span>
+          <span class="e-title">Attractions</span>
+          <span class="e-preview">5 top picks</span>
+          <svg class="e-chev" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Church of Sant Bartomeu i Santa Tecla</div>
+            <div class="item-detail">Iconic white modernista church with twin spires overlooking the seafront. Built in 1884, it's Sitges' most recognizable landmark and offers beautiful views from the plaza.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Maricel Museum</div>
+            <div class="item-detail">Former modernista palace with an exceptional art collection including sculptures, paintings, and decorative arts. The building itself is an architectural masterpiece with terraced gardens.</div>
+            <div class="item-meta">€6 admission • Wed-Sun 10am-5pm</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Cau Ferrat Museum</div>
+            <div class="item-detail">Charming bohemian-style house museum with eclectic art collections, antique furniture, and memorabilia from the artistic community. Home to works by El Greco and contemporary artists.</div>
+            <div class="item-meta">€5 admission • Thu-Sun 10am-5pm</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Palau de Maricel</div>
+            <div class="item-detail">Stunning modernista palace built in 1910 with intricate architecture, ornate interiors, and a magnificent garden overlooking the sea. Used for exhibitions and cultural events.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Casco Antiguo (Old Town)</div>
+            <div class="item-detail">Narrow winding streets lined with local galleries, artisan shops, cafés, and restaurants. Perfect for wandering and discovering hidden gems, street art, and local culture.</div>
+          </div>
+          <div class="tip"><strong>Tip:</strong> Visit museums early in the day to avoid crowds, and explore the old town during evening paseo for authentic local atmosphere.</div>
+        </div>
+      </div>
+
+      <!-- Activities section -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🎯</span>
+          <span class="e-title">Activities</span>
+          <span class="e-preview">6 experiences</span>
+          <svg class="e-chev" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Beach-hopping</div>
+            <div class="item-detail">Explore Sitges' multiple beaches including Playa Principal for families, Playa de la Ribera for a more local vibe, and coves like Playa del Xarco. Each offers unique character and facilities.</div>
+            <div class="item-meta">Free • Year-round</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Wine tasting in Penedès</div>
+            <div class="item-detail">Visit local wineries in the nearby Penedès wine region (20 minutes by car) for tastings of Catalan wine, Spanish sparkling Cava, and local specialties. Many offer tours and food pairings.</div>
+            <div class="item-meta"><span class="price">€20-50</span> per person • Book ahead</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Seafront promenade walk</div>
+            <div class="item-detail">Stroll the beautiful paseo marítimo along the waterfront with views of beaches, chiringuitos (beach bars), and the church. Perfect for sunset walks or morning jogs.</div>
+            <div class="item-meta">Free • Best at sunset</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Carnival celebration</div>
+            <div class="item-detail">Experience Sitges' legendary Carnival in February with parades, costumes, live music, dancing, and vibrant street parties. One of Spain's most famous and lively carnivals with huge LGBTQ+ presence.</div>
+            <div class="item-meta">February • Book accommodation early</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Film festival</div>
+            <div class="item-detail">Visit during the International Film Festival (October) featuring avant-garde, fantasy, and experimental cinema. Screenings at local venues, outdoor projections, and red carpet events.</div>
+            <div class="item-meta">October • Festival passes available</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Sailing & water sports</div>
+            <div class="item-detail">Rent sailboats, kayaks, or paddleboards from local operators. Take a boat trip along the coast or join a sailing excursion for a different perspective of Sitges and nearby coves.</div>
+            <div class="item-meta"><span class="price">€30-80</span> • Book at beach clubs</div>
+          </div>
+          <div class="tip"><strong>Tip:</strong> Book Carnival and Film Festival accommodations 2-3 months in advance. Spring (March-May) offers perfect weather for all outdoor activities.</div>
+        </div>
+      </div>
+
+      <!-- Day trips section -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🚂</span>
+          <span class="e-title">Day trips</span>
+          <span class="e-preview">5 nearby destinations</span>
+          <svg class="e-chev" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name"><a href="https://www.omio.com/trains/sitges/barcelona" class="internal-link">Barcelona</a></div>
+            <div class="item-detail">Spain's vibrant second city just 35 minutes away. Explore Gaudí's Sagrada Familia, Park Güell, Gothic Quarter, La Rambla, museums, restaurants, and nightlife. Full day or overnight trip recommended.</div>
+            <div class="item-meta">35 min • €3-8 by Rodalies train</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name"><a href="https://www.omio.com/trains/sitges/tarragona" class="internal-link">Tarragona</a></div>
+            <div class="item-detail">Historic Mediterranean city with Roman ruins, an impressive amphitheater overlooking the sea, medieval old town, cathedral, and local beaches. Rich cultural heritage and excellent seafood restaurants.</div>
+            <div class="item-meta">45 min • €4-10 by train</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name"><a href="https://www.omio.com/trains/sitges/vilanova-i-la-geltru" class="internal-link">Vilanova i la Geltrú</a></div>
+            <div class="item-detail">Quieter coastal town with beautiful beaches, a charming maritime museum, and relaxed atmosphere. Great for a peaceful beach day or exploring a less touristy Catalan seaside destination.</div>
+            <div class="item-meta">10 min • €1.50-3 by train</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name"><a href="https://www.omio.com/trains/sitges/penedes-wine-region" class="internal-link">Penedès wine region</a></div>
+            <div class="item-detail">Famous wine-producing area with numerous wineries offering tastings, tours, and food pairings. Sample local cava, white wines, and reds while learning about Catalan winemaking tradition.</div>
+            <div class="item-meta">20-30 min by car • Guided tours available</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name"><a href="https://www.omio.com/trains/sitges/montserrat" class="internal-link">Montserrat</a></div>
+            <div class="item-detail">Dramatic mountain monastery with stunning rock formations, spiritual significance, hiking trails, and panoramic views. Visit the basilica, hike to viewpoints, or take the cable car for mountain adventures.</div>
+            <div class="item-meta">1 hour • Combined train+cable car tickets available</div>
+          </div>
+          <div class="tip"><strong>Tip:</strong> Buy a T-10 ticket (10 journeys) for regional trains to save money. Rodalies trains run frequently between Sitges and Barcelona (€3-8).</div>
+        </div>
+      </div>
+
+      <!-- Dining section -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🍽️</span>
+          <span class="e-title">Dining</span>
+          <span class="e-preview">Seafood, paella, local cuisine</span>
+          <svg class="e-chev" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Seafood restaurants</div>
+            <div class="item-detail">Sitges is famous for fresh seafood. Try grilled fish, gambas al ajillo (garlic shrimp), mejillones (mussels), and caldereta de marisco (seafood stew). Most waterfront restaurants serve excellent fresh catches daily.</div>
+            <div class="item-meta"><span class="price">€15-35</span> per main course</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Paella and arròs dishes</div>
+            <div class="item-detail">Traditional paella valenciana and seafood paella (paella de marisco) are local specialties. Many restaurants offer beach paella experiences for lunch overlooking the Mediterranean Sea.</div>
+            <div class="item-meta"><span class="price">€14-28</span> per person • Order ahead</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Xató salad (local specialty)</div>
+            <div class="item-detail">A traditional Catalan salad unique to the Sitges area made with endive, salt cod, tuna, anchovy, and a special romesco sauce. A must-try local dish found in many restaurants and tapas bars.</div>
+            <div class="item-meta"><span class="price">€8-12</span> per serving</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Carrer del Primer de Maig restaurant strip</div>
+            <div class="item-detail">This charming street in the old town is lined with restaurants, tapas bars, and cafés. Great for exploring diverse dining options, from traditional Catalan to international cuisine. Excellent for evening paseo and dining.</div>
+            <div class="item-meta">Various price ranges • Casual atmosphere</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Catalan cuisine specialties</div>
+            <div class="item-detail">Don't miss pan con tomate (bread with tomato), calcots (roasted leeks), botifarra (Catalan sausage), escalivada (roasted vegetables), and esqueixada (salt cod salad). Perfect with local wines and cava.</div>
+            <div class="item-meta"><span class="price">€5-15</span> per dish</div>
+          </div>
+          <div class="tip"><strong>Tip:</strong> Lunch is typically 1-3pm, dinner after 8pm. Many restaurants close between 3-7pm. Weekday lunches offer better value than weekends.</div>
+        </div>
+      </div>
+
+      <!-- Budget section -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">💰</span>
+          <span class="e-title">Budget</span>
+          <span class="e-preview">Moderate pricing overview</span>
+          <svg class="e-chev" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Accommodation costs</div>
+            <div class="item-detail">Sitges is slightly cheaper than Barcelona but pricier than inland towns. Budget hotels €50-80/night, mid-range €80-150/night, boutique hotels €150-300/night. Prices surge during Carnival and film festival.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Meal costs</div>
+            <div class="item-detail">Budget menu del día (lunch special) €10-15, casual meal €12-20, moderate restaurant €20-35, upscale dining €40+. Seafood dishes and waterfront restaurants are pricier. Tapas and casual dining offer good value.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Transport costs</div>
+            <div class="item-detail">T-10 regional train ticket €11.35 (10 journeys in Barcelona metro area). Single journey to Barcelona €3-8. Buses within Sitges free to low cost. Most of town is walkable.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Museum and attractions</div>
+            <div class="item-detail">Museum entries €4-6 each. Beaches are free. Activities like wine tastings €20-50 per person. Book combination tickets for better value. Many cultural events and activities are free or low-cost.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Overall budget estimate</div>
+            <div class="item-detail">Budget traveler: €60-90/day. Mid-range: €100-150/day. Splurge: €200+/day. Sitges is moderately priced with good value outside peak season. Spring and autumn offer the best value with pleasant weather.</div>
+          </div>
+          <div class="tip"><strong>Money-saving tip:</strong> Visit during off-season (April-May, September-October) for lower prices and fewer crowds. Avoid Carnival and festival weekends for better deals.</div>
+        </div>
+      </div>
+
+      <!-- Neighborhoods section -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🏘️</span>
+          <span class="e-title">Neighborhoods</span>
+          <span class="e-preview">4 key areas</span>
+          <svg class="e-chev" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Casco Antiguo (Old Town)</div>
+            <div class="item-detail">The historic heart of Sitges with narrow winding streets, local galleries, artisan shops, boutiques, and traditional restaurants. Home to the Church of Sant Bartomeu i Santa Tecla. Perfect for exploring local culture and wandering.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Seafront (Paseo Marítimo)</div>
+            <div class="item-detail">The waterfront promenade with beaches, beach clubs, restaurants, bars, and hotels. Main tourist area with water sports facilities, lifeguards, and the best views of the Mediterranean. Lively day and night atmosphere.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Terramar</div>
+            <div class="item-detail">Upscale residential neighborhood with beautiful villas, parks, and quieter beaches. Home to cultural institutions and the Palau de Maricel. More relaxed than the center, perfect for peaceful beach access and scenic walks.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Vinyet</div>
+            <div class="item-detail">Charming beach area south of the old town with a quieter vibe, local chiringuitos, and a more authentic Catalan feel. Great for experiencing local beach culture away from the main tourist crowds while staying close to action.</div>
+          </div>
+          <div class="tip"><strong>Tip:</strong> Base yourself in the Old Town for walkable access to restaurants, galleries, and nightlife. Stay near Seafront for beach convenience. Choose Terramar or Vinyet for a quieter, more local experience.</div>
+        </div>
+      </div>
+
+      <!-- Accommodation section -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🏨</span>
+          <span class="e-title">Accommodation</span>
+          <span class="e-preview">Hotels, rentals, budget options</span>
+          <svg class="e-chev" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Boutique hotels</div>
+            <div class="item-detail">Charming small hotels with character, often in modernista buildings or beachfront locations. Many feature rooftop terraces, personalized service, and local art. Prices €120-250/night for quality experience.</div>
+            <div class="item-meta">€120-250/night</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Beachfront rentals</div>
+            <div class="item-detail">Apartments and villas with sea views, terraces, and kitchen facilities. Perfect for families or longer stays. Available through Airbnb, Vrbo, and local property managers. Prices vary widely based on season.</div>
+            <div class="item-meta">€80-300/night • Book early for summer</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Budget accommodations</div>
+            <div class="item-detail">Hostels, basic hotels, and guesthouses offer budget options €40-70/night. Located inland from beach, but walkable to everything. Good for solo travelers and those watching their budget.</div>
+            <div class="item-meta">€40-70/night</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Seasonal pricing</div>
+            <div class="item-detail">Peak season (July-August, Carnival February, Film Festival October): prices 2-3x higher. Spring (April-May) and autumn (September-October) offer best value with pleasant weather. Winter is cheapest but fewer activities.</div>
+          </div>
+          <div class="tip"><strong>Tip:</strong> Book 2-3 months ahead for Carnival and Festival. Consider nearby towns (Vilanova, Castelldefels) for cheaper alternatives with easy train access. Apartment rentals offer better value for groups or longer stays.</div>
+        </div>
+      </div>
+
+      <!-- Safety section -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🛡️</span>
+          <span class="e-title">Safety</span>
+          <span class="e-preview">Safe town, beach tips</span>
+          <svg class="e-chev" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">General safety</div>
+            <div class="item-detail">Sitges is a very safe small coastal town with low crime rates. Tourist areas are well-policed and secure. Standard precautions (avoiding isolated areas at night, watching valuables) apply as in any tourist destination.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Beach safety</div>
+            <div class="item-detail">Designated swimming areas with lifeguards during summer months (flags indicate safe conditions). Check wave conditions and currents. Swim in marked areas only. Most beaches are monitored and family-friendly.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Water conditions</div>
+            <div class="item-detail">Mediterranean water is generally calm, but winter and spring can have stronger currents and larger waves. Water temperature: 14-18°C in spring, 20-22°C in summer. Respect warning flags and lifeguard instructions.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Valuables and pickpocketing</div>
+            <div class="item-detail">Watch belongings in crowded areas and on beaches. Use hotel safes for documents and extra cash. Avoid displaying expensive jewelry or electronics. Street crime exists but is rare; exercise normal urban precautions.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Nighttime safety</div>
+            <div class="item-detail">Sitges is safe at night with good street lighting in main areas. Stick to main streets, the seafront, and popular bars. The LGBTQ+ community is well-integrated and welcomed. Avoid walking alone in very dark side streets late at night.</div>
+          </div>
+          <div class="tip"><strong>Tip:</strong> In an emergency, call 112 (EU emergency number). Keep a copy of your passport separate from the original. Travel insurance is recommended. Tourist police are helpful with reports needed for insurance claims.</div>
+        </div>
+      </div>
+
+      <!-- Useful apps section -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">📱</span>
+          <span class="e-title">Useful apps</span>
+          <span class="e-preview">Navigation, transport, info</span>
+          <svg class="e-chev" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Google Maps</div>
+            <div class="item-detail">Essential for navigation, directions to restaurants, attractions, and public transport. Download offline maps of Sitges and surrounding area for reliable navigation without data connection.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Omio (formerly GoEuro)</div>
+            <div class="item-detail">Compare and book train, bus, and flight tickets. Shows Rodalies train schedules and prices to Barcelona, Tarragona, and other destinations. Very helpful for day trip planning and reservations.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Rodalies (TMB/FGC app)</div>
+            <div class="item-detail">The regional trains app for planning routes, checking real-time schedules, and fare information for journeys from Sitges to Barcelona and surrounding areas. Essential for day trips and local transport.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Citymapper (if available)</div>
+            <div class="item-detail">Excellent for public transport navigation in Barcelona day trips, showing metro, bus, and train options. Less relevant in Sitges itself but very useful for Barcelona exploration.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Tripadvisor or Yelp</div>
+            <div class="item-detail">Find and review restaurants, bars, and attractions. Read recent visitor feedback and see photos. Make reservations at popular restaurants to avoid long waits during peak times.</div>
+          </div>
+          <div class="tip"><strong>Tip:</strong> Download maps.me or similar offline maps app as backup. Keep Omio bookmarked for last-minute transport changes. Consider buying a T-10 card at any metro station for transport flexibility.</div>
+        </div>
+      </div>
+
+      <!-- Packing tips section -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🎒</span>
+          <span class="e-title">Packing tips</span>
+          <span class="e-preview">Beach essentials & spring layers</span>
+          <svg class="e-chev" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Beach essentials</div>
+            <div class="item-detail">Swimsuit, beach towel, flip-flops, beach bag. Beaches are rocky in some areas, so water shoes or sandals are helpful. Bring a change of clothes for after-beach meals at seafront restaurants.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Sun protection</div>
+            <div class="item-detail">High SPF sunscreen (reapply frequently), sunglasses, wide-brimmed hat, and sun shirt. Mediterranean sun is intense even in spring. A lightweight cover-up protects from sun and wind.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Spring layering</div>
+            <div class="item-detail">Days are mild (15-20°C) but mornings/evenings can be cool. Pack a light sweater, thin jacket, or cardigan. Comfortable walking shoes for exploring the old town. Light scarf is versatile for layering and style.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Casual dining wear</div>
+            <div class="item-detail">Dress code is casual except for upscale restaurants. Pack nice casual clothes for evening paseo and dining. Comfortable walking shoes, sandals for casual restaurants, and modest beachwear cover most situations.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Optional items</div>
+            <div class="item-detail">Portable charger for phones, small day backpack, reusable water bottle (refill at cafés), light waterproof jacket for spring showers, comfortable clothing for wine tastings in Penedès region.</div>
+          </div>
+          <div class="tip"><strong>Tip:</strong> Leave space in luggage for shopping as Sitges has excellent boutique galleries and craft shops. Quick-dry clothing is practical for beach days. The town is very walkable, so comfortable shoes are essential.</div>
+        </div>
+      </div>
+
+      <!-- Currency & payments section -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">💶</span>
+          <span class="e-title">Currency & payments</span>
+          <span class="e-preview">Euro, cards, tipping info</span>
+          <svg class="e-chev" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Currency</div>
+            <div class="item-detail">Spain uses the Euro (EUR, symbol €). 1 Euro = 100 cents. Coins: 1, 2, 5, 10, 20, 50 cents; €1, 2. Banknotes: €5, 10, 20, 50, 100, 200. Check current exchange rates before traveling.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Cards and ATMs</div>
+            <div class="item-detail">Visa, Mastercard, and American Express widely accepted. ATMs are abundant in Sitges, Barcelona, and most towns. Withdraw cash in EUR to avoid poor exchange rates. No fees at most Spanish ATMs for major banks.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Cash vs. cards</div>
+            <div class="item-detail">Most establishments accept cards, including small shops and restaurants. Some traditional establishments and markets prefer cash. Carry a mix of both. Contactless payments are standard and widely accepted.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Tipping culture</div>
+            <div class="item-detail">Tipping is NOT expected in Spain. Service is included in restaurant bills. Rounding up to nearest 5-10 EUR or leaving 5-10% at upscale restaurants is appreciated but optional. Tip bar staff with coins or small change.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Cost summary</div>
+            <div class="item-detail">Coffee: €1.50-3 • Meal: €10-25 • Beer: €2-4 • Wine glass: €3-5 • Museum: €4-6 • Train ticket: €3-8 • Taxi/Uber: meter or app pricing</div>
+          </div>
+          <div class="tip"><strong>Tip:</strong> Notify your bank of travel dates to avoid card blocks. Don't exchange money at airports (poor rates). Use ATMs in central areas for security. Keep some emergency cash separate from main wallet.</div>
+        </div>
+      </div>
+
+      <!-- Getting around section -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🚌</span>
+          <span class="e-title">Getting around Sitges</span>
+          <span class="e-preview">Walkable town, train, bus</span>
+          <svg class="e-chev" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Walking</div>
+            <div class="item-detail">Sitges is very walkable and pedestrian-friendly. The entire town center is accessible on foot. Main beaches, old town, and attractions are within 15-20 minutes walking. Wear comfortable shoes for uneven old town streets.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Rodalies trains (Cercanías)</div>
+            <div class="item-detail">Regional train network connects Sitges to Barcelona (35 min, €3-8), Vilanova (10 min), and Tarragona (45 min). Frequent departures (every 15-30 min). Buy individual tickets or T-10 card (€11.35 for 10 journeys). Very convenient and economical.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Buses</div>
+            <div class="item-detail">Local buses connect different areas of Sitges. Most transport needs are walkable. Long-distance buses (to Barcelona, Tarragona) available from main station. Playa line buses useful for reaching different beaches.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Taxis and rideshare</div>
+            <div class="item-detail">Taxis available at station and main plazas. Uber and Bolt operate in the area. Useful for reaching Penedès wineries or late-night returns. More expensive than trains but convenient with luggage.</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Bicycle rental</div>
+            <div class="item-detail">Local bike rental shops offer daily rentals (€15-25/day). Flat terrain perfect for cycling. Bike-friendly paths along seafront and connecting to nearby towns. Great for exploring at your own pace and reaching quieter beaches.</div>
+          </div>
+          <div class="tip"><strong>Tip:</strong> Get a T-10 ticket at any metro/train station for flexibility on regional trains. Walking is the best way to experience Sitges. Rent a bike for reaching nearby beaches. Trains are the most economical way to Barcelona.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleComponent(btn) {
+      btn.classList.toggle('open');
+      btn.nextElementSibling.classList.toggle('open');
+    }
+    function toggle(btn) {
+      btn.classList.toggle('open');
+      btn.nextElementSibling.classList.toggle('open');
+    }
+  </script>
+</body>
+</html>
