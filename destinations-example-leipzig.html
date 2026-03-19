@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Destination Highlights - Leipzig</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f9f9fa; color: #132968; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    .component { max-width: 800px; margin: 24px auto; background: #fff; border-radius: 16px; box-shadow: 0 1px 3px rgba(19,41,104,0.06); overflow: hidden; }
+    .comp-toggle { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; cursor: pointer; border: none; background: none; width: 100%; text-align: left; transition: background 0.15s; }
+    .comp-toggle:hover { background: #fafafc; }
+    .comp-toggle-left { display: flex; align-items: center; gap: 12px; }
+    .comp-toggle h2 { font-size: 20px; font-weight: 700; color: #132968; }
+    .comp-toggle .toggle-sub { font-size: 13px; color: #425486; }
+    .comp-toggle .comp-chev { width: 20px; height: 20px; color: #a1a9c3; transition: transform 0.25s; flex-shrink: 0; }
+    .comp-toggle.open .comp-chev { transform: rotate(180deg); }
+    .comp-body { display: none; }
+    .comp-body.open { display: block; }
+    .season-bar { display: flex; align-items: center; gap: 8px; padding: 4px 24px 12px; }
+    .season-badge { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+    .season-spring { color: #2e7d32; background: #e8f5e9; }
+    .season-note { font-size: 12px; color: #425486; }
+    .city-intro { padding: 0 24px 16px; }
+    .city-name { font-size: 20px; font-weight: 800; color: #132968; margin-bottom: 8px; }
+    .city-blurb { font-size: 14px; color: #425486; line-height: 1.7; }
+    .highlights { display: flex; gap: 12px; padding: 0 24px 20px; overflow-x: auto; }
+    .hl-card { flex: 0 0 200px; background: #f9f9fa; border-radius: 10px; padding: 14px; border: 1px solid #f0f0f2; }
+    .hl-card .hl-emoji { font-size: 20px; margin-bottom: 6px; }
+    .hl-card .hl-title { font-size: 13px; font-weight: 700; color: #132968; margin-bottom: 4px; }
+    .hl-card .hl-desc { font-size: 12px; color: #425486; line-height: 1.5; }
+    .expand { border-top: 1px solid #f0f0f2; }
+    .expand-btn { display: flex; align-items: center; gap: 10px; padding: 14px 24px; cursor: pointer; width: 100%; border: none; background: none; text-align: left; transition: background 0.15s; }
+    .expand-btn:hover { background: #fafafc; }
+    .expand-btn .e-icon { font-size: 16px; width: 24px; text-align: center; flex-shrink: 0; }
+    .expand-btn .e-title { flex: 1; font-size: 13px; font-weight: 600; color: #132968; }
+    .expand-btn .e-preview { font-size: 12px; color: #a1a9c3; margin-right: 8px; }
+    .expand-btn .e-chev { width: 16px; height: 16px; color: #a1a9c3; transition: transform 0.2s; flex-shrink: 0; }
+    .expand-btn.open .e-chev { transform: rotate(180deg); }
+    .expand-body { display: none; padding: 0 24px 16px 58px; }
+    .expand-body.open { display: block; }
+    .item { margin-bottom: 12px; }
+    .item .item-name { font-size: 13px; font-weight: 700; color: #132968; }
+    .item .item-detail { font-size: 12px; color: #425486; line-height: 1.5; margin-top: 2px; }
+    .item .item-meta { font-size: 11px; color: #a1a9c3; margin-top: 2px; }
+    .price { color: #0057b8; font-weight: 700; }
+    .sep { height: 1px; background: #f0f0f2; margin: 12px 0; }
+    .tip { font-size: 12px; color: #425486; background: #f9f9fa; padding: 8px 12px; border-radius: 6px; margin-top: 8px; }
+    .tip strong { color: #132968; }
+    .seasonal { background: #fffde7; border: 1px solid #fff9c4; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; font-size: 12px; color: #f57f17; }
+    .seasonal strong { color: #e65100; }
+    .internal-link { color: #0057b8; text-decoration: none; font-weight: 600; border-bottom: 1px dashed #0057b8; }
+    .internal-link:hover { color: #003d82; border-bottom-style: solid; }
+    @media (max-width: 600px) {
+      .hl-card { flex: 0 0 170px; }
+      .expand-body { padding-left: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="component">
+    <button class="comp-toggle open" onclick="toggleComponent(this)">
+      <div class="comp-toggle-left">
+        <h2>Leipzig</h2>
+        <span class="toggle-sub">Destination Highlights</span>
+      </div>
+      <svg class="comp-chev" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+      </svg>
+    </button>
+
+    <div class="comp-body open">
+      <div class="season-bar">
+        <span class="season-badge season-spring">Spring 2026</span>
+        <span class="season-note">Perfect time for mild weather and cultural events</span>
+      </div>
+
+      <div class="city-intro">
+        <div class="city-name">Leipzig</div>
+        <div class="city-blurb">Often called the new Berlin, Leipzig is a vibrant cultural hub with deep musical heritage—from Bach to Wagner. The city's thriving art scene, affordable cost of living, and bohemian energy make it one of Germany's most exciting destinations for creative travelers.</div>
+      </div>
+
+      <div class="highlights">
+        <div class="hl-card">
+          <div class="hl-emoji">🎼</div>
+          <div class="hl-title">Musical Heritage</div>
+          <div class="hl-desc">Bach & Wagner legacy, world-class concerts and performances</div>
+        </div>
+        <div class="hl-card">
+          <div class="hl-emoji">🎨</div>
+          <div class="hl-title">Art Scene</div>
+          <div class="hl-desc">Contemporary galleries, street art, and creative districts</div>
+        </div>
+        <div class="hl-card">
+          <div class="hl-emoji">💰</div>
+          <div class="hl-title">Affordable</div>
+          <div class="hl-desc">Budget-friendly compared to Berlin and other major cities</div>
+        </div>
+        <div class="hl-card">
+          <div class="hl-emoji">🚴</div>
+          <div class="hl-title">Walkable City</div>
+          <div class="hl-desc">Compact center and excellent tram network</div>
+        </div>
+      </div>
+
+      <!-- ATTRACTIONS -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🏛️</span>
+          <span class="e-title">Attractions</span>
+          <span class="e-preview">Museums, landmarks & must-see spots</span>
+          <svg class="e-chev" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L8 8.586l3.293-3.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">St. Thomas Church (Thomaskirche)</div>
+            <div class="item-detail">Bach's church and a masterpiece of Gothic architecture. Attend concerts where Bach himself directed centuries ago. The interior is stunning and historically rich.</div>
+            <div class="item-meta">Admission: €5 | Concerts vary | UNESCO World Heritage site</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Monument to the Battle of the Nations</div>
+            <div class="item-detail">Monumental 91-meter tower commemorating the 1813 Battle of Leipzig. The crypt contains sculptures and the views from the top reward the long climb. Locals call it "Völkerschlachtdenkmal."</div>
+            <div class="item-meta">Admission: €6 | Panoramic views | Historical significance</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Leipzig Zoo</div>
+            <div class="item-detail">One of Germany's oldest zoos with large, naturalistic enclosures. Over 850 species spread across beautiful grounds. Great for a leisurely half-day visit.</div>
+            <div class="item-meta">Admission: €18 | Family-friendly | 26 hectares</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Spinnerei Art District</div>
+            <div class="item-detail">Former textile factory turned thriving contemporary art hub. Over 80 artists, galleries, and studios open to the public. The raw industrial space filled with cutting-edge work is utterly inspiring.</div>
+            <div class="item-meta">Free entry | Gallery hopping | First Friday openings</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Stasi Museum</div>
+            <div class="item-detail">East German secret police headquarters showcasing Cold War surveillance history. Rooms frozen in time, fascinating exhibits on secret police methods and citizen spying networks.</div>
+            <div class="item-meta">Admission: €8 | Guided tours available | Historical significance</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIVITIES -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🎭</span>
+          <span class="e-title">Activities</span>
+          <span class="e-preview">Things to do & experiences</span>
+          <svg class="e-chev" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L8 8.586l3.293-3.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Attend a Bach Concert</div>
+            <div class="item-detail">Experience classical music in its spiritual home. St. Thomas Church offers regular performances, and the Bach Museum has concerts year-round. Check Gewandhaus orchestra schedules for world-class performances.</div>
+            <div class="item-meta">Prices vary | Book ahead | Unforgettable experience</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Gallery Hopping at Spinnerei</div>
+            <div class="item-detail">Spend an afternoon wandering artist studios and contemporary galleries. Chat with artists, discover emerging work, and grab coffee in the space. First Friday of each month has special openings and extended hours.</div>
+            <div class="item-meta">Free entry | Weekends & First Friday | 3-4 hours ideal</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Paddle the Karl-Heine-Kanal</div>
+            <div class="item-detail">Beautiful canal weaving through old industrial areas now full of parks and cafés. Rent a kayak or canoe and paddle past art installations, riverside restaurants, and green spaces.</div>
+            <div class="item-meta">Rentals: €12-15/hour | Spring-fall season | Unique perspective</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Vinyl Shopping & Record Digging</div>
+            <div class="item-detail">Leipzig's music heritage extends to vinyl culture. Independent record shops like Plattenrausch and Musikhandel Stock are paradise for collectors and music lovers seeking rare finds.</div>
+            <div class="item-meta">Scattered throughout city | Afternoon activity | Eclectic selection</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Nightlife on Karl-Liebknecht-Straße</div>
+            <div class="item-detail">The city's epicenter for bars, clubs, and live music. From techno venues to indie rock clubs to cocktail bars, this street pulses with energy after dark. Summer beer gardens too.</div>
+            <div class="item-meta">Varies by venue | Thursday-Sunday lively | Alternative scene</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY TRIPS -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🚂</span>
+          <span class="e-title">Day Trips</span>
+          <span class="e-preview">Easy escapes from Leipzig</span>
+          <svg class="e-chev" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L8 8.586l3.293-3.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name"><a href="https://www.omio.com/trains/leipzig/dresden" class="internal-link">Dresden</a></div>
+            <div class="item-detail">Baroque masterpiece with Frauenkirche, Zwinger Palace, and riverside charm. Easily Germany's most beautiful city. The 1h15m train ride makes it perfect for an overnight or full-day trip.</div>
+            <div class="item-meta">1h 15 mins by train | €8-15 return | Must-see destination</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name"><a href="https://www.omio.com/trains/leipzig/berlin" class="internal-link">Berlin</a></div>
+            <div class="item-detail">Germany's vibrant capital with museums, galleries, nightlife, and history. Reichstag, Brandenburg Gate, street art districts, and countless neighborhoods to explore. Direct fast trains make it accessible.</div>
+            <div class="item-meta">1h 15 mins by train | €10-20 return | Capital city energy</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name"><a href="https://www.omio.com/trains/leipzig/weimar" class="internal-link">Weimar</a></div>
+            <div class="item-detail">Cultural heart of Germany. Home to Goethe, Schiller, and the Bauhaus movement. Compact medieval town with literary heritage, museums, and intimate charm. Easy one-hour journey.</div>
+            <div class="item-meta">1 hour by train | €8-12 return | Literary significance</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name"><a href="https://www.omio.com/trains/leipzig/wittenberg" class="internal-link">Wittenberg</a></div>
+            <div class="item-detail">Where Martin Luther sparked the Reformation. Castle Church, historic town square, and Luther House museum. Peaceful riverfront town with Renaissance architecture and deep historical roots.</div>
+            <div class="item-meta">1 hour by train | €8-12 return | Reformation history</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name"><a href="https://www.omio.com/trains/leipzig/meissen" class="internal-link">Meissen</a></div>
+            <div class="item-detail">Famous for porcelain manufacture and hilltop castle. Wander cobblestone streets, visit the porcelain factory, and enjoy riverside views. Charming small town with Saxon character.</div>
+            <div class="item-meta">1h 30 mins by train | €10-15 return | Porcelain heritage</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DINING -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🍽️</span>
+          <span class="e-title">Dining</span>
+          <span class="e-preview">Food scene & restaurants</span>
+          <svg class="e-chev" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L8 8.586l3.293-3.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Saxon Cuisine</div>
+            <div class="item-detail">Traditional regional food includes sauerbraten (pot roast), wild boar, potato soup, and Leipzig Allerlei (mixed vegetables). Rich, hearty comfort food that pairs perfectly with local beer and coffee culture.</div>
+            <div class="item-meta">Winter favorite | Traditional restaurants | Budget-friendly</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Auerbachs Keller</div>
+            <div class="item-detail">Historic wine restaurant in a 16th-century vaulted cellar. Famous from Goethe's Faust, it's touristy but charming with good Saxon dishes and wine selection. The underground setting is atmospheric.</div>
+            <div class="item-meta">Lunch €12-18 | Dinner €18-28 | Reservation recommended | Historic</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Coffee Culture</div>
+            <div class="item-detail">Specialty coffee scene thriving with indie roasters like Bragazzis and local cafés. Excellent pour-overs, espresso, and pastries. Perfect for morning ritual or afternoon breaks.</div>
+            <div class="item-meta">Coffee €2-4 | Independent cafés | Hipster-friendly</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Südvorstadt Restaurant Scene</div>
+            <div class="item-detail">The southern district brims with international cuisine, vegan restaurants, wine bars, and casual eateries. From Thai to Italian to contemporary German, it's where locals eat. Most places are casual and reasonably priced.</div>
+            <div class="item-meta">Meals €8-16 | Casual atmosphere | Diverse options</div>
+          </div>
+          <div class="tip"><strong>Tip:</strong> Look for "Studentenkneipe" (student bars/restaurants) for authentic, cheap local food and beer in a lively atmosphere.</div>
+        </div>
+      </div>
+
+      <!-- BUDGET -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">💵</span>
+          <span class="e-title">Budget</span>
+          <span class="e-preview">Costs & money-saving tips</span>
+          <svg class="e-chev" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L8 8.586l3.293-3.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Meal Costs</div>
+            <div class="item-detail">Street food or casual lunch: €5-9. Mid-range restaurant: €12-18. Upscale dining: €25-45. Coffee: €2-4. Beer (500ml glass): €2.50-4. Significantly cheaper than Berlin or Munich.</div>
+            <div class="item-meta">Very affordable | Budget travelers' paradise | Excellent value</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Transport Costs</div>
+            <div class="item-detail">Single tram/bus ticket: €2.60. Day pass: €8. Week pass: €32. Train to Dresden: €8-15 return. Bike rentals: €10-15/day. Excellent value for connectivity.</div>
+            <div class="item-meta">Budget-friendly | Day pass recommended | Bike culture</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Museum Prices</div>
+            <div class="item-detail">Most museums: €5-8 entry. Stasi Museum: €8. Battle of Nations: €6. Zoo: €18. Many free entry times (some museums free evening hours). Student discounts widely available.</div>
+            <div class="item-meta">Affordable | Free days exist | Student discounts</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Accommodation</div>
+            <div class="item-detail">Budget hostel dorm: €15-25/night. Budget private room: €30-50/night. Mid-range hotel: €60-100/night. Luxury hotel: €120-200/night. Airbnb apartments: €40-80/night. Much cheaper than Berlin.</div>
+            <div class="item-meta">Great value | Multiple options | Compare prices</div>
+          </div>
+          <div class="tip"><strong>Budget tip:</strong> Leipzig's "First Friday" art openings are free, student bars offer cheap meals, and many parks/riverside walks cost nothing.</div>
+        </div>
+      </div>
+
+      <!-- NEIGHBORHOODS -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🏘️</span>
+          <span class="e-title">Neighborhoods</span>
+          <span class="e-preview">Where to stay & explore</span>
+          <svg class="e-chev" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L8 8.586l3.293-3.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Südvorstadt (South)</div>
+            <div class="item-detail">Trendy, bohemian neighborhood full of students, cafés, bars, and independent restaurants. Vibrant nightlife, art scene, and vintage shops. Tree-lined streets and alternative culture. Best for young travelers.</div>
+            <div class="item-meta">Hipster hub | Nightlife | Budget accommodations</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Plagwitz & Lindenau (West)</div>
+            <div class="item-detail">Post-industrial creative district. Converted warehouses host galleries, studios, bars, and clubs. Raw, artistic vibe with street art. More relaxed than Südvorstadt but equally creative. Weekend gallery walks.</div>
+            <div class="item-meta">Art scene | Industrial charm | Emerging neighborhood</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Connewitz (South)</div>
+            <div class="item-detail">Alternative, politically engaged neighborhood with squatter culture, street art, and punk rock venues. Authentic, edgy, and very Leipzig. Home to grassroots clubs and independent bookstores.</div>
+            <div class="item-meta">Alternative culture | Street art | Youth scene</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">City Center (Altstadt)</div>
+            <div class="item-detail">Historic Old Town with main attractions, St. Thomas Church, monuments, and restaurants. More touristy but essential. Beautiful architecture and pedestrian streets. Great for first-time visitors.</div>
+            <div class="item-meta">Tourist hub | Main attractions | Higher prices</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Schleußig (South)</div>
+            <div class="item-detail">Quiet, leafy residential neighborhood along the Pleiße river. Perfect for walks, parks, and escape from crowds. Local cafés and brewery biergarten. Peaceful base for relaxed exploration.</div>
+            <div class="item-meta">Peaceful | Parks & nature | River setting</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCOMMODATION -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🏨</span>
+          <span class="e-title">Accommodation</span>
+          <span class="e-preview">Where to sleep</span>
+          <svg class="e-chev" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L8 8.586l3.293-3.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Budget Hostels</div>
+            <div class="item-detail">Shared dorms from €15-25/night. Popular spots include Sleepy Lion, Apt Hostel, and The Commondery. Social atmosphere, kitchen access, and location-friendly. Great for solo travelers and backpackers.</div>
+            <div class="item-meta">€15-25/dorm | Social environment | City center options</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Budget Private Rooms</div>
+            <div class="item-detail">Guesthouses and budget hotels: €30-50/night. Often in Südvorstadt and Plagwitz. No-frills but clean and central. Sometimes include breakfast. Good balance of price and privacy.</div>
+            <div class="item-meta">€30-50/night | Simple but clean | Local neighborhoods</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Mid-Range Hotels</div>
+            <div class="item-detail">Three-star hotels: €60-100/night. Quality accommodations with better amenities. Spread across neighborhoods. Good reviews on booking platforms. Often include breakfast.</div>
+            <div class="item-meta">€60-100/night | Comfort level | Multiple locations</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Luxury Hotels</div>
+            <div class="item-detail">Four/five-star properties: €120-200/night. Premium chains and boutique hotels. City center locations, full amenities, concierge. Still cheaper than Berlin or Munich luxury.</div>
+            <div class="item-meta">€120-200/night | Premium amenities | Central locations</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Airbnb & Apartments</div>
+            <div class="item-detail">Furnished apartments: €40-80/night for 1-2 person units. Good value for longer stays. Neighborhoods offer authentic local experience. Kitchen access saves money on meals.</div>
+            <div class="item-meta">€40-80/night | Kitchen access | Local neighborhoods</div>
+          </div>
+          <div class="tip"><strong>Pro tip:</strong> Booking accommodations in Südvorstadt or Plagwitz saves money while offering better atmosphere than city center.</div>
+        </div>
+      </div>
+
+      <!-- SAFETY -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🛡️</span>
+          <span class="e-title">Safety</span>
+          <span class="e-preview">Safety tips & precautions</span>
+          <svg class="e-chev" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L8 8.586l3.293-3.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Overall Safety</div>
+            <div class="item-detail">Leipzig is a very safe city by international standards. Crime rates are low, and violent crime is rare. The culture is welcoming and non-confrontational. Safe for solo travelers, families, and all groups.</div>
+            <div class="item-meta">Very safe | Low crime | Welcoming culture</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Standard Precautions</div>
+            <div class="item-detail">Use normal urban awareness: don't flash valuables, watch bags on public transport, avoid empty train cars late at night, stay in well-lit areas. These are basic urban safety practices, not specific Leipzig concerns.</div>
+            <div class="item-meta">Common sense applies | Minimal risk | Day & night safe</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Neighborhoods to Avoid</div>
+            <div class="item-detail">No neighborhoods are genuinely dangerous. Connewitz has a rough reputation from squatter protests, but it's safe—just edgy. All districts accessible to tourists. Eastern suburbs are quieter but safe.</div>
+            <div class="item-meta">All areas accessible | No true danger zones | Reputation ≠ reality</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Emergency Numbers</div>
+            <div class="item-detail">Police: 110. Ambulance/Fire: 112. Non-emergency police: 0341-3640. All operators speak English. Medical facilities are excellent and centralized.</div>
+            <div class="item-meta">English-speaking | Reliable services | Excellent healthcare</div>
+          </div>
+          <div class="tip"><strong>Safety note:</strong> Leipzig residents are helpful and approachable. Don't hesitate to ask for directions or assistance—the city is genuinely friendly.</div>
+        </div>
+      </div>
+
+      <!-- USEFUL APPS -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">📱</span>
+          <span class="e-title">Useful Apps</span>
+          <span class="e-preview">Helpful tools & resources</span>
+          <svg class="e-chev" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L8 8.586l3.293-3.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Omio</div>
+            <div class="item-detail">Book train, bus, and flight tickets across Europe. Essential for day trips to Dresden, Berlin, Weimar. Compares prices and shows all transport options. Highly recommended for planning escapes.</div>
+            <div class="item-meta">Multi-transport | Price comparison | Essential app</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">LVB App</div>
+            <div class="item-detail">Official Leipzig tram and bus app. Real-time departures, trip planning, ticket purchase, and service updates. Indispensable for navigating the public transport system efficiently.</div>
+            <div class="item-meta">Local transit | Real-time data | Ticket purchasing</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Google Maps</div>
+            <div class="item-detail">Navigation, search for restaurants/museums/shops, offline maps download capability. Works reliably in Leipzig. Use for walking directions and discovering nearby spots.</div>
+            <div class="item-meta">Navigation | Discovery | Always useful</div>
+          </div>
+          <div class="tip"><strong>App note:</strong> Consider downloading offline maps before arrival for peace of mind, though data connectivity is excellent throughout the city.</div>
+        </div>
+      </div>
+
+      <!-- PACKING TIPS -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🎒</span>
+          <span class="e-title">Packing Tips</span>
+          <span class="e-preview">What to bring</span>
+          <svg class="e-chev" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L8 8.586l3.293-3.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Spring Layers</div>
+            <div class="item-detail">March/April temperatures range 8-15°C. Pack light sweaters, cardigans, and a light jacket. Long sleeves for morning/evening. Layers work best as weather fluctuates throughout the day.</div>
+            <div class="item-meta">Essential | Variable weather | Comfort priority</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Rain Gear</div>
+            <div class="item-detail">Spring brings frequent rain. Lightweight rain jacket or poncho essential. Compact umbrella. Waterproof bag for electronics. Quick-dry clothes appreciated. Rain is unpredictable so be prepared.</div>
+            <div class="item-meta">Must-have | Spring showers | Quick-dry fabrics</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Comfortable Walking Shoes</div>
+            <div class="item-detail">Leipzig is walkable and bike-friendly. Bring good walking shoes (broken in beforehand). Waterproof if possible. Flat, stable soles for cobblestone streets. Exploring requires many steps daily.</div>
+            <div class="item-meta">Priority item | Cobblestones | Daily walking</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Accessories</div>
+            <div class="item-detail">Light scarf useful for warmth and style. Sunglasses for spring sun. Hat optional. Small daypack for walking tours. Power bank for phone/camera charging. Reusable water bottle (tap water is excellent).</div>
+            <div class="item-meta">Nice-to-have | Comfort items | Practicality</div>
+          </div>
+          <div class="tip"><strong>Packing note:</strong> Leipzig's spring weather is mild but changeable—the key is layering. Dress warmly in mornings/evenings but have options to cool off during day.</div>
+        </div>
+      </div>
+
+      <!-- CURRENCY & PAYMENTS -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">💳</span>
+          <span class="e-title">Currency & Payments</span>
+          <span class="e-preview">Money, cards & tipping</span>
+          <svg class="e-chev" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L8 8.586l3.293-3.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Currency</div>
+            <div class="item-detail">Currency is the Euro (EUR, €). 1 Euro = approximately 1.10 USD. Coins come in 1€, 2€, and smaller denominations. Notes from €5-€500 (large denominations rare in shops).</div>
+            <div class="item-meta">Euro only | No USD accepted | ATMs abundant</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Cards Widely Accepted</div>
+            <div class="item-detail">VISA and Mastercard accepted almost everywhere. ATMs (Geldautomat) ubiquitous for cash withdrawals with minimal fees. Contactless/chip payments standard. Mobile payment (Apple Pay, Google Pay) increasingly common.</div>
+            <div class="item-meta">Card-friendly | ATMs everywhere | Contactless standard</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Tipping Culture</div>
+            <div class="item-detail">Tipping is expected but not obligatory. Restaurants: 5-10% customary for good service. Rounding up is common (€23.50 bill → €25). Taxis: 5-10%. Tour guides: €2-5 appreciated. Bartenders: small change or 5%.</div>
+            <div class="item-meta">5-10% standard | Rounding acceptable | Appreciated not required</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Cash vs. Card</div>
+            <div class="item-detail">Many small cafés, markets, and bars still prefer cash. Larger restaurants and shops accept cards. Have mix of both. Cash for markets and casual dining, cards for hotels and big purchases.</div>
+            <div class="item-meta">Bring both | Mix recommended | Small places take cash</div>
+          </div>
+          <div class="tip"><strong>Money tip:</strong> Exchange money at ATMs (best rates) rather than banks or exchange shops. Notify your bank of travel dates to avoid card blocks for EU charges.</strong></div>
+        </div>
+      </div>
+
+      <!-- GETTING AROUND -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🚌</span>
+          <span class="e-title">Getting Around Leipzig</span>
+          <span class="e-preview">Transport & navigation</span>
+          <svg class="e-chev" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L8 8.586l3.293-3.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Tram Network (Straßenbahn)</div>
+            <div class="item-detail">Heart of Leipzig's transit. Extensive network covering entire city. Frequent, reliable, and punctual. 24-hour service on weekends. Single ticket €2.60, day pass €8, week pass €32. Most convenient way to move around city.</div>
+            <div class="item-meta">Extensive | Frequent | Budget-friendly | Day pass recommended</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Buses</div>
+            <div class="item-detail">Supplement tram network for outlying areas. Same ticket system. Less essential than trams for typical tourist routes but useful for specific destinations. Night buses available.</div>
+            <div class="item-meta">Secondary option | Same tickets | Outlying areas</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">S-Bahn (Regional Train)</div>
+            <div class="item-detail">Regional rail network connecting Leipzig suburbs and nearby towns. Good for day trips to Meissen, Colditz. Integrated with tram/bus network. Day pass includes S-Bahn in zones.</div>
+            <div class="item-meta">Regional connections | Suburbs | Day trip option</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Bicycle Culture</div>
+            <div class="item-detail">Leipzig is very bike-friendly with extensive network of dedicated cycling paths. Flat terrain perfect for cycling. Bike rentals: €10-15/day. Long-term rentals available. Cycling is local transport method.</div>
+            <div class="item-meta">Bike-friendly | Flat terrain | Rental affordable | Local culture</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Walking</div>
+            <div class="item-detail">City center is compact and very walkable. Most attractions within walking distance of each other. Streets are safe and pedestrian-friendly. Best way to discover neighborhoods and get lost intentionally.</div>
+            <div class="item-meta">City center walkable | Safe streets | Discovery-friendly</div>
+          </div>
+          <div class="sep"></div>
+          <div class="item">
+            <div class="item-name">Taxis & Uber</div>
+            <div class="item-detail">Taxis readily available, reliable, and metered. Uber operates but local taxi apps also available. More expensive than public transport but convenient late-night. Short rides: €5-10.</div>
+            <div class="item-meta">Available | Metered | Expensive | Late-night option</div>
+          </div>
+          <div class="tip"><strong>Transport note:</strong> Buy a day pass (€8) if using public transport more than twice. Download LVB app for real-time information and trip planning. Walking + one day pass covers most travelers' needs perfectly.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function toggleComponent(btn) {
+      btn.classList.toggle('open');
+      btn.nextElementSibling.classList.toggle('open');
+    }
+    function toggle(btn) {
+      btn.classList.toggle('open');
+      btn.nextElementSibling.classList.toggle('open');
+    }
+  </script>
+</body>
+</html>
