@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Berlin Destination Highlights</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f9f9fa; color: #132968; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    .component { max-width: 800px; margin: 24px auto; background: #fff; border-radius: 16px; box-shadow: 0 1px 3px rgba(19,41,104,0.06); overflow: hidden; }
+    .comp-toggle { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; cursor: pointer; border: none; background: none; width: 100%; text-align: left; transition: background 0.15s; }
+    .comp-toggle:hover { background: #fafafc; }
+    .comp-toggle-left { display: flex; align-items: center; gap: 12px; }
+    .comp-toggle h2 { font-size: 20px; font-weight: 700; color: #132968; }
+    .comp-toggle .toggle-sub { font-size: 13px; color: #425486; }
+    .comp-toggle .comp-chev { width: 20px; height: 20px; color: #a1a9c3; transition: transform 0.25s; flex-shrink: 0; }
+    .comp-toggle.open .comp-chev { transform: rotate(180deg); }
+    .comp-body { display: none; }
+    .comp-body.open { display: block; }
+    .season-bar { display: flex; align-items: center; gap: 8px; padding: 4px 24px 12px; }
+    .season-badge { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+    .season-spring { color: #2e7d32; background: #e8f5e9; }
+    .season-note { font-size: 12px; color: #425486; }
+    .city-intro { padding: 0 24px 16px; }
+    .city-name { font-size: 20px; font-weight: 800; color: #132968; margin-bottom: 8px; }
+    .city-blurb { font-size: 14px; color: #425486; line-height: 1.7; }
+    .highlights { display: flex; gap: 12px; padding: 0 24px 20px; overflow-x: auto; }
+    .hl-card { flex: 0 0 200px; background: #f9f9fa; border-radius: 10px; padding: 14px; border: 1px solid #f0f0f2; }
+    .hl-card .hl-emoji { font-size: 20px; margin-bottom: 6px; }
+    .hl-card .hl-title { font-size: 13px; font-weight: 700; color: #132968; margin-bottom: 4px; }
+    .hl-card .hl-desc { font-size: 12px; color: #425486; line-height: 1.5; }
+    .expand { border-top: 1px solid #f0f0f2; }
+    .expand-btn { display: flex; align-items: center; gap: 10px; padding: 14px 24px; cursor: pointer; width: 100%; border: none; background: none; text-align: left; transition: background 0.15s; }
+    .expand-btn:hover { background: #fafafc; }
+    .expand-btn .e-icon { font-size: 16px; width: 24px; text-align: center; flex-shrink: 0; }
+    .expand-btn .e-title { flex: 1; font-size: 13px; font-weight: 600; color: #132968; }
+    .expand-btn .e-preview { font-size: 12px; color: #a1a9c3; margin-right: 8px; }
+    .expand-btn .e-chev { width: 16px; height: 16px; color: #a1a9c3; transition: transform 0.2s; flex-shrink: 0; }
+    .expand-btn.open .e-chev { transform: rotate(180deg); }
+    .expand-body { display: none; padding: 0 24px 16px 58px; }
+    .expand-body.open { display: block; }
+    .item { margin-bottom: 12px; }
+    .item .item-name { font-size: 13px; font-weight: 700; color: #132968; }
+    .item .item-detail { font-size: 12px; color: #425486; line-height: 1.5; margin-top: 2px; }
+    .item .item-meta { font-size: 11px; color: #a1a9c3; margin-top: 2px; }
+    .price { color: #0057b8; font-weight: 700; }
+    .g { color: #0a8a3e; font-weight: 600; }
+    .sep { height: 1px; background: #f0f0f2; margin: 12px 0; }
+    .tip { font-size: 12px; color: #425486; background: #f9f9fa; padding: 8px 12px; border-radius: 6px; margin-top: 8px; }
+    .tip strong { color: #132968; }
+    .seasonal { background: #fffde7; border: 1px solid #fff9c4; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; font-size: 12px; color: #f57f17; }
+    .seasonal strong { color: #e65100; }
+    .internal-link { color: #0057b8; text-decoration: none; font-weight: 600; border-bottom: 1px dashed #0057b8; }
+    .internal-link:hover { color: #003d82; border-bottom-style: solid; }
+    @media (max-width: 600px) {
+      .hl-card { flex: 0 0 170px; }
+      .expand-body { padding-left: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="component">
+    <!-- Main Toggle -->
+    <button class="comp-toggle open" onclick="toggleComponent(this)">
+      <div class="comp-toggle-left">
+        <h2>Berlin</h2>
+        <span class="toggle-sub">Spring 2026</span>
+      </div>
+      <svg class="comp-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="18 15 12 9 6 15"></polyline>
+      </svg>
+    </button>
+
+    <!-- Main Body (starts open) -->
+    <div class="comp-body open">
+      <!-- Season Bar -->
+      <div class="season-bar">
+        <span class="season-badge season-spring">🌱 Spring 2026</span>
+        <span class="season-note">March–May: Mild temps, cherry blossoms, outdoor season awakens</span>
+      </div>
+
+      <!-- City Intro -->
+      <div class="city-intro">
+        <div class="city-name">Welcome to Berlin</div>
+        <div class="city-blurb">
+          Step off the train into a city that pulses with creative energy and unburdened reinvention. From the graffitied walls of Kreuzberg to the elegant boulevards of Charlottenburg, Berlin refuses to stay the same. History breathes from every corner—the Brandenburg Gate, the Wall's ghost, the scars and triumphs of the 20th century—yet the city remains radically forward-looking, with world-class techno clubs, cutting-edge galleries, and street art that rewrites itself weekly. Spring brings warmth, longer days, and an explosion of outdoor beer gardens and riverside hangouts. This is a city where you can feel the weight of history and the thrill of tomorrow, all at once.
+        </div>
+      </div>
+
+      <!-- Highlights -->
+      <div class="highlights">
+        <div class="hl-card">
+          <div class="hl-emoji">🏛️</div>
+          <div class="hl-title">Museum Island</div>
+          <div class="hl-desc">Five world-class museums in one UNESCO compound, from ancient Egypt to Prussian treasures.</div>
+        </div>
+        <div class="hl-card">
+          <div class="hl-emoji">🎨</div>
+          <div class="hl-title">East Side Gallery</div>
+          <div class="hl-desc">1.3 km of vibrant murals on the remaining Berlin Wall, an ever-changing open-air gallery.</div>
+        </div>
+        <div class="hl-card">
+          <div class="hl-emoji">🎵</div>
+          <div class="hl-title">Techno Culture</div>
+          <div class="hl-desc">Legendary clubs like Berghain and Watergate define the world's techno capital.</div>
+        </div>
+        <div class="hl-card">
+          <div class="hl-emoji">🚲</div>
+          <div class="hl-title">Bike & Explore</div>
+          <div class="hl-desc">Over 1,000 km of bike lanes crisscross the city—the best way to discover hidden neighborhoods.</div>
+        </div>
+      </div>
+
+      <!-- Sections -->
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🎭</span>
+          <span class="e-title">Attractions</span>
+          <span class="e-preview">Museums, monuments & more</span>
+          <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Museum Island (Museumsinsel)</div>
+            <div class="item-detail">Five major museums including the Pergamon Museum (Greco-Roman antiquities), Neues Museum (Egyptian bust of Nefertiti), and the German Historical Museum. UNESCO World Heritage site. Allow a full day or split visits.</div>
+            <div class="item-meta"><span class="price">€20–30 per museum</span> • Mitte district</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Brandenburg Gate & Reichstag</div>
+            <div class="item-detail">Berlin's most iconic monument. The Reichstag dome offers 360° city views (book ahead). Nearby: Memorial to the Murdered Jews of Europe—a haunting, essential 2,711 concrete stelae.</div>
+            <div class="item-meta">Free to view gate • <span class="price">€3–5</span> for dome • Mitte</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">East Side Gallery</div>
+            <div class="item-detail">1.3 km stretch of original Berlin Wall, now a dynamic open-air gallery. Over 100 murals by international artists; constantly evolving. Best visited in daylight; walk from Friedrichshain or Kreuzberg.</div>
+            <div class="item-meta">Free • Friedrichshain</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Memorial to the Murdered Jews of Europe</div>
+            <div class="item-detail">2,711 concrete stelae of varying heights create a disorienting, deeply moving maze. The underground information center provides historical context. Powerful and humbling.</div>
+            <div class="item-meta">Free • Mitte</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Charlottenburg Palace</div>
+            <div class="item-detail">Prussia's grand royal residence in the west. Stunning gardens, opulent rooms, and sculpture collections. Quieter than Museum Island; worth a half-day trip.</div>
+            <div class="item-meta"><span class="price">€12–15</span> • Charlottenburg district</div>
+          </div>
+
+          <div class="tip"><strong>Pro tip:</strong> Buy a Museum Pass Berlin (€30) for 3 consecutive days of unlimited entry to 70+ museums.</div>
+        </div>
+      </div>
+
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🎪</span>
+          <span class="e-title">Activities</span>
+          <span class="e-preview">Clubs, tours, markets & more</span>
+          <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Techno Clubs</div>
+            <div class="item-detail">Berghain (industrial, strict dress code), Watergate (rooftop views on the Spree), Tresor (legendary Friedrichshain club), Sisyphos (outdoor garden). Clubs don't get going until midnight; many run 24+ hours.</div>
+            <div class="item-meta"><span class="price">€8–15 entry</span> • Various districts</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Street Art Tours</div>
+            <div class="item-detail">Explore Kreuzberg's RAW-Gelände, Friedrichshain murals, and East Side Gallery with knowledgeable guides. Many tours led by local artists who explain the political and creative context.</div>
+            <div class="item-meta"><span class="price">€15–25</span> per person • 2–3 hours</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Bike Tours & Rentals</div>
+            <div class="item-detail">Over 1,000 km of dedicated bike lanes. Rent from Call a Bike or similar services. Great for exploring parks like Tiergarten, riding along the Spree, or discovering quieter neighborhoods. Guided tours available.</div>
+            <div class="item-meta"><span class="price">€10–15 per day rental</span></div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Flea Markets & Vintage</div>
+            <div class="item-detail">Mauerpark Sunday flea market (legendary, crowded). RAW-Gelände market (Friedrichshain, Sundays). Kreuzberg vintage shops and markets. Great for records, vintage clothes, and curiosities.</div>
+            <div class="item-meta"><span class="price">Free entry</span> • Year-round • Varies by market</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Spree River Boat Tours</div>
+            <div class="item-detail">Scenic cruises past Museum Island, the Reichstag, and Kreuzberg. Several companies offer day tours or sunset cruises. A peaceful way to see the city from the water, especially lovely in spring.</div>
+            <div class="item-meta"><span class="price">€12–20</span> • 1–2 hours</div>
+          </div>
+
+          <div class="tip"><strong>Pro tip:</strong> Visit Mauerpark on Sunday mornings for the flea market and karaoke in the afternoon—a quintessential Berlin experience.</div>
+        </div>
+      </div>
+
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🚆</span>
+          <span class="e-title">Day Trips</span>
+          <span class="e-preview">Easy train escapes</span>
+          <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name"><a href="https://www.omio.com/trains/berlin/potsdam" class="internal-link">Potsdam</a></div>
+            <div class="item-detail">25 minutes by S-Bahn. Baroque palaces (Sanssouci, Neues Palais), manicured gardens, and lakeside charm. Perfect half-day or full-day escape from the bustle.</div>
+            <div class="item-meta"><span class="price">€3.50 return</span> • S-Bahn S7</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name"><a href="https://www.omio.com/trains/berlin/dresden" class="internal-link">Dresden</a></div>
+            <div class="item-detail">2 hours by regional train. Saxon capital with stunning Baroque architecture (Frauenkirche, Zwinger Palace). Elbe River views, ceramics collections, and riverside wine gardens. Plan an overnight or long day.</div>
+            <div class="item-meta"><span class="price">€25–40 return</span> • Regional trains</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name"><a href="https://www.omio.com/trains/berlin/leipzig" class="internal-link">Leipzig</a></div>
+            <div class="item-detail">1 hour 15 minutes by rail. Arts and culture hub with grand concert halls, the stunning St. Thomas Church, and vibrant creative scene. More intimate than Berlin, less touristy.</div>
+            <div class="item-meta"><span class="price">€20–35 return</span> • Regional trains</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name"><a href="https://www.omio.com/trains/berlin/hamburg" class="internal-link">Hamburg</a></div>
+            <div class="item-detail">1 hour 45 minutes by InterCity. Germany's port city with canals, fish markets, harbor walks, and a more Nordic vibe. Longer day trip; consider overnight.</div>
+            <div class="item-meta"><span class="price">€40–60 return</span> • InterCity trains</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name"><a href="https://www.omio.com/trains/berlin/szczecin" class="internal-link">Szczecin</a></div>
+            <div class="item-detail">2 hours by regional train into Poland. Castle Island, Oder River, maritime museums, and Eastern European flavor. Budget-friendly, less crowded, great for off-the-beaten-path travelers.</div>
+            <div class="item-meta"><span class="price">€15–25 return</span> • Regional trains</div>
+          </div>
+
+          <div class="tip"><strong>Pro tip:</strong> Use Omio or BVG for journey planning and tickets. Weekend rail passes offer savings for multiple day trips.</div>
+        </div>
+      </div>
+
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🍽️</span>
+          <span class="e-title">Dining</span>
+          <span class="e-preview">Street food to fine dining</span>
+          <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Currywurst</div>
+            <div class="item-detail">Berlin's iconic street food: grilled pork sausage smothered in curry ketchup. Curry 36 and Curry 61 are the famous rivals. Eaten standing up from a paper tray with a wooden fork.</div>
+            <div class="item-meta"><span class="price">€3–5</span> • All over the city</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Döner Kebab</div>
+            <div class="item-detail">Berlin has some of the best döner in Europe. Crispy outside, tender meat, fresh vegetables and sauce in warm pita. Street stalls and small shops throughout Kreuzberg, Neukölln, and beyond.</div>
+            <div class="item-meta"><span class="price">€4–6</span> • Every neighborhood</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Markthalle Neun (Street Food Thursdays)</div>
+            <div class="item-detail">Historic market hall in Friedrichshain. Thursday evenings feature international street food vendors, craft beer, live DJs, and a young creative crowd. Festive, casual, excellent for sampling.</div>
+            <div class="item-meta"><span class="price">€5–12 per dish</span> • Friedrichshain • Thursdays 17:00–23:00</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Kreuzberg Food Scene</div>
+            <div class="item-detail">Multicultural neighborhood packed with Vietnamese, Turkish, Middle Eastern, Asian, and fusion restaurants. Affordable, authentic, no-fuss dining. Walk Kottbusser Tor and Mehringdamm for options.</div>
+            <div class="item-meta"><span class="price">€7–15 per meal</span> • Kreuzberg</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Beer Gardens & Cafes</div>
+            <div class="item-detail">Spring & summer: Biergärten pop up everywhere. Café culture dominates mornings (strong coffee, pastries). Evening beers at rooftop bars with skyline views (Watergate, Klunkerkranich in Neukölln).</div>
+            <div class="item-meta"><span class="price">€3–5 beer, €2–4 coffee</span></div>
+          </div>
+
+          <div class="tip"><strong>Pro tip:</strong> Restaurants are expensive and formal. Street food and casual eateries give better value and authentic Berlin flavor. Breakfast (brunch) is sacred on weekends.</div>
+        </div>
+      </div>
+
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">💰</span>
+          <span class="e-title">Budget</span>
+          <span class="e-preview">Costs & money tips</span>
+          <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Food Costs</div>
+            <div class="item-detail">Street food (currywurst, döner): €3–6. Casual meal (bakery, deli): €6–10. Restaurant dinner: €12–25. Beer (bar): €3–5. Coffee: €2–3.</div>
+            <div class="item-meta">Budget-friendly compared to other major European cities</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Transport Costs</div>
+            <div class="item-detail">Single journey (U-Bahn/S-Bahn/bus): €2.80. 7-day pass (Berlin AB zone): €37. 30-day pass: €110. Day trips via BVG: €3–6 return. Bike rental: €10–15/day.</div>
+            <div class="item-meta">Excellent public transport system</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Museum & Attraction Prices</div>
+            <div class="item-detail">Single museum: €7–15. Museum Pass Berlin (70 museums, 3 days): €30. Reichstag dome: €3–5. East Side Gallery: free. Charlottenburg Palace: €12–15. Boat tour: €12–20.</div>
+            <div class="item-meta">Museum Pass offers excellent value</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Accommodation</div>
+            <div class="item-detail">Hostels: €20–30/night. Budget hotels: €50–80/night. Mid-range: €80–150/night. Luxury: €150–300+/night. Prices vary by neighborhood; Kreuzberg & Friedrichshain cheaper than Mitte.</div>
+            <div class="item-meta">Book in advance for spring season</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Nightlife & Entertainment</div>
+            <div class="item-detail">Club entry: €8–15. Drinks in clubs: €4–6. Live music venue: €10–25. Flea markets: free entry. Street art tours: €15–25.</div>
+            <div class="item-meta">Budget-friendly compared to other major capitals</div>
+          </div>
+
+          <div class="tip"><strong>Pro tip:</strong> Berlin is significantly cheaper than Paris, London, or Amsterdam. A comfortable day costs €40–60 on a budget, €80–120 mid-range. Free museum hours are rarely offered; focus on free attractions like East Side Gallery and street art.</div>
+        </div>
+      </div>
+
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🏘️</span>
+          <span class="e-title">Neighborhoods</span>
+          <span class="e-preview">Each has its own soul</span>
+          <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Kreuzberg</div>
+            <div class="item-detail">Gritty, bohemian, multicultural. Street art everywhere, squatter history, Turkish & Middle Eastern communities, young crowds, experimental galleries & clubs. Chaotic energy; base yourself here for authentic Berlin.</div>
+            <div class="item-meta">Budget-friendly, vibrant nightlife</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Mitte</div>
+            <div class="item-detail">Historic center: Museum Island, Brandenburg Gate, Reichstag, Memorial. More polished, touristy, upscale. Touristy but essential. Good restaurants & bars. Can feel crowded.</div>
+            <div class="item-meta">Touristy, central, pricier</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Friedrichshain</div>
+            <div class="item-detail">East Berlin, artistic edge, RAW-Gelände (concert venue & cultural space), East Side Gallery, Markthalle Neun. Young, creative, post-industrial vibe. Clubs and late-night culture dominate.</div>
+            <div class="item-meta">Nightlife hub, street art, cool cafes</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Prenzlauer Berg</div>
+            <div class="item-detail">Charming, gentrified, cafes & galleries. Boutique shops, Sunday flea markets, craft beer bars. Less edgy than Kreuzberg or Friedrichshain; more polished, Instagram-friendly. Good base for independent travelers.</div>
+            <div class="item-meta">Trendy, friendly, mid-range prices</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Neukölln</div>
+            <div class="item-detail">Up-and-coming, diverse, street-food hub. Rap culture, vinyl shops, small galleries, adventurous food scene. Less crowded than Kreuzberg. Edgy, creative, still affordable.</div>
+            <div class="item-meta">Emerging arts scene, budget-friendly</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Charlottenburg</div>
+            <div class="item-detail">West Berlin's grand residential district. Charlottenburg Palace, green spaces, upscale shopping (Ku'damm boulevard). Quieter, more bourgeois, elegant gardens. Better for a day trip than overnight stay.</div>
+            <div class="item-meta">Palaces & parks, quieter vibe</div>
+          </div>
+
+          <div class="tip"><strong>Pro tip:</strong> Stay in Kreuzberg, Friedrichshain, or Prenzlauer Berg for authentic Berlin. Mitte is convenient but touristy. Neighborhoods are connected by excellent U-Bahn & S-Bahn; easy to explore.</div>
+        </div>
+      </div>
+
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🏨</span>
+          <span class="e-title">Accommodation</span>
+          <span class="e-preview">Budget to luxury, all locations</span>
+          <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Hostels</div>
+            <div class="item-detail">ClinkNOW (Kreuzberg), Chic&Basic (Kreuzberg), Generator Berlin (Mitte). €20–30/night dorms, €45–60 private rooms. Social atmosphere, good for solo travelers and backpackers.</div>
+            <div class="item-meta"><span class="price">€20–60/night</span> • Across neighborhoods</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Budget Hotels & Guesthouses</div>
+            <div class="item-detail">Ibis Budget Berlin Mitte, Heart of Gold Hostel (boutique), AirBnB apartments in Neukölln or Friedrichshain. €50–80/night. Simple, clean, no frills.</div>
+            <div class="item-meta"><span class="price">€50–80/night</span> • Various neighborhoods</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Mid-Range Hotels</div>
+            <div class="item-detail">Soho House Berlin (Kreuzberg), Michelberger Hotel (Friedrichshain), Circus Hotel (Kreuzberg). €80–150/night. Stylish, local character, good restaurant or bar scenes.</div>
+            <div class="item-meta"><span class="price">€80–150/night</span> • Cool neighborhoods</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Luxury Hotels</div>
+            <div class="item-detail">Hotel de Rome (Mitte), Adlon Kempinski (Brandenburg Gate), Waldorf Astoria (Mitte). €150–300+/night. High-end service, prime locations, spa & dining.</div>
+            <div class="item-meta"><span class="price">€150–300+/night</span> • Mitte & Charlottenburg</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Spring Season Tips</div>
+            <div class="item-detail">March–May is peak season. Book 2–4 weeks ahead for good options. Prices rise. Avoid peak Easter week if budget-conscious. Long weekends fill up fast.</div>
+            <div class="item-meta">Plan ahead for spring travel</div>
+          </div>
+
+          <div class="tip"><strong>Pro tip:</strong> Kreuzberg and Friedrichshain offer the best mix of budget and authenticity. Mitte is convenient but pricier. Check Booking.com, Airbnb, and hostelbookers.com for reviews and last-minute deals.</div>
+        </div>
+      </div>
+
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🚨</span>
+          <span class="e-title">Safety</span>
+          <span class="e-preview">General tips & cautions</span>
+          <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Overall Safety</div>
+            <div class="item-detail">Berlin is generally safe for tourists. Street crime is rare. Violent crime uncommon. Like any major city, stay aware in crowded areas. U-Bahn and S-Bahn run safely day and night.</div>
+            <div class="item-meta"><span class="g">Generally safe</span></div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Bike Theft</div>
+            <div class="item-detail">Bike theft is rampant. Always lock bikes to racks (even for a few minutes). Use sturdy U-locks, not cable locks. Leave valuables out of sight. Bike rentals have insurance; personal bikes less recoverable.</div>
+            <div class="item-meta"><span class="price">High theft risk</span></div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Pickpocketing</div>
+            <div class="item-detail">Rare but happens in crowded areas: Hauptbahnhof train station, Museum Island, flea markets, club queues. Keep valuables secure. Don't flash expensive items.</div>
+            <div class="item-meta">Low risk, but stay alert</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Late-Night / Nightlife</div>
+            <div class="item-detail">Clubs and bars are safe. U-Bahn and S-Bahn run 24/7 (Night trains N1–N60 on weekends). Share taxi rides. Avoid walking alone in remote areas very late. Stick to lit, populated streets.</div>
+            <div class="item-meta"><span class="g">Safe if sensible</span></div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Drug Culture</div>
+            <div class="item-detail">Drugs visible in some neighborhoods (especially Kreuzberg, Friedrichshain) but avoid unsolicited offers. Police don't bother casual users but fines apply. Nightlife venues are generally safe and monitored.</div>
+            <div class="item-meta">Present, but manageable with caution</div>
+          </div>
+
+          <div class="tip"><strong>Pro tip:</strong> Use common sense: watch belongings, avoid isolated alleys, use registered taxis or Uber, keep phone secure in crowds. Berlin is much safer than it looks; the graffiti is art, not danger.</div>
+        </div>
+      </div>
+
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">📱</span>
+          <span class="e-title">Useful Apps</span>
+          <span class="e-preview">Navigation & booking tools</span>
+          <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Omio</div>
+            <div class="item-detail">Book trains across Europe & Germany. Journey planner for Berlin day trips. Compares prices and routes. Essential for Potsdam, Dresden, Leipzig, Hamburg links.</div>
+            <div class="item-meta">Free • iOS & Android</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">BVG (Berlin Transport Authority App)</div>
+            <div class="item-detail">Official app for U-Bahn, S-Bahn, buses, trams. Real-time departures, journey planner, digital ticket purchase (day passes, single tickets). Offline maps available.</div>
+            <div class="item-meta">Free with paid tickets • iOS & Android</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Google Maps</div>
+            <div class="item-detail">Works perfectly in Berlin. Offline maps downloadable. Great for walking, cycling routes, restaurant reviews, opening hours. Metro integration.</div>
+            <div class="item-meta">Free • iOS & Android</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Lime / Tier</div>
+            <div class="item-detail">E-scooter rentals. Fun for short distances; cheaper than taxis. Abundant in central neighborhoods. €1 to unlock + €0.15–0.25 per minute.</div>
+            <div class="item-meta"><span class="price">€1 + per-minute fee</span> • iOS & Android</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Citymapper</div>
+            <div class="item-detail">Alternative journey planner with good real-time transit data and bike lane mapping. Helpful for avoiding crowded trains during peak hours.</div>
+            <div class="item-meta">Free & premium • iOS & Android</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Call a Bike / NextBike</div>
+            <div class="item-detail">Bike rental network across Berlin. €5 monthly membership + €0.08–0.12 per minute. Stations everywhere. Good for flexible, short rentals.</div>
+            <div class="item-meta"><span class="price">€5/month + per-minute</span> • iOS & Android</div>
+          </div>
+
+          <div class="tip"><strong>Pro tip:</strong> Download BVG and Google Maps offline before arrival. Omio is essential for day trips. Have €15–20 cash backup; card acceptance is widespread but not universal in small cafes.</div>
+        </div>
+      </div>
+
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🎒</span>
+          <span class="e-title">Packing Tips</span>
+          <span class="e-preview">Spring essentials</span>
+          <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Clothing: Layers</div>
+            <div class="item-detail">Spring (March–May): 8–15°C mornings, 15–20°C afternoons. Pack light sweater, cardigan, or hoodie. T-shirts and long-sleeve shirts. Jeans or casual pants. One pair of comfortable walking shoes.</div>
+            <div class="item-meta">Layering is key for changeable weather</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Rain Jacket</div>
+            <div class="item-detail">Spring brings occasional rain. Pack a compact rain jacket or windbreaker. Umbrella optional (bulky, often not needed). Quick-dry fabrics preferred.</div>
+            <div class="item-meta">Essential for unpredictable spring</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Shoes</div>
+            <div class="item-detail">Comfortable walking shoes (sneakers, loafers). Berlin involves lots of walking & cycling. Break in shoes before arrival. Consider waterproof or quick-dry materials. Bike theft is high; don't wear valuables on feet.</div>
+            <div class="item-meta">Durability & comfort over style</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Accessories</div>
+            <div class="item-detail">Lightweight scarf (warmth & style). Sunglasses & hat (spring sun increases). Small backpack or shoulder bag for daily carry. Power bank for extended exploration.</div>
+            <div class="item-meta">Practical and versatile</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Bike-Specific Gear</div>
+            <div class="item-detail">If renting bikes: padded shorts optional, reflective vest or clip (safety), small lock if exploring remote areas. Call a Bike provides basic locks with rentals.</div>
+            <div class="item-meta">For cycling comfort & safety</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Nightlife & Clubs</div>
+            <div class="item-detail">Smart casual is fine; many clubs have relaxed dress codes. Dark jeans, nice top, clean shoes. Avoid athletic wear at high-end venues (Berghain, Watergate). Comfortable shoes for standing all night.</div>
+            <div class="item-meta">Dress codes vary by venue</div>
+          </div>
+
+          <div class="tip"><strong>Pro tip:</strong> Pack light; Berlin shops are excellent and prices reasonable. Invest in good shoes—you'll walk 15,000+ steps daily. Bring adapters for EU outlets (Type C, rarely Type F in hostels).</div>
+        </div>
+      </div>
+
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">💳</span>
+          <span class="e-title">Currency & Payments</span>
+          <span class="e-preview">Money matters in Berlin</span>
+          <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">Currency: Euro (€)</div>
+            <div class="item-detail">Germany uses the Euro. 1 EUR ≈ $1.05–1.10 USD (rates fluctuate). ATMs abundant throughout Berlin. Check with your bank for international withdrawal fees.</div>
+            <div class="item-meta">Standard EU currency</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Card Acceptance</div>
+            <div class="item-detail">Visa & Mastercard widely accepted at restaurants, shops, hotels, attractions. Amex less common. Contactless payment standard. Smaller cafes & street vendors may request cash.</div>
+            <div class="item-meta">Broadly accepted, but carry cash backup</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Cash</div>
+            <div class="item-detail">Many places accept cards, but some smaller restaurants, markets, and street vendors prefer cash. Have €50–100 for day-to-day expenses. ATMs free with most international cards.</div>
+            <div class="item-meta"><span class="price">Bring €50–100 backup cash</span></div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Tipping Culture</div>
+            <div class="item-detail">Tipping expected but more relaxed than US. Restaurants: 5–10% (or round up). Bars: €1–2 per drink or round up. Taxis: 5–10%. Street vendors (currywurst, etc.): optional, round up appreciated.</div>
+            <div class="item-meta">Less aggressive than US, more than UK</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Digital Payments</div>
+            <div class="item-detail">Google Pay & Apple Pay accepted at most terminals. PayPal for online bookings. Wise or TransferWise good for international transfers if staying longer.</div>
+            <div class="item-meta">Convenient for contactless payments</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Avoiding Fees</div>
+            <div class="item-detail">Use ATMs from major banks (not airports). Check with your home bank for international withdrawal costs. Exchange currency in advance if poor ATM fees expected. Credit cards for larger purchases (hotels, tours).</div>
+            <div class="item-meta">Plan ahead to minimize charges</div>
+          </div>
+
+          <div class="tip"><strong>Pro tip:</strong> German vendors expect politeness with tipping; saying "Danke" (thanks) with your payment is standard. Many small places still cash-only; always have backup notes. Berlin's payment scene is increasingly digital, but cash still king in old-school cafes.</div>
+        </div>
+      </div>
+
+      <div class="expand">
+        <button class="expand-btn" onclick="toggle(this)">
+          <span class="e-icon">🚇</span>
+          <span class="e-title">Getting Around Berlin</span>
+          <span class="e-preview">U-Bahn, S-Bahn, buses & bikes</span>
+          <svg class="e-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="expand-body">
+          <div class="item">
+            <div class="item-name">U-Bahn (Subway)</div>
+            <div class="item-detail">Underground metro with 10 lines (U1–U9, U55). Covers central & eastern Berlin. Frequent, reliable, runs 24/7 on weekends (restricted hours weekdays). Buy single tickets (€2.80) or passes (7-day €37, 30-day €110).</div>
+            <div class="item-meta"><span class="price">€2.80 per trip</span> • Frequent service</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">S-Bahn (Commuter Rail)</div>
+            <div class="item-detail">Elevated/ground-level rapid transit. Links suburbs, airports (Tegel, BER), and major destinations. Often faster than U-Bahn for longer distances. Same ticketing system as U-Bahn. Connects to regional trains for day trips.</div>
+            <div class="item-meta"><span class="price">€2.80 per trip</span> • Essential for outer areas</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Buses & Trams</div>
+            <div class="item-detail">Over 350 bus routes, 22 tram lines. Scenic alternatives to metro. Covers areas U-/S-Bahn miss. Night buses (N-series) run 24 hours. Same ticketing system; validates on board.</div>
+            <div class="item-meta"><span class="price">€2.80 per trip</span> • Covers entire city</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Bikes & Bike Rentals</div>
+            <div class="item-detail">Over 1,000 km of bike lanes. Bike rentals via Call a Bike (€5/month + €0.08–0.12/min), shop rentals (€10–15/day), or Airbnb hosts. Perfect for exploring neighborhoods, riverside, parks. Lock bikes to racks.</div>
+            <div class="item-meta"><span class="price">€10–15 per day</span> • Best for sightseeing</div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Taxis & Ride-Sharing</div>
+            <div class="item-detail">Taxis abundant; phone or hail on street. Uber & Bolt also operate. Flat meter start (€3.90), then per-km. 10 km ≈ €20–25. More expensive than transit but convenient late-night. Fixed airport rates available.</div>
+            <div class="item-meta"><span class="price">€20–30 for 10 km</span></div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Day Trip Trains</div>
+            <div class="item-detail">Regional trains to Potsdam (S7, 25 min), regional trains to Dresden, Leipzig, Hamburg via Omio or Deutsche Bahn. Weekend rail passes offer savings. Book ahead in peak season.</div>
+            <div class="item-meta"><span class="price">€3–50 depending on destination</span></div>
+          </div>
+
+          <div class="item">
+            <div class="item-name">Buying Tickets</div>
+            <div class="item-detail">BVG app (best for reservations & digital tickets), station ticket machines (English available), or on board (no discount). Validate tickets or risk €60 fine. Weekly/monthly passes cheaper than individual trips if staying 4+ days.</div>
+            <div class="item-meta">BVG app recommended</div>
+          </div>
+
+          <div class="tip"><strong>Pro tip:</strong> Buy a 7-day pass (€37) if staying 4+ days; saves money vs. daily singles. Bikes are fastest for neighborhood exploration. U-/S-Bahn is most reliable for attractions. Always validate tickets to avoid fines. Night buses are reliable and safe for late returns.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function toggleComponent(btn) {
+      btn.classList.toggle('open');
+      btn.nextElementSibling.classList.toggle('open');
+    }
+    function toggle(btn) {
+      btn.classList.toggle('open');
+      btn.nextElementSibling.classList.toggle('open');
+    }
+  </script>
+</body>
+</html>
