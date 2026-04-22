@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StationBoxes v2 — Barcelona → Madrid</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f5f6fa; color: #132968; line-height: 1.55; -webkit-font-smoothing: antialiased; padding: 20px 0 60px; }
+
+  .wrap { max-width: 1020px; margin: 0 auto; padding: 0 20px; }
+
+  /* Page header */
+  .page-head { padding: 20px 0 28px; }
+  .page-head h1 { font-size: 26px; font-weight: 800; color: #132968; margin-bottom: 6px; }
+  .page-head p { font-size: 14px; color: #425486; max-width: 720px; }
+  .page-head .tags { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 999px; letter-spacing: 0.2px; }
+  .tag.mode { background: #e8f0fe; color: #0057b8; }
+  .tag.route { background: #fce8f1; color: #b0008e; }
+  .tag.v2 { background: #132968; color: #fff; }
+
+  /* View toggle */
+  .toggle { display: inline-flex; background: #fff; border: 1px solid #e1e4ee; border-radius: 10px; padding: 3px; margin-bottom: 22px; }
+  .toggle button { border: none; background: transparent; padding: 8px 16px; font-size: 13px; font-weight: 600; color: #425486; cursor: pointer; border-radius: 7px; font-family: inherit; }
+  .toggle button.active { background: #132968; color: #fff; }
+
+  /* Section heading (Departure / Arrival) */
+  .section-head { display: flex; align-items: center; gap: 10px; margin: 28px 0 14px; }
+  .section-head .icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; }
+  .section-head .icon.dep { background: #e8f0fe; color: #0057b8; }
+  .section-head .icon.arr { background: #e3f5e8; color: #0a8a3e; }
+  .section-head h2 { font-size: 17px; font-weight: 700; color: #132968; }
+  .section-head .sub { font-size: 12px; color: #8690aa; margin-left: 6px; }
+
+  /* Intro FAQ block */
+  .faq-intro { background: #fff; border: 1px solid #e1e4ee; border-radius: 12px; padding: 20px 22px; margin-bottom: 14px; box-shadow: 0 1px 2px rgba(19,41,104,0.04); }
+  .faq-intro .q { font-size: 15px; font-weight: 700; color: #132968; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 8px; }
+  .faq-intro .q::before { content: '?'; display: inline-block; width: 20px; height: 20px; background: #0057b8; color: #fff; border-radius: 50%; text-align: center; font-size: 12px; font-weight: 700; line-height: 20px; flex-shrink: 0; margin-top: 1px; }
+  .faq-intro .a { font-size: 13.5px; color: #425486; line-height: 1.6; }
+  .faq-intro .a strong { color: #132968; font-weight: 700; }
+  .faq-intro .faq-meta { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #e1e4ee; font-size: 11px; color: #8690aa; display: flex; gap: 14px; flex-wrap: wrap; }
+  .faq-intro .faq-meta span strong { color: #425486; }
+
+  /* Station card */
+  .station-card { background: #fff; border-radius: 12px; margin-bottom: 10px; overflow: hidden; border: 1px solid #e1e4ee; }
+  .station-card.primary { border-color: #132968; box-shadow: 0 2px 8px rgba(19,41,104,0.08); }
+  .station-head { padding: 16px 22px; display: flex; justify-content: space-between; align-items: center; gap: 16px; cursor: pointer; }
+  .station-head:hover { background: #fafbfd; }
+  .station-head .name { font-size: 16px; font-weight: 700; color: #132968; }
+  .station-head .sub-info { font-size: 12px; color: #8690aa; margin-top: 2px; }
+  .station-head .meta { display: flex; gap: 10px; align-items: center; }
+  .rank-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 10px; border-radius: 4px; }
+  .rank-badge.primary { background: #132968; color: #fff; }
+  .rank-badge.secondary { background: #e1e4ee; color: #425486; }
+  .booking-share { font-size: 11px; font-weight: 600; color: #0a8a3e; background: #e3f5e8; padding: 4px 8px; border-radius: 4px; }
+  .booking-share.low { color: #8690aa; background: #f0f2f7; }
+  .chev { width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; color: #8690aa; transition: transform 0.2s; font-size: 14px; }
+  .station-card.open .chev { transform: rotate(180deg); }
+  .station-body { padding: 0 22px 22px; display: none; }
+  .station-card.open .station-body { display: block; }
+
+  /* Sub-accordion inside station body */
+  .sub-section { border-top: 1px solid #f0f2f7; }
+  .sub-section:first-child { border-top: 0; }
+  .sub-head { padding: 13px 0; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+  .sub-head:hover .sub-title { color: #0057b8; }
+  .sub-title { font-size: 13px; font-weight: 700; color: #132968; display: flex; align-items: center; gap: 8px; }
+  .sub-title .ic { width: 22px; height: 22px; border-radius: 6px; background: #e8f0fe; color: #0057b8; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; }
+  .atom-tag { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #8690aa; background: #f0f2f7; padding: 2px 7px; border-radius: 3px; margin-left: 8px; }
+  .sub-body { padding: 4px 0 14px 30px; display: none; font-size: 13px; color: #425486; }
+  .sub-section.open .sub-body { display: block; }
+  .sub-section.open .sub-chev { transform: rotate(180deg); }
+  .sub-chev { transition: transform 0.2s; font-size: 12px; color: #8690aa; }
+  .sub-body p { margin-bottom: 8px; }
+  .sub-body ul { padding-left: 18px; margin-bottom: 8px; }
+  .sub-body li { margin-bottom: 4px; }
+  .pill { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; margin-right: 4px; margin-bottom: 4px; }
+  .pill.live { background: #e3f5e8; color: #0a8a3e; }
+  .pill.needs { background: #fff8e5; color: #8a6400; }
+  .data-row { display: grid; grid-template-columns: 140px 1fr; gap: 12px; padding: 6px 0; font-size: 12.5px; border-bottom: 1px dashed #f0f2f7; }
+  .data-row:last-child { border-bottom: 0; }
+  .data-row .k { color: #8690aa; font-weight: 600; }
+  .data-row .v { color: #132968; font-weight: 500; }
+
+  /* Legend */
+  .legend { background: #fff; border: 1px solid #e1e4ee; border-radius: 10px; padding: 14px 18px; margin-bottom: 22px; font-size: 12px; color: #425486; display: flex; gap: 24px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .legend-dot.live { background: #0a8a3e; }
+  .legend-dot.needs { background: #e8b040; }
+  .legend-dot.new { background: #b0008e; }
+
+  /* FAQ consolidation callout */
+  .faq-callout { background: #fce8f1; border-left: 4px solid #b0008e; border-radius: 8px; padding: 18px 22px; margin-top: 26px; }
+  .faq-callout h3 { font-size: 14px; font-weight: 700; color: #7a005f; margin-bottom: 10px; }
+  .faq-callout p { font-size: 13px; color: #5a0047; margin-bottom: 10px; }
+  .faq-callout ul { padding-left: 22px; font-size: 13px; color: #5a0047; }
+  .faq-callout li { margin-bottom: 6px; }
+  .faq-callout code { background: rgba(176,0,142,0.12); padding: 1px 6px; border-radius: 3px; font-size: 12px; }
+
+  /* Current state */
+  .current-note { background: #fff8e5; border: 1px solid #ffd879; border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; font-size: 13px; color: #6e4d00; }
+  .current-note strong { color: #3d2a00; }
+  .current-box { background: #fff; border-radius: 12px; padding: 22px; border: 1px solid #e1e4ee; margin-bottom: 18px; }
+  .current-box h3 { font-size: 14px; font-weight: 700; margin-bottom: 14px; }
+  .current-field { padding: 10px 0; border-bottom: 1px dashed #f0f2f7; display: grid; grid-template-columns: 180px 1fr; gap: 12px; font-size: 13px; }
+  .current-field:last-child { border-bottom: 0; }
+  .current-field .lbl { color: #8690aa; font-weight: 600; }
+  .current-field .val { color: #132968; font-weight: 500; }
+  .current-field .val.empty { color: #b8391e; font-style: italic; }
+
+  /* Schema diff */
+  .schema-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .schema-col { background: #fff; border-radius: 12px; border: 1px solid #e1e4ee; overflow: hidden; }
+  .schema-col.before { border-color: #f9d8d0; }
+  .schema-col.after { border-color: #a8d5b4; }
+  .schema-col h3 { padding: 14px 18px; font-size: 13px; font-weight: 700; border-bottom: 1px solid #f0f2f7; }
+  .schema-col.before h3 { background: #fef7f5; color: #b8391e; }
+  .schema-col.after h3 { background: #f0faf3; color: #0a8a3e; }
+  .schema-col pre { padding: 16px 18px; font-size: 11.5px; font-family: 'SF Mono', Menlo, monospace; color: #132968; overflow-x: auto; line-height: 1.55; }
+  .schema-col pre .key { color: #b0008e; }
+  .schema-col pre .str { color: #0a8a3e; }
+  .schema-col pre .com { color: #8690aa; font-style: italic; }
+  .schema-col pre .add { background: #e3f5e8; }
+  .schema-col pre .rem { background: #fde3db; text-decoration: line-through; opacity: 0.7; }
+  .schema-note { padding: 14px 18px; font-size: 12px; background: #fafbfd; border-top: 1px solid #f0f2f7; color: #425486; }
+
+  /* View container */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  @media (max-width: 780px) {
+    .schema-grid { grid-template-columns: 1fr; }
+    .current-field { grid-template-columns: 1fr; }
+    .data-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="page-head">
+    <h1>StationBoxes v2 — Barcelona → Madrid</h1>
+    <p>Prototype of the redesigned StationBoxes component. Ranked by <strong>share of bookings per route</strong> over the last 90 days. Leads with an intro FAQ answering "which stations serve this route" before surfacing station detail.</p>
+    <div class="tags">
+      <span class="tag mode">Train</span>
+      <span class="tag route">BCN → MAD</span>
+      <span class="tag v2">StationBoxes v2</span>
+    </div>
+  </div>
+
+  <div class="toggle">
+    <button class="active" data-view="proposed">Proposed v2</button>
+    <button data-view="current">Current state</button>
+    <button data-view="schema">Schema.org diff</button>
+  </div>
+
+  <!-- ========== PROPOSED V2 ========== -->
+  <div class="view active" id="view-proposed">
+
+    <div class="legend">
+      <div class="legend-item"><span class="legend-dot live"></span> <strong>Data live in LPS</strong> — available today</div>
+      <div class="legend-item"><span class="legend-dot needs"></span> <strong>Needs enrichment</strong> — see Data Plan</div>
+      <div class="legend-item"><span class="legend-dot new"></span> <strong>New field</strong> — schema extension</div>
+    </div>
+
+    <!-- DEPARTURE SECTION -->
+    <div class="section-head">
+      <div class="icon dep">→</div>
+      <h2>Departure stations in Barcelona</h2>
+      <span class="sub">3 stations serve this route</span>
+    </div>
+
+    <div class="faq-intro">
+      <div class="q">Where does the train depart from in Barcelona?</div>
+      <div class="a">
+        Trains from Barcelona to Madrid depart primarily from <strong>Barcelona Sants</strong>, the city's main high-speed rail hub and the departure point for the vast majority of AVE, Avlo, Ouigo and Iryo services. A smaller number of services also stop at <strong>Passeig de Gràcia</strong> a few minutes after leaving Sants, and a handful of long-distance services depart from <strong>Estació de França</strong>. Always check your ticket — the exact departure station varies by operator, time of day and service type.
+      </div>
+      <div class="faq-meta">
+        <span><strong>Source FAQ:</strong> "Where does the train depart from in Barcelona?" (Q-new)</span>
+        <span><strong>JSON-LD:</strong> FAQPage → mainEntity</span>
+        <span><strong>Atom:</strong> Departure Station Identity</span>
+      </div>
+    </div>
+
+    <!-- Primary: Barcelona Sants -->
+    <div class="station-card primary open" data-station="sants">
+      <div class="station-head" onclick="toggleStation(this)">
+        <div>
+          <div class="name">Barcelona Sants</div>
+          <div class="sub-info">Plaça dels Països Catalans, s/n, 08014 Barcelona · UIC 71801</div>
+        </div>
+        <div class="meta">
+          <span class="booking-share">92% of bookings</span>
+          <span class="rank-badge primary">Primary</span>
+          <span class="chev">▼</span>
+        </div>
+      </div>
+      <div class="station-body">
+
+        <div class="sub-section open">
+          <div class="sub-head" onclick="toggleSub(this)">
+            <div class="sub-title"><span class="ic">i</span> Train Departure Station <span class="atom-tag">Atom · 3.2k demand</span></div>
+            <span class="sub-chev">▼</span>
+          </div>
+          <div class="sub-body">
+            <div class="data-row"><span class="k">Full name</span><span class="v">Estació de Sants <span class="pill live">live</span></span></div>
+            <div class="data-row"><span class="k">Address</span><span class="v">Plaça dels Països Catalans, s/n, 08014 Barcelona <span class="pill live">live</span></span></div>
+            <div class="data-row"><span class="k">Coordinates</span><span class="v">41.3790° N, 2.1400° E <span class="pill live">live</span></span></div>
+            <div class="data-row"><span class="k">Operator</span><span class="v">Adif (infrastructure) / Renfe (services) <span class="pill live">live</span></span></div>
+            <div class="data-row"><span class="k">UIC code</span><span class="v">71801 <span class="pill live">live</span></span></div>
+            <div class="data-row"><span class="k">Contact</span><span class="v">+34 912 320 320 (Renfe) <span class="pill live">live</span></span></div>
+            <div class="data-row"><span class="k">Platforms</span><span class="v">14 platforms on lower level · AVE/Iryo typically 5–10 · displayed ~20 min before departure <span class="pill needs">needs</span></span></div>
+            <div class="data-row"><span class="k">Main entrance</span><span class="v">Plaça dels Països Catalans · secondary entrances on Carrer de Numància <span class="pill live">live</span></span></div>
+          </div>
+        </div>
+
+        <div class="sub-section">
+          <div class="sub-head" onclick="toggleSub(this)">
+            <div class="sub-title"><span class="ic">→</span> Train Station to City Center Transport <span class="atom-tag">Atom · 3.9k demand</span></div>
+            <span class="sub-chev">▼</span>
+          </div>
+          <div class="sub-body">
+            <p>Barcelona Sants is ~3 km southwest of the city centre (Plaça de Catalunya). Options:</p>
+            <ul>
+              <li><strong>Metro</strong> — L3 (green) and L5 (blue) from "Sants Estació" · ~8 min to Plaça de Catalunya · €2.55 single / T-casual 10-trip €12.15 <span class="pill live">live</span></li>
+              <li><strong>Rodalies commuter rail</strong> — R1/R3/R4 direct to Passeig de Gràcia (~5 min) <span class="pill live">live</span></li>
+              <li><strong>Taxi</strong> — ~€12–15 to city centre · official rank at main exit <span class="pill needs">needs</span></li>
+              <li><strong>Bus</strong> — lines 30, 32, 78, 115 and night buses N1/N2 <span class="pill live">live</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="sub-section">
+          <div class="sub-head" onclick="toggleSub(this)">
+            <div class="sub-title"><span class="ic">♦</span> Train Station Facilities <span class="atom-tag">Atom · 3.7k demand</span></div>
+            <span class="sub-chev">▼</span>
+          </div>
+          <div class="sub-body">
+            <ul>
+              <li>Ticket office & self-service machines (06:00–23:00) <span class="pill live">live</span></li>
+              <li>Food court: Pans & Company, Starbucks, Rodilla, Burger King, Farggi <span class="pill needs">needs</span></li>
+              <li>Sala Club (Renfe Premium lounge) for AVE Premium / Iryo Infinita passengers <span class="pill needs">needs</span></li>
+              <li>Free Wi-Fi throughout the station <span class="pill live">live</span></li>
+              <li>ATMs, pharmacy, newsagent, tourist info desk <span class="pill needs">needs</span></li>
+              <li>Toilets (paid €0.60, accessible facilities free) <span class="pill needs">needs</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="sub-section">
+          <div class="sub-head" onclick="toggleSub(this)">
+            <div class="sub-title"><span class="ic">☰</span> Station Luggage Storage <span class="atom-tag">Atom · 1.8k demand</span></div>
+            <span class="sub-chev">▼</span>
+          </div>
+          <div class="sub-body">
+            <ul>
+              <li><strong>Consigna</strong> (station left-luggage) — €3.60–5.20/day depending on size, open 05:30–23:00 <span class="pill needs">needs</span></li>
+              <li><strong>Bounce partners nearby</strong> — several locations within 5 min walk, ~€5.90/day with 24/7 access <span class="pill needs">needs</span></li>
+              <li>No short-term lockers <span class="pill needs">needs</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="sub-section">
+          <div class="sub-head" onclick="toggleSub(this)">
+            <div class="sub-title"><span class="ic">♿</span> Train Station Accessibility <span class="atom-tag">Atom · 1.2k demand</span></div>
+            <span class="sub-chev">▼</span>
+          </div>
+          <div class="sub-body">
+            <ul>
+              <li>Fully step-free — lifts to all platforms <span class="pill live">live</span></li>
+              <li><strong>Adif Acerca</strong> assistance service — book minimum 30 min before departure via +34 912 320 320 <span class="pill live">live</span></li>
+              <li>Tactile paving on platforms, induction loops at ticket counters <span class="pill needs">needs</span></li>
+              <li>Accessible toilets (free, via European Key) <span class="pill needs">needs</span></li>
+              <li>Service dogs welcome <span class="pill live">live</span></li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Secondary: Passeig de Gràcia -->
+    <div class="station-card" data-station="pdg">
+      <div class="station-head" onclick="toggleStation(this)">
+        <div>
+          <div class="name">Barcelona Passeig de Gràcia</div>
+          <div class="sub-info">Passeig de Gràcia, 6, 08007 Barcelona · UIC 71802</div>
+        </div>
+        <div class="meta">
+          <span class="booking-share">7% of bookings</span>
+          <span class="rank-badge secondary">Secondary</span>
+          <span class="chev">▼</span>
+        </div>
+      </div>
+      <div class="station-body">
+        <div class="sub-section open">
+          <div class="sub-head" onclick="toggleSub(this)">
+            <div class="sub-title"><span class="ic">i</span> Train Departure Station <span class="atom-tag">Atom · 3.2k demand</span></div>
+            <span class="sub-chev">▼</span>
+          </div>
+          <div class="sub-body">
+            <div class="data-row"><span class="k">Address</span><span class="v">Passeig de Gràcia, 6, 08007 Barcelona <span class="pill live">live</span></span></div>
+            <div class="data-row"><span class="k">Location</span><span class="v">City centre, directly under Passeig de Gràcia <span class="pill live">live</span></span></div>
+            <div class="data-row"><span class="k">UIC code</span><span class="v">71802 <span class="pill live">live</span></span></div>
+            <div class="data-row"><span class="k">Why use it</span><span class="v">Some AVE/Avlo services stop here ~5 min after Sants. Most convenient if your hotel is near Plaça de Catalunya or Las Ramblas.</span></div>
+          </div>
+        </div>
+        <div class="sub-section">
+          <div class="sub-head" onclick="toggleSub(this)">
+            <div class="sub-title"><span class="ic">→</span> Train Station to City Center Transport <span class="atom-tag">Atom · 3.9k demand</span></div>
+            <span class="sub-chev">▼</span>
+          </div>
+          <div class="sub-body">
+            <p>Already in the city centre — Plaça de Catalunya is a 4-minute walk. Metro L2, L3, L4 all connect at Passeig de Gràcia.</p>
+          </div>
+        </div>
+        <div class="sub-section">
+          <div class="sub-head" onclick="toggleSub(this)">
+            <div class="sub-title"><span class="ic">♦</span> Train Station Facilities <span class="atom-tag">Atom · 3.7k demand</span></div>
+            <span class="sub-chev">▼</span>
+          </div>
+          <div class="sub-body">
+            <ul>
+              <li>Smaller underground station — ticket machines, limited seating <span class="pill needs">needs</span></li>
+              <li>No dedicated food court; cafés on street level <span class="pill needs">needs</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="sub-section">
+          <div class="sub-head" onclick="toggleSub(this)">
+            <div class="sub-title"><span class="ic">☰</span> Station Luggage Storage <span class="atom-tag">Atom · 1.8k demand</span></div>
+            <span class="sub-chev">▼</span>
+          </div>
+          <div class="sub-body">
+            <p>No in-station left-luggage. Bounce partners available within 5–10 min walk across the Eixample. <span class="pill needs">needs</span></p>
+          </div>
+        </div>
+        <div class="sub-section">
+          <div class="sub-head" onclick="toggleSub(this)">
+            <div class="sub-title"><span class="ic">♿</span> Train Station Accessibility <span class="atom-tag">Atom · 1.2k demand</span></div>
+            <span class="sub-chev">▼</span>
+          </div>
+          <div class="sub-body">
+            <p>Lifts to all platforms. Adif Acerca assistance available — book 30 min minimum in advance. <span class="pill live">live</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tertiary: Estació de França -->
+    <div class="station-card" data-station="franca">
+      <div class="station-head" onclick="toggleStation(this)">
+        <div>
+          <div class="name">Barcelona Estació de França</div>
+          <div class="sub-info">Av. del Marquès de l'Argentera, s/n, 08003 Barcelona · UIC 71803</div>
+        </div>
+        <div class="meta">
+          <span class="booking-share low">&lt;1% of bookings</span>
+          <span class="rank-badge secondary">Occasional</span>
+          <span class="chev">▼</span>
+        </div>
+      </div>
+      <div class="station-body">
+        <div class="sub-section open">
+          <div class="sub-head" onclick="toggleSub(this)">
+            <div class="sub-title"><span class="ic">i</span> Train Departure Station <span class="atom-tag">Atom · 3.2k demand</span></div>
+            <span class="sub-chev">▼</span>
+          </div>
+          <div class="sub-body">
+            <div class="data-row"><span class="k">Address</span><span class="v">Av. del Marquès de l'Argentera, 08003 Barcelona <span class="pill live">live</span></span></div>
+            <div class="data-row"><span class="k">Location</span><span class="v">Near Barceloneta and Ciutadella park <span class="pill live">live</span></span></div>
+            <div class="data-row"><span class="k">Why use it</span><span class="v">Rarely used for Madrid services — mostly regional and long-distance non-HSR trains. Verify on your ticket.</span></div>
+          </div>
+        </div>
+        <div class="sub-section">
+          <div class="sub-head" onclick="toggleSub(this)">
+            <div class="sub-title"><span class="ic">→</span> Train Station to City Center Transport <span class="atom-tag">Atom · 3.9k demand</span></div>
+            <span class="sub-chev">▼</span>
+          </div>
+          <div class="sub-body">
+            <p>Metro L4 (yellow) "Barceloneta" — 3 min walk to the station. ~10 min to Plaça de Catalunya.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARRIVAL SECTION -->
+    <div class="section-head">
+      <div class="icon arr">←</div>
+      <h2>Arrival stations in Madrid</h2>
+      <span class="sub">2 stations serve this route</span>
+    </div>
+
+    <div class="faq-intro">
+      <div class="q">Where does the train arrive in Madrid?</div>
+      <div class="a">
+        Trains from Barcelona typically arrive at <strong>Madrid Puerta de Atocha – Almudena Grandes</strong>, the main high-speed terminus in the city centre and the destination for the majority of AVE, Ouigo, Iryo and Avlo services. Some Iryo and Avlo services terminate at <strong>Madrid Chamartín – Clara Campoamor</strong> in the north of the city instead. Check your ticket — the arrival station depends on the operator and specific service.
+      </div>
+      <div class="faq-meta">
+        <span><strong>Source FAQ:</strong> "Where does the train arrive in Madrid?" (Q-new)</span>
+        <span><strong>JSON-LD:</strong> FAQPage → mainEntity</span>
+        <span><strong>Atom:</strong> Arrival Station Identity</span>
+      </div>
+    </div>
+
+    <!-- Primary: Atocha -->
+    <div class="station-card primary" data-station="atocha">
+      <div class="station-head" onclick="toggleStation(this)">
+        <div>
+          <div class="name">Madrid Puerta de Atocha – Almudena Grandes</div>
+          <div class="sub-info">Plaza Emperador Carlos V, s/n, 28045 Madrid · UIC 71600</div>
+        </div>
+        <div class="meta">
+          <span class="booking-share">88% of bookings</span>
+          <span class="rank-badge primary">Primary</span>
+          <span class="chev">▼</span>
+        </div>
+      </div>
+      <div class="station-body">
+        <div class="sub-section open">
+          <div class="sub-head" onclick="toggleSub(this)">
+            <div class="sub-title"><span class="ic">i</span> Train Arrival Station <span class="atom-tag">Atom · 3.0k demand</span></div>
+            <span class="sub-chev">▼</span>
+          </div>
+          <div class="sub-body">
+            <div class="data-row"><span class="k">Full name</span><span class="v">Madrid Puerta de Atocha – Almudena Grandes <span class="pill live">live</span></span></div>
+            <div class="data-row"><span class="k">Address</span><span class="v">Plaza Emperador Carlos V, 28045 Madrid <span class="pill live">live</span></span></div>
+            <div class="data-row"><span class="k">Coordinates</span><span class="v">40.4066° N, 3.6897° W <span class="pill live">live</span></span></div>
+            <div class="data-row"><span class="k">Operator</span><span class="v">Adif / Renfe <span class="pill live">live</span></span></div>
+            <div class="data-row"><span class="k">UIC code</span><span class="v">71600 <span class="pill live">live</span></span></div>
+            <div class="data-row"><span class="k">Arrival concourse</span><span class="v">Follow "Salida / Exit" to main concourse · metro and taxi signs clearly marked · note: adjacent Atocha Cercanías is a 3 min walk <span class="pill needs">needs</span></span></div>
+          </div>
+        </div>
+        <div class="sub-section">
+          <div class="sub-head" onclick="toggleSub(this)">
+            <div class="sub-title"><span class="ic">→</span> Train Station to City Center Transport <span class="atom-tag">Atom · 3.9k demand</span></div>
+            <span class="sub-chev">▼</span>
+          </div>
+          <div class="sub-body">
+            <ul>
+              <li><strong>Metro</strong> — L1 (light blue) from "Estación del Arte" / "Atocha" · 3 stops to Sol (city centre) <span class="pill live">live</span></li>
+              <li><strong>Cercanías commuter rail</strong> — C1, C2, C3, C4, C5, C7, C8, C10 from Atocha Cercanías (free connection included with AVE/Avlo ticket if used within 4 hours) <span class="pill live">live</span></li>
+              <li><strong>Taxi</strong> — ~€10 to Puerta del Sol · official rank at main exit <span class="pill needs">needs</span></li>
+              <li><strong>Walk</strong> — Retiro Park 5 min, Reina Sofía 2 min, Sol 20 min <span class="pill live">live</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="sub-section">
+          <div class="sub-head" onclick="toggleSub(this)">
+            <div class="sub-title"><span class="ic">♦</span> Train Station Facilities <span class="atom-tag">Atom · 3.7k demand</span></div>
+            <span class="sub-chev">▼</span>
+          </div>
+          <div class="sub-body">
+            <ul>
+              <li>Tropical garden (iconic), ticket offices, self-service machines <span class="pill live">live</span></li>
+              <li>Food court: El Corte Inglés, Rodilla, Mercado Gourmet, Farggi <span class="pill needs">needs</span></li>
+              <li>Sala Club Renfe lounge · Iryo Infinita lounge <span class="pill needs">needs</span></li>
+              <li>Free Wi-Fi throughout <span class="pill live">live</span></li>
+              <li>ATMs, pharmacy, car rental desks, tourist info <span class="pill needs">needs</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="sub-section">
+          <div class="sub-head" onclick="toggleSub(this)">
+            <div class="sub-title"><span class="ic">☰</span> Station Luggage Storage <span class="atom-tag">Atom · 1.8k demand</span></div>
+            <span class="sub-chev">▼</span>
+          </div>
+          <div class="sub-body">
+            <ul>
+              <li><strong>Consigna</strong> — €3.60–5.20/day, 05:30–22:20 <span class="pill needs">needs</span></li>
+              <li><strong>Bounce partners</strong> — several within 5 min walk, ~€5.90/day <span class="pill needs">needs</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="sub-section">
+          <div class="sub-head" onclick="toggleSub(this)">
+            <div class="sub-title"><span class="ic">♿</span> Train Station Accessibility <span class="atom-tag">Atom · 1.2k demand</span></div>
+            <span class="sub-chev">▼</span>
+          </div>
+          <div class="sub-body">
+            <ul>
+              <li>Fully step-free — lifts and ramps throughout <span class="pill live">live</span></li>
+              <li>Adif Acerca service — book 30 min minimum before arrival/departure <span class="pill live">live</span></li>
+              <li>Tactile paving, accessible toilets, induction loops <span class="pill needs">needs</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Secondary: Chamartín -->
+    <div class="station-card" data-station="chamartin">
+      <div class="station-head" onclick="toggleStation(this)">
+        <div>
+          <div class="name">Madrid Chamartín – Clara Campoamor</div>
+          <div class="sub-info">Calle de Agustín de Foxá, s/n, 28036 Madrid · UIC 71601</div>
+        </div>
+        <div class="meta">
+          <span class="booking-share">12% of bookings</span>
+          <span class="rank-badge secondary">Secondary</span>
+          <span class="chev">▼</span>
+        </div>
+      </div>
+      <div class="station-body">
+        <div class="sub-section open">
+          <div class="sub-head" onclick="toggleSub(this)">
+            <div class="sub-title"><span class="ic">i</span> Train Arrival Station <span class="atom-tag">Atom · 3.0k demand</span></div>
+            <span class="sub-chev">▼</span>
+          </div>
+          <div class="sub-body">
+            <div class="data-row"><span class="k">Address</span><span class="v">Calle de Agustín de Foxá, s/n, 28036 Madrid <span class="pill live">live</span></span></div>
+            <div class="data-row"><span class="k">Location</span><span class="v">North Madrid — Chamartín district <span class="pill live">live</span></span></div>
+            <div class="data-row"><span class="k">UIC code</span><span class="v">71601 <span class="pill live">live</span></span></div>
+            <div class="data-row"><span class="k">Why it's used</span><span class="v">Some Iryo and Avlo services terminate here. Useful if your destination is in north Madrid.</span></div>
+          </div>
+        </div>
+        <div class="sub-section">
+          <div class="sub-head" onclick="toggleSub(this)">
+            <div class="sub-title"><span class="ic">→</span> Train Station to City Center Transport <span class="atom-tag">Atom · 3.9k demand</span></div>
+            <span class="sub-chev">▼</span>
+          </div>
+          <div class="sub-body">
+            <ul>
+              <li><strong>Metro</strong> — L1 (light blue) and L10 (dark blue) from "Chamartín" · ~15 min to Sol <span class="pill live">live</span></li>
+              <li><strong>Cercanías</strong> — multiple lines direct to Atocha and Sol <span class="pill live">live</span></li>
+              <li><strong>Taxi</strong> — ~€20 to city centre <span class="pill needs">needs</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="sub-section">
+          <div class="sub-head" onclick="toggleSub(this)">
+            <div class="sub-title"><span class="ic">♦</span> Train Station Facilities <span class="atom-tag">Atom · 3.7k demand</span></div>
+            <span class="sub-chev">▼</span>
+          </div>
+          <div class="sub-body">
+            <p>Shopping centre above station with cafés, shops, food court. Ticket offices, accessible throughout. <span class="pill needs">needs</span></p>
+          </div>
+        </div>
+        <div class="sub-section">
+          <div class="sub-head" onclick="toggleSub(this)">
+            <div class="sub-title"><span class="ic">☰</span> Station Luggage Storage <span class="atom-tag">Atom · 1.8k demand</span></div>
+            <span class="sub-chev">▼</span>
+          </div>
+          <div class="sub-body">
+            <p>Consigna available in the station concourse. Bounce partners within 10 min. <span class="pill needs">needs</span></p>
+          </div>
+        </div>
+        <div class="sub-section">
+          <div class="sub-head" onclick="toggleSub(this)">
+            <div class="sub-title"><span class="ic">♿</span> Train Station Accessibility <span class="atom-tag">Atom · 1.2k demand</span></div>
+            <span class="sub-chev">▼</span>
+          </div>
+          <div class="sub-body">
+            <p>Step-free access throughout. Adif Acerca assistance — book 30 min minimum in advance. <span class="pill live">live</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-callout">
+      <h3>FAQ consolidation</h3>
+      <p>The following FAQs currently sitting outside StationBoxes are absorbed by this component:</p>
+      <ul>
+        <li><strong>Q-new</strong> "Where does the train depart from in Barcelona?" → departure intro paragraph + structured markup</li>
+        <li><strong>Q-new</strong> "Where does the train arrive in Madrid?" → arrival intro paragraph + structured markup</li>
+        <li><strong>Q1</strong> "How do I get from Madrid airport to the city centre?" → stays (route-level FAQ, different atom)</li>
+        <li><strong>Q37</strong> "Where can I store my luggage in Barcelona?" → absorbed into <code>Luggage storage</code> section on each departure station card</li>
+        <li><strong>Q38</strong> "Do I need to go through security at train stations?" → absorbed into <code>Wayfinding</code> section on primary station cards</li>
+      </ul>
+      <p style="margin-top:10px;">All absorbed FAQs continue to emit as individual Question/Answer pairs in the <code>FAQPage</code> JSON-LD, with <code>about</code> pointing to the relevant TrainStation <code>@id</code> — so we keep the rich result eligibility while reducing page clutter.</p>
+    </div>
+
+  </div>
+
+  <!-- ========== CURRENT STATE ========== -->
+  <div class="view" id="view-current">
+    <div class="current-note">
+      <strong>Today's state on omio.com/trains/barcelona/madrid</strong> — station information is sparse, inline with route details, and schema-only emits nested <code>TrainStation{"name": "..."}</code> with no other properties. There is no concept of multiple served stations per route; the component assumes 1:1.
+    </div>
+
+    <div class="current-box">
+      <h3>StationBoxes data payload today (per TrainTrip)</h3>
+      <div class="current-field">
+        <span class="lbl">departureStation.name</span>
+        <span class="val">"Barcelona Sants" <span class="pill live">live</span></span>
+      </div>
+      <div class="current-field">
+        <span class="lbl">departurePlatform</span>
+        <span class="val empty">"" (empty field, rendered)</span>
+      </div>
+      <div class="current-field">
+        <span class="lbl">arrivalStation.name</span>
+        <span class="val">"Madrid Puerta de Atocha – Almudena Grandes" <span class="pill live">live</span></span>
+      </div>
+      <div class="current-field">
+        <span class="lbl">arrivalPlatform</span>
+        <span class="val empty">"" (empty field, rendered)</span>
+      </div>
+      <div class="current-field">
+        <span class="lbl">additional served stations</span>
+        <span class="val empty">not modelled — route assumes 1 origin + 1 destination</span>
+      </div>
+      <div class="current-field">
+        <span class="lbl">address</span>
+        <span class="val empty">not emitted</span>
+      </div>
+      <div class="current-field">
+        <span class="lbl">geo coordinates</span>
+        <span class="val empty">not emitted</span>
+      </div>
+      <div class="current-field">
+        <span class="lbl">UIC code</span>
+        <span class="val empty">not emitted</span>
+      </div>
+      <div class="current-field">
+        <span class="lbl">amenityFeature</span>
+        <span class="val empty">not emitted</span>
+      </div>
+      <div class="current-field">
+        <span class="lbl">accessibilityFeature</span>
+        <span class="val empty">not emitted</span>
+      </div>
+      <div class="current-field">
+        <span class="lbl">FAQ → station link</span>
+        <span class="val empty">FAQs render as separate block, no <code>about</code> relationship to TrainStation</span>
+      </div>
+    </div>
+
+    <div class="current-note">
+      <strong>What's missing for SEO / AI overviews:</strong> no canonical TrainStation entity, no relationships between FAQs and stations, no representation of multiple served stations per route, no operational data (facilities, accessibility, luggage, directions) that competitors (rome2rio, seat61, welcomepickups) rank for.
+    </div>
+  </div>
+
+  <!-- ========== SCHEMA.ORG DIFF ========== -->
+  <div class="view" id="view-schema">
+
+    <div class="current-note">
+      <strong>Key change:</strong> move from one nested <code>TrainStation{name}</code> per TrainTrip to a top-level <code>@graph</code> with one TrainStation entity per served station, cross-referenced by <code>@id</code>. This supports "which stations serve this route" directly in structured data.
+    </div>
+
+    <div class="schema-grid">
+      <div class="schema-col before">
+        <h3>Current (rendered today)</h3>
+<pre>{
+  <span class="key">"@context"</span>: <span class="str">"https://schema.org"</span>,
+  <span class="key">"@type"</span>: <span class="str">"TrainTrip"</span>,
+  <span class="key">"departureStation"</span>: {
+    <span class="key">"@type"</span>: <span class="str">"TrainStation"</span>,
+    <span class="key">"name"</span>: <span class="str">"Barcelona Sants"</span>
+  },
+  <span class="key">"departurePlatform"</span>: <span class="str">""</span>,
+  <span class="key">"arrivalStation"</span>: {
+    <span class="key">"@type"</span>: <span class="str">"TrainStation"</span>,
+    <span class="key">"name"</span>: <span class="str">"Madrid Atocha"</span>
+  },
+  <span class="key">"arrivalPlatform"</span>: <span class="str">""</span>
+  <span class="com">// No address, no geo, no UIC,
+  // no amenities, no accessibility,
+  // no concept of alternate stations</span>
+}</pre>
+        <div class="schema-note">10 occurrences of TrainStation on the page, all name-only, all nested inside TrainTrip. FAQ block renders visually but <strong>no FAQPage JSON-LD is emitted</strong>.</div>
+      </div>
+
+      <div class="schema-col after">
+        <h3>Proposed v2 (@graph)</h3>
+<pre>{
+  <span class="key">"@context"</span>: <span class="str">"https://schema.org"</span>,
+  <span class="key">"@graph"</span>: [
+    <span class="com">// Departure stations (ranked by booking share)</span>
+    {
+      <span class="key">"@type"</span>: <span class="str">"TrainStation"</span>,
+      <span class="key">"@id"</span>: <span class="str">"#stn-sants"</span>,
+      <span class="key">"name"</span>: <span class="str">"Barcelona Sants"</span>,
+      <span class="key">"address"</span>: {<span class="key">"@type"</span>:<span class="str">"PostalAddress"</span>,<span class="key">"streetAddress"</span>:<span class="str">"Plaça dels Països Catalans"</span>,<span class="key">"postalCode"</span>:<span class="str">"08014"</span>,<span class="key">"addressLocality"</span>:<span class="str">"Barcelona"</span>},
+      <span class="key">"geo"</span>: {<span class="key">"@type"</span>:<span class="str">"GeoCoordinates"</span>,<span class="key">"latitude"</span>:<span class="str">"41.3790"</span>,<span class="key">"longitude"</span>:<span class="str">"2.1400"</span>},
+      <span class="key">"identifier"</span>: {<span class="key">"@type"</span>:<span class="str">"PropertyValue"</span>,<span class="key">"propertyID"</span>:<span class="str">"UIC"</span>,<span class="key">"value"</span>:<span class="str">"71801"</span>},
+      <span class="key">"amenityFeature"</span>: [...],
+      <span class="key">"accessibilityFeature"</span>: [<span class="str">"stepFreeAccess"</span>, <span class="str">"assistedBoarding"</span>, ...]
+    },
+    { <span class="key">"@id"</span>: <span class="str">"#stn-pdg"</span>, <span class="com">/* Passeig de Gràcia */</span> ... },
+    { <span class="key">"@id"</span>: <span class="str">"#stn-franca"</span>, <span class="com">/* Estació de França */</span> ... },
+
+    <span class="com">// Arrival stations</span>
+    { <span class="key">"@id"</span>: <span class="str">"#stn-atocha"</span>, <span class="com">/* Atocha */</span> ... },
+    { <span class="key">"@id"</span>: <span class="str">"#stn-chamartin"</span>, <span class="com">/* Chamartín */</span> ... },
+
+    <span class="com">// Route references stations by @id</span>
+    {
+      <span class="key">"@type"</span>: <span class="str">"TrainTrip"</span>,
+      <span class="key">"departureStation"</span>: {<span class="key">"@id"</span>:<span class="str">"#stn-sants"</span>},
+      <span class="key">"arrivalStation"</span>: {<span class="key">"@id"</span>:<span class="str">"#stn-atocha"</span>}
+    },
+
+    <span class="com">// FAQPage references stations</span>
+    {
+      <span class="key">"@type"</span>: <span class="str">"FAQPage"</span>,
+      <span class="key">"mainEntity"</span>: [
+        {
+          <span class="key">"@type"</span>: <span class="str">"Question"</span>,
+          <span class="key">"name"</span>: <span class="str">"Where does the train depart from in Barcelona?"</span>,
+          <span class="key">"about"</span>: [{<span class="key">"@id"</span>:<span class="str">"#stn-sants"</span>},{<span class="key">"@id"</span>:<span class="str">"#stn-pdg"</span>},{<span class="key">"@id"</span>:<span class="str">"#stn-franca"</span>}],
+          <span class="key">"acceptedAnswer"</span>: { ... }
+        }
+      ]
+    }
+  ]
+}</pre>
+        <div class="schema-note">Each served station is a full entity with address/geo/UIC/amenityFeature/accessibilityFeature. The route references them by <code>@id</code>. The FAQ "where does the train depart from" explicitly relates to all three departure stations via <code>about</code>, giving AI overviews a direct station→answer link.</div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  // View toggle
+  document.querySelectorAll('.toggle button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.toggle button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById('view-' + btn.dataset.view).classList.add('active');
+    });
+  });
+
+  // Station card toggle (full station)
+  function toggleStation(headEl) {
+    headEl.parentElement.classList.toggle('open');
+  }
+
+  // Sub-section toggle (within a station)
+  function toggleSub(headEl) {
+    headEl.parentElement.classList.toggle('open');
+  }
+</script>
+
+</body>
+</html>
