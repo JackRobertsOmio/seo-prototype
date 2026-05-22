@@ -1,4 +1,4 @@
-# Station Info V2.1: Structure & Extraction MVP
+# Station Info V2.1: Structure & Public Transport MVP
 
 Owner: Sevim  
 Prototype: `station-info-v2-1-prototype.html`  
@@ -8,9 +8,9 @@ Scope: Route-page station information component
 
 ## Summary
 
-Implement Station Info V2.1 as a no-new-data MVP that reuses existing station/place payload data in a clearer, route-specific, SEO-friendly component.
+Implement Station Info V2.1 as a scoped MVP that reuses existing station/place payload data in a clearer, route-specific, SEO-friendly component, with one allowed new data source: Rome2Rio public transport connections for the city-centre transport panel.
 
-The goal is not to add new station data. The goal is to make existing data easier for users, search engines and LLMs to extract:
+The goal is not broad station enrichment. The goal is to make existing data easier for users, search engines and LLMs to extract, while using Rome2Rio only to improve public transport answers:
 
 - Which station pair is most common for the route.
 - Which station(s) a route departs from.
@@ -41,21 +41,22 @@ Competitor review showed:
 
 ## Product Principle
 
-Use existing station data in a clearer, route-specific, answer-shaped format before adding new data.
+Use existing station data in a clearer, route-specific, answer-shaped format. In V2.1, the only new data allowed is Rome2Rio public transport data for station-to-city-centre transport. Everything else moves to V2.2.
 
 ## Core Scope
 
 In scope:
 
 - Implement the V2.1 train station component.
-- Use existing station/place payload fields only.
+- Use existing station/place payload fields as the primary source.
+- Add Rome2Rio public transport connections for the City-centre transport panel where Omio payload transport data is missing or too thin.
 - Add SEO intro with station-to-station answer.
 - Link the station-pair page where available.
 - Group stations by route side: departure and arrival.
 - Render each station card with two panels:
   - City-centre transport
   - Station overview
-- Convert public transport payload into mode-based rows.
+- Convert Omio/Rome2Rio public transport data into mode-based rows.
 - Convert amenities/facilities into grouped service summaries.
 - Use natural station aliases in user-facing copy where useful.
 - Keep canonical names, station IDs and coordinates in data/schema.
@@ -65,7 +66,7 @@ In scope:
 
 Out of scope:
 
-- New station enrichment.
+- New station enrichment except Rome2Rio public transport connections.
 - Platform guidance.
 - Entrance guidance.
 - Taxi prices.
@@ -188,6 +189,12 @@ Station cards use two content panels.
 
 Purpose: answer the station-to-city-centre atom.
 
+Data source order:
+
+1. Use Omio station/place payload public transport data where available.
+2. Use Rome2Rio public transport data as the V2.1 fallback/enrichment source.
+3. If neither source has public transport data, show distance-only fallback.
+
 Heading patterns:
 
 ```text
@@ -233,7 +240,8 @@ Fallback:
 
 Transport guardrails:
 
-- Show only modes present in the payload.
+- Show only modes present in Omio payload data or Rome2Rio public transport data.
+- Use Rome2Rio only for public transport connections: mode, line/service names, stops/stations and operators where available.
 - Do not invent travel times.
 - Do not invent prices.
 - Do not invent taxi costs.
@@ -241,6 +249,7 @@ Transport guardrails:
 - Do not invent line colours.
 - Do not invent airport links.
 - Do not make “best way” recommendations unless explicitly available in data.
+- Do not use Rome2Rio taxi, walking, driving, rideshare or price data in V2.1.
 
 ## Panel 2: Station Overview
 
@@ -374,6 +383,7 @@ Route-level:
 - travel mode
 - route-station pair/share where available
 - station-to-station page URL where available
+- Rome2Rio public transport response for station-to-city-centre connections where available
 
 Station-level:
 
@@ -403,6 +413,29 @@ Station-level:
 - car rental
 - hotels
 - businesses/shops
+
+## Rome2Rio V2.1 Boundary
+
+Rome2Rio is in scope only for the `City-centre transport` panel.
+
+Allowed from Rome2Rio in V2.1:
+
+- public transport modes
+- public transport line or service names
+- public transport operators
+- relevant stop/station names for the station-to-city-centre connection
+
+Not allowed from Rome2Rio in V2.1:
+
+- fares or price ranges
+- taxi prices
+- walking times
+- driving times
+- rideshare options
+- best-way recommendations
+- airport-transfer claims unless already part of the station/city-centre public transport response
+
+If Rome2Rio data is unavailable or low confidence, fall back to Omio payload data or distance-only copy.
 
 ## Example Barcelona to Madrid Payload Usage
 
@@ -461,7 +494,7 @@ Flight note:
 - TrainStation schema validates syntactically.
 - Mobile layout has no horizontal overflow.
 - Accordions are keyboard accessible.
-- No V2.2/high-decay facts appear unless already in the payload.
+- No V2.2/high-decay facts appear unless already in the payload, except Rome2Rio public transport connections in the City-centre transport panel.
 
 ## QA Checklist
 

@@ -42,11 +42,11 @@
   </style>
 </head>
 <body>
-<h1>Station Info V2.1: Structure &amp; Extraction MVP</h1>
+<h1>Station Info V2.1: Structure &amp; Public Transport MVP</h1>
 <p>Owner: Sevim   Prototype: <code>station-info-v2-1-prototype.html</code>   Public prototype: https://jackrobertsomio.github.io/seo-prototype/station-info-v2-1-prototype.html   Example route: Barcelona to Madrid trains   Scope: Route-page station information component</p>
 <h2>Summary</h2>
-<p>Implement Station Info V2.1 as a no-new-data MVP that reuses existing station/place payload data in a clearer, route-specific, SEO-friendly component.</p>
-<p>The goal is not to add new station data. The goal is to make existing data easier for users, search engines and LLMs to extract:</p>
+<p>Implement Station Info V2.1 as a scoped MVP that reuses existing station/place payload data in a clearer, route-specific, SEO-friendly component, with one allowed new data source: Rome2Rio public transport connections for the city-centre transport panel.</p>
+<p>The goal is not broad station enrichment. The goal is to make existing data easier for users, search engines and LLMs to extract, while using Rome2Rio only to improve public transport answers:</p>
 <ul>
 <li>Which station pair is most common for the route.</li>
 <li>Which station(s) a route departs from.</li>
@@ -75,18 +75,19 @@
 <li>Omio has stronger structured station/place data than it currently renders.</li>
 </ul>
 <h2>Product Principle</h2>
-<p>Use existing station data in a clearer, route-specific, answer-shaped format before adding new data.</p>
+<p>Use existing station data in a clearer, route-specific, answer-shaped format. In V2.1, the only new data allowed is Rome2Rio public transport data for station-to-city-centre transport. Everything else moves to V2.2.</p>
 <h2>Core Scope</h2>
 <p>In scope:</p>
 <ul>
 <li>Implement the V2.1 train station component.</li>
-<li>Use existing station/place payload fields only.</li>
+<li>Use existing station/place payload fields as the primary source.</li>
+<li>Add Rome2Rio public transport connections for the City-centre transport panel where Omio payload transport data is missing or too thin.</li>
 <li>Add SEO intro with station-to-station answer.</li>
 <li>Link the station-pair page where available.</li>
 <li>Group stations by route side: departure and arrival.</li>
 <li>Render each station card with two panels:</li>
 <p>- City-centre transport   - Station overview</p>
-<li>Convert public transport payload into mode-based rows.</li>
+<li>Convert Omio/Rome2Rio public transport data into mode-based rows.</li>
 <li>Convert amenities/facilities into grouped service summaries.</li>
 <li>Use natural station aliases in user-facing copy where useful.</li>
 <li>Keep canonical names, station IDs and coordinates in data/schema.</li>
@@ -96,7 +97,7 @@
 </ul>
 <p>Out of scope:</p>
 <ul>
-<li>New station enrichment.</li>
+<li>New station enrichment except Rome2Rio public transport connections.</li>
 <li>Platform guidance.</li>
 <li>Entrance guidance.</li>
 <li>Taxi prices.</li>
@@ -187,6 +188,8 @@ Trains from Barcelona arrive at Madrid-Puerta de Atocha-Almudena Grandes. Madrid
 <p>Station cards use two content panels.</p>
 <h2>Panel 1: City-Centre Transport</h2>
 <p>Purpose: answer the station-to-city-centre atom.</p>
+<p>Data source order:</p>
+<p>1. Use Omio station/place payload public transport data where available. 2. Use Rome2Rio public transport data as the V2.1 fallback/enrichment source. 3. If neither source has public transport data, show distance-only fallback.</p>
 <p>Heading patterns:</p>
 <pre><code>
 Getting to [departure_station] from [origin] city centre
@@ -220,7 +223,8 @@ Train: AVE, Alvia, Euromed, Talgo, Trenhotel, TGV, Avant, Intercity, R1, R2, R2 
 </code></pre>
 <p>Transport guardrails:</p>
 <ul>
-<li>Show only modes present in the payload.</li>
+<li>Show only modes present in Omio payload data or Rome2Rio public transport data.</li>
+<li>Use Rome2Rio only for public transport connections: mode, line/service names, stops/stations and operators where available.</li>
 <li>Do not invent travel times.</li>
 <li>Do not invent prices.</li>
 <li>Do not invent taxi costs.</li>
@@ -228,6 +232,7 @@ Train: AVE, Alvia, Euromed, Talgo, Trenhotel, TGV, Avant, Intercity, R1, R2, R2 
 <li>Do not invent line colours.</li>
 <li>Do not invent airport links.</li>
 <li>Do not make “best way” recommendations unless explicitly available in data.</li>
+<li>Do not use Rome2Rio taxi, walking, driving, rideshare or price data in V2.1.</li>
 </ul>
 <h2>Panel 2: Station Overview</h2>
 <p>Purpose: summarize station facilities and services in practical traveler language.</p>
@@ -339,6 +344,7 @@ Use the shortest commonly understood station alias in user-facing headings when 
 <li>travel mode</li>
 <li>route-station pair/share where available</li>
 <li>station-to-station page URL where available</li>
+<li>Rome2Rio public transport response for station-to-city-centre connections where available</li>
 </ul>
 <p>Station-level:</p>
 <ul>
@@ -369,6 +375,26 @@ Use the shortest commonly understood station alias in user-facing headings when 
 <li>hotels</li>
 <li>businesses/shops</li>
 </ul>
+<h2>Rome2Rio V2.1 Boundary</h2>
+<p>Rome2Rio is in scope only for the <code>City-centre transport</code> panel.</p>
+<p>Allowed from Rome2Rio in V2.1:</p>
+<ul>
+<li>public transport modes</li>
+<li>public transport line or service names</li>
+<li>public transport operators</li>
+<li>relevant stop/station names for the station-to-city-centre connection</li>
+</ul>
+<p>Not allowed from Rome2Rio in V2.1:</p>
+<ul>
+<li>fares or price ranges</li>
+<li>taxi prices</li>
+<li>walking times</li>
+<li>driving times</li>
+<li>rideshare options</li>
+<li>best-way recommendations</li>
+<li>airport-transfer claims unless already part of the station/city-centre public transport response</li>
+</ul>
+<p>If Rome2Rio data is unavailable or low confidence, fall back to Omio payload data or distance-only copy.</p>
 <h2>Example Barcelona to Madrid Payload Usage</h2>
 <p>Barcelona Sants:</p>
 <ul>
@@ -423,7 +449,7 @@ Use the shortest commonly understood station alias in user-facing headings when 
 <li>TrainStation schema validates syntactically.</li>
 <li>Mobile layout has no horizontal overflow.</li>
 <li>Accordions are keyboard accessible.</li>
-<li>No V2.2/high-decay facts appear unless already in the payload.</li>
+<li>No V2.2/high-decay facts appear unless already in the payload, except Rome2Rio public transport connections in the City-centre transport panel.</li>
 </ul>
 <h2>QA Checklist</h2>
 <ul>

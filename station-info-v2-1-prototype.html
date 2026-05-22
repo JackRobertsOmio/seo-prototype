@@ -789,7 +789,7 @@
     <details class="audit">
       <summary>Payload coverage audit</summary>
       <div class="audit-body">
-        <p class="faq-answer">V2.1 uses current StationBoxes fields only. Route-station booking share should be used only for station-pair ordering and primary/secondary route rendering where available. Unsupported prototype fields stay out of the production copy: UIC codes, platform guidance, entrance notes, ticket prices, taxi estimates, lounge details, assistance-service rules and extra Barcelona departure stations.</p>
+        <p class="faq-answer">V2.1 uses current StationBoxes fields as the primary source, with Rome2Rio public transport connections allowed only for the city-centre transport panel. Route-station booking share should be used only for station-pair ordering and primary/secondary route rendering where available. Unsupported prototype fields stay out of the production copy: UIC codes, platform guidance, entrance notes, ticket prices, taxi estimates, walking times, driving times, rideshare options, lounge details, assistance-service rules and extra Barcelona departure stations.</p>
         <div class="audit-grid">
           <section class="audit-card">
             <h3>Station-to-station intro link</h3>
@@ -800,13 +800,13 @@
             <h3>Proposal: mode-based transport panel</h3>
             <p>Keep the two-panel station card structure: City-centre transport plus Station overview. This keeps the user experience compact while preserving Omio's route-station model.</p>
             <p>Change the City-centre transport panel from one dense sentence into mode-based rows, for example: Metro, Bus and Train. This gives the panel Trainline-style readability without flattening the page into generic editorial copy.</p>
-            <p>Use only modes present in the station data. If a station has no transport connections, show the city-centre distance only.</p>
+            <p>Use modes present in StationBoxes/Pelican public transport data first, then Rome2Rio public transport data where the Omio payload is missing or thin. If neither source has public transport connections, show the city-centre distance only.</p>
           </section>
           <section class="audit-card">
             <h3>Implementation note: AI-generated transport answer</h3>
-            <p>Test an AI-generated version of the City-centre transport panel for V2.1. The generator should rewrite existing station fields into a useful answer, not create new transport facts.</p>
-            <p>Allowed inputs: route origin, route destination, direction, station name, city, address, distance to city centre and public transport connections.</p>
-            <p>Guardrails: do not invent travel times, prices, taxi costs, walking routes, line colours, airport links or best-way recommendations unless those values exist in the provided data. If transport connections are missing, use the city-centre distance only.</p>
+            <p>Test an AI-generated version of the City-centre transport panel for V2.1. The generator should rewrite station fields plus Rome2Rio public transport connections into a useful answer, not create unsupported transport facts.</p>
+            <p>Allowed inputs: route origin, route destination, direction, station name, city, address, distance to city centre, StationBoxes/Pelican public transport connections and Rome2Rio public transport connections.</p>
+            <p>Guardrails: do not invent travel times, prices, taxi costs, walking routes, line colours, airport links or best-way recommendations. Do not use Rome2Rio taxi, walking, driving, rideshare or price data in V2.1. If transport connections are missing, use the city-centre distance only.</p>
           </section>
           <section class="audit-card">
             <h3>Barcelona Sants</h3>
