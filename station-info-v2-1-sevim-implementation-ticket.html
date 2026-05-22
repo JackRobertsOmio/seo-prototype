@@ -1,0 +1,456 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Station Info V2.1 Sevim Implementation Ticket</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.45;
+      color: #172b4d;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 24px;
+    }
+    h1 {
+      font-size: 32px;
+      line-height: 1.15;
+    }
+    h2 {
+      border-top: 1px solid #dfe1e6;
+      padding-top: 22px;
+      margin-top: 28px;
+    }
+    h3 {
+      margin-top: 22px;
+    }
+    code {
+      background: #f4f5f7;
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+    pre {
+      background: #f4f5f7;
+      padding: 12px;
+      border-radius: 6px;
+      overflow: auto;
+      white-space: pre-wrap;
+    }
+    li {
+      margin: 4px 0;
+    }
+  </style>
+</head>
+<body>
+<h1>Station Info V2.1: Structure &amp; Extraction MVP</h1>
+<p>Owner: Sevim   Prototype: <code>station-info-v2-1-prototype.html</code>   Public prototype: https://jackrobertsomio.github.io/seo-prototype/station-info-v2-1-prototype.html   Example route: Barcelona to Madrid trains   Scope: Route-page station information component</p>
+<h2>Summary</h2>
+<p>Implement Station Info V2.1 as a no-new-data MVP that reuses existing station/place payload data in a clearer, route-specific, SEO-friendly component.</p>
+<p>The goal is not to add new station data. The goal is to make existing data easier for users, search engines and LLMs to extract:</p>
+<ul>
+<li>Which station pair is most common for the route.</li>
+<li>Which station(s) a route departs from.</li>
+<li>Which station(s) a route arrives at.</li>
+<li>How to get to or from each station and the city centre.</li>
+<li>What facilities and services are available at each station.</li>
+</ul>
+<p>The working prototype uses Barcelona to Madrid trains:</p>
+<ul>
+<li>Barcelona Sants</li>
+<li>Madrid-Puerta de Atocha-Almudena Grandes / Madrid Atocha</li>
+<li>Madrid Chamartín</li>
+</ul>
+<h2>Context</h2>
+<p>Current station content exists in StationBoxes payloads, but it is often rendered as thin copy, icons, or raw amenity labels. This makes the content less useful for:</p>
+<ul>
+<li>SEO queries such as <code>Barcelona to Madrid train stations</code>, <code>Barcelona Sants to Madrid Atocha</code>, <code>Madrid Atocha facilities</code>, <code>getting from Madrid Atocha to city centre</code>.</li>
+<li>LLM extraction of station facts.</li>
+<li>Users trying to understand where they leave from, where they arrive, and what services exist at the station.</li>
+</ul>
+<p>Competitor review showed:</p>
+<ul>
+<li>Trainline uses clear route-specific station copy and station-pair pages.</li>
+<li>Busbud and FlixBus expose stop/station options well for buses.</li>
+<li>Ferryhopper and Direct Ferries are strong on ferry route logistics, but mix port and operator-rule content.</li>
+<li>Omio has stronger structured station/place data than it currently renders.</li>
+</ul>
+<h2>Product Principle</h2>
+<p>Use existing station data in a clearer, route-specific, answer-shaped format before adding new data.</p>
+<h2>Core Scope</h2>
+<p>In scope:</p>
+<ul>
+<li>Implement the V2.1 train station component.</li>
+<li>Use existing station/place payload fields only.</li>
+<li>Add SEO intro with station-to-station answer.</li>
+<li>Link the station-pair page where available.</li>
+<li>Group stations by route side: departure and arrival.</li>
+<li>Render each station card with two panels:</li>
+<p>- City-centre transport   - Station overview</p>
+<li>Convert public transport payload into mode-based rows.</li>
+<li>Convert amenities/facilities into grouped service summaries.</li>
+<li>Use natural station aliases in user-facing copy where useful.</li>
+<li>Keep canonical names, station IDs and coordinates in data/schema.</li>
+<li>Suppress missing/null/false fields.</li>
+<li>Preserve coordinates for schema/data attributes, but do not show raw coordinates to users.</li>
+<li>Add FAQ schema only for visible FAQ-style questions.</li>
+</ul>
+<p>Out of scope:</p>
+<ul>
+<li>New station enrichment.</li>
+<li>Platform guidance.</li>
+<li>Entrance guidance.</li>
+<li>Taxi prices.</li>
+<li>Public transport fares.</li>
+<li>Walking times.</li>
+<li>Luggage prices.</li>
+<li>Lounge detail.</li>
+<li>Accessibility booking rules.</li>
+<li>Operator/onboard services for buses/ferries/flights.</li>
+<li>Ferry terminal/operator-terminal enrichment.</li>
+<li>Any unsupported “best way” recommendation.</li>
+</ul>
+<h2>Component Structure</h2>
+<h3>1. Header</h3>
+<p>Title pattern:</p>
+<pre><code>
+[Origin] to [Destination] train stations
+</code></pre>
+<p>Example:</p>
+<pre><code>
+Barcelona to Madrid train stations
+</code></pre>
+<p>SEO intro pattern:</p>
+<pre><code>
+Most [origin] to [destination] trains use the [origin_station] to [primary_destination_station] station pair, with some services arriving at [secondary_destination_station]. Use this guide to compare [origin] and [destination] train stations on this route, check city-centre transport, and see station facilities including luggage storage, Wi-Fi, toilets, accessibility, parking, taxis, bike services and car rental.
+</code></pre>
+<p>Example copy:</p>
+<pre><code>
+Most Barcelona to Madrid trains use the Barcelona Sants to Madrid Atocha station pair, with some services arriving at Madrid Chamartín. Use this guide to compare Barcelona and Madrid train stations on this route, check city-centre transport, and see station facilities including luggage storage, Wi-Fi, toilets, accessibility, parking, taxis, bike services and car rental.
+</code></pre>
+<p>Linking rule:</p>
+<ul>
+<li>If a station-to-station page exists, link the primary station-pair text.</li>
+<li>Example link text: <code>Barcelona Sants to Madrid Atocha</code></li>
+<li>Example URL: <code>https://www.omio.es/trenes/barcelona-sants/madrid-atocha</code></li>
+</ul>
+<p>Primary/secondary rule:</p>
+<ul>
+<li>Use route-station booking share where available.</li>
+<li>Do not infer primary/secondary from total station booking volume.</li>
+<li>If route-station booking share is unavailable, use neutral ordering and avoid “most common” language.</li>
+</ul>
+<h3>2. Departure Group</h3>
+<p>Group heading:</p>
+<pre><code>
+Departure station in [Origin]
+</code></pre>
+<p>FAQ question:</p>
+<pre><code>
+Which [origin] station do trains to [destination] leave from?
+</code></pre>
+<p>FAQ answer pattern:</p>
+<pre><code>
+Trains from [origin] to [destination] leave from [station_name]. The station is [distance] km from [origin] city centre at [address]. You can reach [station_name] by [available transport connections].
+</code></pre>
+<p>Example:</p>
+<pre><code>
+Trains from Barcelona to Madrid leave from Barcelona Sants. The station is 1 km from Barcelona city centre at Plaça dels Països Catalans, 1, 7, 08014 Barcelona, Spain. You can reach Barcelona Sants by metro lines L3 and L5, bus lines A1 and A2, and regional and long-distance train services.
+</code></pre>
+<h3>3. Arrival Group</h3>
+<p>Group heading:</p>
+<pre><code>
+Arrival stations in [Destination]
+</code></pre>
+<p>FAQ question:</p>
+<pre><code>
+Which [destination] station do trains from [origin] arrive at?
+</code></pre>
+<p>FAQ answer pattern:</p>
+<pre><code>
+Trains from [origin] arrive at [primary_arrival_station]. [Secondary_arrival_station] is also shown as a [destination] station for this route. [Primary_arrival_station] is [distance] km from [destination] city centre, while [secondary_arrival_station] is [distance] km from [destination] city centre. Check your ticket before travel so you know which [destination] station your train uses.
+</code></pre>
+<p>Example:</p>
+<pre><code>
+Trains from Barcelona arrive at Madrid-Puerta de Atocha-Almudena Grandes. Madrid Chamartín is also shown as a Madrid station for this route. Madrid-Puerta de Atocha-Almudena Grandes is 1 km from Madrid city centre, while Madrid Chamartín is 6 km from Madrid city centre. Check your ticket before travel so you know which Madrid station your train uses.
+</code></pre>
+<h2>Station Card Requirements</h2>
+<p>Each station card should show:</p>
+<ul>
+<li>Station name.</li>
+<li>Departure/arrival badge.</li>
+<li>Address where available.</li>
+<li>Distance to city centre where available.</li>
+<li>Phone where available.</li>
+<li>Expand/collapse body.</li>
+<li>Link to station page where available.</li>
+</ul>
+<p>Station cards use two content panels.</p>
+<h2>Panel 1: City-Centre Transport</h2>
+<p>Purpose: answer the station-to-city-centre atom.</p>
+<p>Heading patterns:</p>
+<pre><code>
+Getting to [departure_station] from [origin] city centre
+Getting from [arrival_station] to [destination] city centre
+</code></pre>
+<p>Example heading:</p>
+<pre><code>
+Getting to Barcelona Sants from Barcelona city centre
+</code></pre>
+<p>Answer sentence pattern:</p>
+<pre><code>
+[Station] is [distance] km from [city] city centre and is connected by [available modes].
+</code></pre>
+<p>Mode rows:</p>
+<pre><code>
+Metro: [metro lines]
+Bus: [bus lines]
+Train: [train lines]
+</code></pre>
+<p>Example:</p>
+<pre><code>
+Barcelona Sants is 1 km from Barcelona city centre and is connected by metro, bus and train.
+
+Metro: L3 and L5 serve Barcelona Sants.
+Bus: A1 and A2 serve the station.
+Train: AVE, Alvia, Euromed, Talgo, Trenhotel, TGV, Avant, Intercity, R1, R2, R2 Nord, R2 Sud, R3, R4, RG1, R11, R12, R13, R14, R15, R16 and R17 also serve Barcelona Sants.
+</code></pre>
+<p>Fallback:</p>
+<pre><code>
+[Station] is [distance] km from [city] city centre.
+</code></pre>
+<p>Transport guardrails:</p>
+<ul>
+<li>Show only modes present in the payload.</li>
+<li>Do not invent travel times.</li>
+<li>Do not invent prices.</li>
+<li>Do not invent taxi costs.</li>
+<li>Do not invent walking routes.</li>
+<li>Do not invent line colours.</li>
+<li>Do not invent airport links.</li>
+<li>Do not make “best way” recommendations unless explicitly available in data.</li>
+</ul>
+<h2>Panel 2: Station Overview</h2>
+<p>Purpose: summarize station facilities and services in practical traveler language.</p>
+<p>Heading pattern:</p>
+<pre><code>
+[Station alias] station facilities and services
+</code></pre>
+<p>Example:</p>
+<pre><code>
+Madrid Atocha station facilities and services
+</code></pre>
+<p>Summary pattern:</p>
+<pre><code>
+[Station] has the main services travelers need [before departure / after arriving], including [available services].
+</code></pre>
+<p>Example:</p>
+<pre><code>
+Barcelona Sants has the main services travelers need before taking a Barcelona to Madrid train, including food and drink, Wi-Fi, luggage storage, ticket support, accessibility facilities, toilets, taxis, parking, bike services and car rental.
+</code></pre>
+<p>Recommended groups:</p>
+<ul>
+<li>Food and drink</li>
+<li>Wi-Fi and ATMs</li>
+<li>Tickets and information</li>
+<li>Luggage and lost property</li>
+<li>Parking, taxis and toilets</li>
+<li>Bike and car services</li>
+<li>Accessibility</li>
+<li>Shops, hotels and contact</li>
+</ul>
+<p>Rendering rules:</p>
+<ul>
+<li>Render only groups with available data.</li>
+<li>Use detailed text where available.</li>
+<li>Use concise availability language where only boolean data exists.</li>
+<li>Suppress null/false fields.</li>
+<li>Do not show raw amenity chips as the primary content.</li>
+</ul>
+<p>Examples:</p>
+<pre><code>
+Wi-Fi hotspots are available in and near restaurants. ATMs are in the central part of the station.
+</code></pre>
+<pre><code>
+Parking, taxis and toilets are available at Barcelona Sants.
+</code></pre>
+<h2>Alias Rules</h2>
+<p>Use natural aliases in visible copy where they improve readability and search alignment:</p>
+<ul>
+<li><code>Madrid Atocha</code> in headings and intro.</li>
+<li><code>Barcelona Sants</code> in headings and intro.</li>
+</ul>
+<p>Keep canonical names in:</p>
+<ul>
+<li>station card title when needed</li>
+<li>schema</li>
+<li>IDs</li>
+<li>data attributes</li>
+<li>station links</li>
+</ul>
+<p>Example:</p>
+<ul>
+<li>Visible heading: <code>Madrid Atocha station facilities and services</code></li>
+<li>Canonical card/entity: <code>Madrid-Puerta de Atocha-Almudena Grandes</code></li>
+</ul>
+<p>AI alias rule:</p>
+<pre><code>
+Use the shortest commonly understood station alias in user-facing headings when it is unambiguous for the route. Preserve the canonical station name in structured data and station identifiers. Do not invent aliases; use only approved alias mappings or names present in Omio data.
+</code></pre>
+<h2>Structured Data</h2>
+<p>Add or preserve FAQPage schema for visible FAQ intros only:</p>
+<ul>
+<li><code>Which Barcelona station do trains to Madrid leave from?</code></li>
+<li><code>Which Madrid station do trains from Barcelona arrive at?</code></li>
+</ul>
+<p>Do not add FAQ schema for intro copy unless it is rendered as a visible Q&amp;A.</p>
+<p>Add/keep TrainStation entities where safe:</p>
+<ul>
+<li>name</li>
+<li>address</li>
+<li>telephone where available</li>
+<li>geo coordinates where available</li>
+<li>station page URL as <code>@id</code></li>
+</ul>
+<p>Use <code>about</code> relationships from FAQ questions to relevant TrainStation entities.</p>
+<h2>Route-Station Ranking Logic</h2>
+<p>Use route-station booking share for:</p>
+<ul>
+<li>primary station pair in the intro</li>
+<li>primary/secondary arrival station ordering</li>
+<li>primary/secondary labels where supported</li>
+</ul>
+<p>Do not use total station booking volume for route rendering decisions.</p>
+<p>Use total station booking volume only for:</p>
+<ul>
+<li>data audit priority</li>
+<li>deciding which station records to enrich first in V2.2</li>
+</ul>
+<p>Fallbacks:</p>
+<ul>
+<li>If route-station share is unavailable, preserve payload order.</li>
+<li>Avoid “most common,” “primary,” or “main” unless supported.</li>
+<li>Use neutral wording such as <code>also shown as a station for this route</code>.</li>
+</ul>
+<h2>Required Data Inputs</h2>
+<p>Route-level:</p>
+<ul>
+<li>origin city</li>
+<li>destination city</li>
+<li>travel mode</li>
+<li>route-station pair/share where available</li>
+<li>station-to-station page URL where available</li>
+</ul>
+<p>Station-level:</p>
+<ul>
+<li>station ID</li>
+<li>station canonical name</li>
+<li>station alias where approved</li>
+<li>station page URL</li>
+<li>route side: departure / arrival</li>
+<li>address</li>
+<li>phone</li>
+<li>distance to city centre</li>
+<li>coordinates</li>
+<li>public transport connection strings</li>
+<li>ticket office hours</li>
+<li>Wi-Fi</li>
+<li>luggage storage</li>
+<li>parking</li>
+<li>dining</li>
+<li>ATM</li>
+<li>taxi</li>
+<li>toilets/WC</li>
+<li>accessibility</li>
+<li>information desk</li>
+<li>lost and found</li>
+<li>bike parking</li>
+<li>bike rental</li>
+<li>car rental</li>
+<li>hotels</li>
+<li>businesses/shops</li>
+</ul>
+<h2>Example Barcelona to Madrid Payload Usage</h2>
+<p>Barcelona Sants:</p>
+<ul>
+<li>Use: name, address, phone, station link, ticket hours, transport, distance, Wi-Fi, luggage storage, parking, dining, ATM, taxi, toilets, accessibility, hotels, lost and found, ticket office, business, coordinates, bike parking, bike rental, car rental, information desk.</li>
+</ul>
+<p>Madrid Atocha:</p>
+<ul>
+<li>Use: canonical name, alias, address, phone, station link, ticket hours, transport, distance, Wi-Fi, luggage storage, parking, dining, ATM, taxi, toilets, accessibility, hotels, lost and found, ticket office, businesses, coordinates, bike parking, bike rental, car rental, information desk.</li>
+</ul>
+<p>Madrid Chamartín:</p>
+<ul>
+<li>Use: name, address, station link, distance, parking, dining, ATM, taxi, toilets, accessibility, hotels, lost and found, ticket office, coordinates, bike parking, bike rental, car rental, information desk.</li>
+<li>Suppress: null phone, null transport detail, null ticket hours, null Wi-Fi text, null luggage storage text.</li>
+</ul>
+<h2>Cross-Mode Future Pattern</h2>
+<p>This ticket implements train station V2.1, but the component should be built so the rendering pattern can become <code>Travel Place Info V2.1</code>.</p>
+<p>Mode variants:</p>
+<ul>
+<li>Train: <code>train stations</code>, <code>city-centre transport</code>, <code>station facilities and services</code>.</li>
+<li>Bus: <code>bus stations and stops</code>, <code>city-centre transport</code>, <code>bus station facilities and services</code>.</li>
+<li>Ferry: <code>ferry ports</code>, <code>port access</code>, <code>port facilities and services</code>.</li>
+<li>Flight: <code>airports</code>, <code>airport access</code>, <code>airport facilities and services</code>.</li>
+</ul>
+<p>Bus note:</p>
+<ul>
+<li>Do not add onboard bus services to this component. That already exists elsewhere and is out of scope.</li>
+</ul>
+<p>Ferry note:</p>
+<ul>
+<li>V2.1 should focus on port access and port facilities.</li>
+<li>V2.2 should add ferry/operator-rule data such as operator terminal mapping, check-in timing, vehicle boarding, foot passenger process, luggage rules, cabins, pets, bicycle-on-ferry rules and documents.</li>
+</ul>
+<p>Flight note:</p>
+<ul>
+<li>V2.1 should focus on airport access and airport facilities.</li>
+<li>Airline rules should stay separate.</li>
+</ul>
+<h2>Acceptance Criteria</h2>
+<ul>
+<li>Component renders using existing payload data only.</li>
+<li>Header includes station-pair intro and link where available.</li>
+<li>Departure and arrival stations are grouped separately.</li>
+<li>FAQ intros render before the station cards for each route side.</li>
+<li>Each station card has <code>City-centre transport</code> and <code>Station overview</code> panels.</li>
+<li>Transport panel uses mode-based rows where mode data exists.</li>
+<li>Transport fallback uses distance only when mode data is missing.</li>
+<li>Station overview summarizes facilities and shows grouped detail.</li>
+<li>Null/false fields do not render empty UI.</li>
+<li>Coordinates are not visible to users.</li>
+<li>Station links are preserved.</li>
+<li>FAQ schema only includes visible FAQ questions.</li>
+<li>TrainStation schema validates syntactically.</li>
+<li>Mobile layout has no horizontal overflow.</li>
+<li>Accordions are keyboard accessible.</li>
+<li>No V2.2/high-decay facts appear unless already in the payload.</li>
+</ul>
+<h2>QA Checklist</h2>
+<ul>
+<li>Test a route with one departure and one arrival station.</li>
+<li>Test a route with one departure and multiple arrival stations.</li>
+<li>Test a station with rich transport details.</li>
+<li>Test a station with only distance and no transport details.</li>
+<li>Test a station with rich facility text.</li>
+<li>Test a station with boolean-only amenities.</li>
+<li>Test station page link presence and absence.</li>
+<li>Test station-to-station page link presence and absence.</li>
+<li>Validate FAQ schema.</li>
+<li>Validate TrainStation schema.</li>
+<li>Check mobile and desktop layout.</li>
+</ul>
+<h2>Prototype</h2>
+<p>Public prototype:</p>
+<pre><code>
+https://jackrobertsomio.github.io/seo-prototype/station-info-v2-1-prototype.html
+</code></pre>
+<p>Local prototype file:</p>
+<pre><code>
+station-info-v2-1-prototype.html
+</code></pre>
+<p>Current local URL when server is running:</p>
+<pre><code>
+http://127.0.0.1:8765/station-info-v2-1-prototype.html
+</code></pre>
+</body>
+</html>

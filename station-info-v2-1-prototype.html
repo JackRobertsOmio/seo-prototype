@@ -1,0 +1,915 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Station Info V2.1 - Barcelona to Madrid</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #132968;
+      --muted: #5c6a91;
+      --quiet: #eef2f7;
+      --line: #d9deea;
+      --paper: #ffffff;
+      --canvas: #f7f8fb;
+      --blue: #0057b8;
+      --green: #117a46;
+      --coral: #e65d57;
+      --violet: #694fc4;
+      --amber: #9a6600;
+      --shadow: 0 10px 28px rgba(19, 41, 104, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    a {
+      color: var(--blue);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 24px 18px 56px;
+    }
+
+    .component {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .component-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcff;
+    }
+
+    .eyebrow {
+      color: var(--coral);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.05;
+      letter-spacing: 0;
+      max-width: 720px;
+    }
+
+    .intro {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 15px;
+      max-width: 760px;
+    }
+
+    .group {
+      padding: 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .group:last-child {
+      border-bottom: 0;
+    }
+
+    .group-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-end;
+      margin-bottom: 14px;
+    }
+
+    .group-title {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .direction-icon {
+      width: 32px;
+      height: 32px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 8px;
+      background: #e8f0fe;
+      color: var(--blue);
+      font-weight: 900;
+      flex: 0 0 auto;
+    }
+
+    .direction-icon.arrival {
+      background: #e7f5ee;
+      color: var(--green);
+    }
+
+    .group h2 {
+      font-size: 20px;
+      letter-spacing: 0;
+    }
+
+    .count {
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .faq-intro {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      margin-bottom: 14px;
+      background: #fbfcff;
+    }
+
+    .faq-label {
+      color: var(--coral);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .faq-question {
+      font-size: 18px;
+      font-weight: 850;
+      margin-bottom: 8px;
+      letter-spacing: 0;
+    }
+
+    .faq-answer {
+      color: var(--muted);
+      font-size: 15px;
+      max-width: 880px;
+    }
+
+    .station-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .station-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    .station-card.primary {
+      border-color: rgba(0, 87, 184, 0.45);
+    }
+
+    .station-summary {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      padding: 18px;
+      text-align: left;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: center;
+      cursor: pointer;
+      font: inherit;
+      color: inherit;
+    }
+
+    .station-summary:hover {
+      background: #fbfcff;
+    }
+
+    .station-name-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .station-name {
+      font-size: 18px;
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--quiet);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .badge.primary {
+      background: #e8f0fe;
+      color: var(--blue);
+    }
+
+    .badge.secondary {
+      background: #e7f5ee;
+      color: var(--green);
+    }
+
+    .station-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .chevron {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--quiet);
+      color: var(--muted);
+      transition: transform 160ms ease;
+    }
+
+    .station-card[data-open="true"] .chevron {
+      transform: rotate(180deg);
+    }
+
+    .station-body {
+      display: none;
+      padding: 0 18px 18px;
+    }
+
+    .station-card[data-open="true"] .station-body {
+      display: block;
+    }
+
+    .atom-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      padding-top: 2px;
+    }
+
+    .atom {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: #ffffff;
+      min-width: 0;
+    }
+
+    .atom.wide {
+      grid-column: 1 / -1;
+    }
+
+    .atom-name {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 850;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .atom h3 {
+      font-size: 15px;
+      line-height: 1.25;
+      margin-bottom: 8px;
+      letter-spacing: 0;
+    }
+
+    .atom p,
+    .atom li {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .atom ul {
+      padding-left: 18px;
+      margin: 8px 0 0;
+    }
+
+    .transport-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .transport-row {
+      display: grid;
+      grid-template-columns: 88px minmax(0, 1fr);
+      gap: 10px;
+      padding-top: 8px;
+      border-top: 1px solid var(--line);
+      min-width: 0;
+    }
+
+    .transport-mode {
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    .transport-detail {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .overview-block {
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+      min-width: 0;
+    }
+
+    .overview-block h4 {
+      margin: 0 0 5px;
+      font-size: 13px;
+      letter-spacing: 0;
+    }
+
+    .overview-block p {
+      margin: 0;
+    }
+
+    .detail-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #f2f5f9;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .link-row {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .station-link {
+      display: inline-flex;
+      min-height: 34px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 13px;
+      font-weight: 800;
+      background: #ffffff;
+    }
+
+    .schema-note {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .audit {
+      margin-top: 20px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      overflow: hidden;
+    }
+
+    .audit summary {
+      cursor: pointer;
+      padding: 16px 18px;
+      font-weight: 850;
+    }
+
+    .audit-body {
+      border-top: 1px solid var(--line);
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .audit-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .audit-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fbfcff;
+    }
+
+    .audit-card h3 {
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .audit-card p {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    @media (max-width: 860px) {
+      .atom-grid,
+      .overview-grid,
+      .audit-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .group-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .count {
+        white-space: normal;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .page {
+        padding: 12px 10px 40px;
+      }
+
+      .component-header,
+      .group {
+        padding: 18px 14px;
+      }
+
+      .station-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .transport-row {
+        grid-template-columns: 1fr;
+        gap: 3px;
+      }
+
+      .chevron {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="component" aria-labelledby="station-info-title">
+      <header class="component-header">
+        <div>
+          <div class="eyebrow">Station Info V2.1</div>
+          <h1 id="station-info-title">Barcelona to Madrid train stations</h1>
+          <p class="intro">Most Barcelona to Madrid trains use the <a href="https://www.omio.es/trenes/barcelona-sants/madrid-atocha">Barcelona Sants to Madrid Atocha</a> station pair, with some services arriving at Madrid Chamartín. Use this guide to compare Barcelona and Madrid train stations on this route, check city-centre transport, and see station facilities including luggage storage, Wi-Fi, toilets, accessibility, parking, taxis, bike services and car rental.</p>
+        </div>
+      </header>
+
+      <section class="group" aria-labelledby="departure-title">
+        <div class="group-head">
+          <div class="group-title">
+            <span class="direction-icon" aria-hidden="true">D</span>
+            <div>
+              <h2 id="departure-title">Departure station in Barcelona</h2>
+            </div>
+          </div>
+          <span class="count">1 station shown</span>
+        </div>
+
+        <div class="faq-intro">
+          <div class="faq-label">Route FAQ</div>
+          <p class="faq-question">Which Barcelona station do trains to Madrid leave from?</p>
+          <p class="faq-answer">Trains from Barcelona to Madrid leave from Barcelona Sants. The station is 1 km from Barcelona city centre at Plaça dels Països Catalans, 1, 7, 08014 Barcelona, Spain. You can reach Barcelona Sants by metro lines L3 and L5, bus lines A1 and A2, and regional and long-distance train services.</p>
+        </div>
+
+        <div class="station-list">
+          <article class="station-card primary" data-open="true" data-station-id="1003399" data-latitude="41.378998234320456" data-longitude="2.1399138851633097">
+            <button class="station-summary" type="button" aria-expanded="true">
+              <span>
+                <span class="station-name-row">
+                  <span class="station-name">Barcelona Sants</span>
+                  <span class="badge primary">Departure</span>
+                </span>
+                <span class="station-meta">
+                  <span>Plaça dels Països Catalans, 1, 7, 08014 Barcelona, Spain</span>
+                  <span>1 km from Barcelona city centre</span>
+                  <span>+34 934956020</span>
+                </span>
+              </span>
+              <span class="chevron" aria-hidden="true">⌄</span>
+            </button>
+
+            <div class="station-body">
+              <div class="atom-grid">
+                <section class="atom wide">
+                  <div class="atom-name">City-centre transport</div>
+                  <h3>Getting to Barcelona Sants from Barcelona city centre</h3>
+                  <p>Barcelona Sants is 1 km from Barcelona city centre and is connected by metro, bus and train.</p>
+                  <div class="transport-list">
+                    <div class="transport-row">
+                      <span class="transport-mode">Metro</span>
+                      <span class="transport-detail">L3 and L5 serve Barcelona Sants.</span>
+                    </div>
+                    <div class="transport-row">
+                      <span class="transport-mode">Bus</span>
+                      <span class="transport-detail">A1 and A2 serve the station.</span>
+                    </div>
+                    <div class="transport-row">
+                      <span class="transport-mode">Train</span>
+                      <span class="transport-detail">AVE, Alvia, Euromed, Talgo, Trenhotel, TGV, Avant, Intercity, R1, R2, R2 Nord, R2 Sud, R3, R4, RG1, R11, R12, R13, R14, R15, R16 and R17 also serve Barcelona Sants.</span>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="atom wide">
+                  <div class="atom-name">Station overview</div>
+                  <h3>Barcelona Sants station facilities and services</h3>
+                  <p>Barcelona Sants has the main services travelers need before taking a Barcelona to Madrid train, including food and drink, Wi-Fi, luggage storage, ticket support, accessibility facilities, toilets, taxis, parking, bike services and car rental.</p>
+
+                  <div class="overview-grid">
+                    <div class="overview-block">
+                      <h4>Food and drink</h4>
+                      <p>Food options include McDonald’s, Caffe di Fiore, Ars Café, Café de l’Estació, Café de l’Estació Deli, Lavazza, Como, Peter’s, Tutti Frutti and Enrique Tomás.</p>
+                    </div>
+                    <div class="overview-block">
+                      <h4>Wi-Fi and ATMs</h4>
+                      <p>Wi-Fi hotspots are available in and near restaurants. ATMs are in the central part of the station.</p>
+                    </div>
+                    <div class="overview-block">
+                      <h4>Tickets and information</h4>
+                      <p>The ticket office is open Monday to Sunday from 06:00 to 22:00. Information desks are located in various places inside the station.</p>
+                    </div>
+                    <div class="overview-block">
+                      <h4>Luggage and lost property</h4>
+                      <p>Staffed and automatic luggage storage is open daily from 05:30 to 21:00. Lost and found is available at the station.</p>
+                    </div>
+                    <div class="overview-block">
+                      <h4>Parking, taxis and toilets</h4>
+                      <p>Parking, taxis and toilets are available at Barcelona Sants.</p>
+                    </div>
+                    <div class="overview-block">
+                      <h4>Bike and car services</h4>
+                      <p>Bike parking, bike rental and car rental are available at the station.</p>
+                    </div>
+                    <div class="overview-block">
+                      <h4>Accessibility</h4>
+                      <p>All areas of Barcelona Sants have full disability access facilities.</p>
+                    </div>
+                    <div class="overview-block">
+                      <h4>Shops, hotels and contact</h4>
+                      <p>Station services include Movistar. Nearby hotels include Apartments Eixample, Apartment Guell and Sweet Inn Callao. Phone: +34 934956020.</p>
+                    </div>
+                  </div>
+
+                  <div class="link-row">
+                    <a class="station-link" href="https://www.omio.com/train-stations/spain/barcelona/barcelona-sants">More about Barcelona Sants</a>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="group" aria-labelledby="arrival-title">
+        <div class="group-head">
+          <div class="group-title">
+            <span class="direction-icon arrival" aria-hidden="true">A</span>
+            <div>
+              <h2 id="arrival-title">Arrival stations in Madrid</h2>
+            </div>
+          </div>
+          <span class="count">2 stations shown</span>
+        </div>
+
+        <div class="faq-intro">
+          <div class="faq-label">Route FAQ</div>
+          <p class="faq-question">Which Madrid station do trains from Barcelona arrive at?</p>
+          <p class="faq-answer">Trains from Barcelona arrive at Madrid-Puerta de Atocha-Almudena Grandes. Madrid Chamartín is also shown as a Madrid station for this route. Madrid-Puerta de Atocha-Almudena Grandes is 1 km from Madrid city centre, while Madrid Chamartín is 6 km from Madrid city centre. Check your ticket before travel so you know which Madrid station your train uses.</p>
+        </div>
+
+        <div class="station-list">
+          <article class="station-card primary" data-open="true" data-station-id="1003193" data-latitude="40.405016320398104" data-longitude="-3.688253843665168">
+            <button class="station-summary" type="button" aria-expanded="true">
+              <span>
+                <span class="station-name-row">
+                  <span class="station-name">Madrid-Puerta de Atocha-Almudena Grandes</span>
+                  <span class="badge primary">Arrival</span>
+                </span>
+                <span class="station-meta">
+                  <span>Glorieta Emperador Carlos V, 28045 Madrid, Spain</span>
+                  <span>1 km from Madrid city centre</span>
+                  <span>+34 912432343</span>
+                </span>
+              </span>
+              <span class="chevron" aria-hidden="true">⌄</span>
+            </button>
+
+            <div class="station-body">
+              <div class="atom-grid">
+                <section class="atom wide">
+                  <div class="atom-name">City-centre transport</div>
+                  <h3>Getting from Madrid Atocha to Madrid city centre</h3>
+                  <p>Madrid-Puerta de Atocha-Almudena Grandes is 1 km from Madrid city centre and has onward metro, bus and Cercanías connections.</p>
+                  <div class="transport-list">
+                    <div class="transport-row">
+                      <span class="transport-mode">Metro</span>
+                      <span class="transport-detail">Line 1 serves Madrid Atocha.</span>
+                    </div>
+                    <div class="transport-row">
+                      <span class="transport-mode">Bus</span>
+                      <span class="transport-detail">Lines 10, 14, 24, 26, 32, 37, 54, 57, 59, 85, 86, 102, 121 and 203 serve the station.</span>
+                    </div>
+                    <div class="transport-row">
+                      <span class="transport-mode">Train</span>
+                      <span class="transport-detail">Cercanías lines C1, C2, C3, C4, C5, C7, C8 and C10 connect from the station.</span>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="atom wide">
+                  <div class="atom-name">Station overview</div>
+                  <h3>Madrid Atocha station facilities and services</h3>
+                  <p>Madrid-Puerta de Atocha-Almudena Grandes has the main services travelers need after arriving from Barcelona, including food and drink, Wi-Fi, luggage storage, ticket support, accessibility facilities, toilets, taxis, parking, bike services and car rental.</p>
+
+                  <div class="overview-grid">
+                    <div class="overview-block">
+                      <h4>Food and drink</h4>
+                      <p>Food options include Passion Food, La Barrila, Enrique Tomás, Pic Nic, Foodissimo!, PureGusto and Burger King.</p>
+                    </div>
+                    <div class="overview-block">
+                      <h4>Wi-Fi and ATMs</h4>
+                      <p>Free Wi-Fi is available in the station and on Renfe trains. ATMs are located at several points in the station.</p>
+                    </div>
+                    <div class="overview-block">
+                      <h4>Tickets and information</h4>
+                      <p>The ticket office is open Monday to Sunday from 10:00 to 20:00. The information desk is on the ground floor of the main concourse.</p>
+                    </div>
+                    <div class="overview-block">
+                      <h4>Luggage and lost property</h4>
+                      <p>Luggage storage is open daily from 05:30 to 22:00. Lost and found is available at the station.</p>
+                    </div>
+                    <div class="overview-block">
+                      <h4>Parking, taxis and toilets</h4>
+                      <p>Parking, taxis and toilets are available at Madrid-Puerta de Atocha-Almudena Grandes.</p>
+                    </div>
+                    <div class="overview-block">
+                      <h4>Bike and car services</h4>
+                      <p>Bike parking, bike rental and car rental are available at the station.</p>
+                    </div>
+                    <div class="overview-block">
+                      <h4>Accessibility</h4>
+                      <p>The station has wheelchair parking, adapted elevators, adapted platforms and an accessible lobby shopping area.</p>
+                    </div>
+                    <div class="overview-block">
+                      <h4>Shops, businesses, hotels and contact</h4>
+                      <p>Station services include Post Office, Relay Prensa and Viajes Reina. Nearby hotels include 60 Balconies Urban Stay, Only YOU Hotel Atocha and SLEEP’N Atocha. Phone: +34 912432343.</p>
+                    </div>
+                  </div>
+
+                  <div class="link-row">
+                    <a class="station-link" href="https://www.omio.com/train-stations/spain/madrid/madrid-puerta-de-atocha">More about Madrid-Puerta de Atocha-Almudena Grandes</a>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </article>
+
+          <article class="station-card" data-open="false" data-station-id="1002949" data-latitude="40.47231847704002" data-longitude="-3.6825012281723275">
+            <button class="station-summary" type="button" aria-expanded="false">
+              <span>
+                <span class="station-name-row">
+                  <span class="station-name">Madrid Chamartín</span>
+                  <span class="badge secondary">Arrival</span>
+                </span>
+                <span class="station-meta">
+                  <span>28036 Madrid, Spain</span>
+                  <span>6 km from Madrid city centre</span>
+                </span>
+              </span>
+              <span class="chevron" aria-hidden="true">⌄</span>
+            </button>
+
+            <div class="station-body">
+              <div class="atom-grid">
+                <section class="atom wide">
+                  <div class="atom-name">City-centre transport</div>
+                  <h3>Getting from Madrid Chamartín to Madrid city centre</h3>
+                  <p>Madrid Chamartín is 6 km from Madrid city centre.</p>
+                </section>
+
+                <section class="atom wide">
+                  <div class="atom-name">Station overview</div>
+                  <h3>Madrid Chamartín station facilities and services</h3>
+                  <p>Madrid Chamartín is also shown as a Madrid arrival station for Barcelona to Madrid trains. It is 6 km from Madrid city centre and has core services including food, ATMs, ticket support, accessibility facilities, toilets, taxis, parking, bike services and car rental.</p>
+
+                  <div class="overview-grid">
+                    <div class="overview-block">
+                      <h4>Food, ATMs and station support</h4>
+                      <p>Madrid Chamartín has dining options, ATMs, ticket office support and an information desk.</p>
+                    </div>
+                    <div class="overview-block">
+                      <h4>Parking, taxis and toilets</h4>
+                      <p>Parking, taxis and toilets are available at Madrid Chamartín.</p>
+                    </div>
+                    <div class="overview-block">
+                      <h4>Lost property and onward services</h4>
+                      <p>Lost and found, bike parking, bike rental and car rental are available at the station.</p>
+                    </div>
+                    <div class="overview-block">
+                      <h4>Accessibility</h4>
+                      <p>Madrid Chamartín has accessibility facilities.</p>
+                    </div>
+                    <div class="overview-block">
+                      <h4>Nearby hotels</h4>
+                      <p>Nearby hotels are available around Madrid Chamartín.</p>
+                    </div>
+                  </div>
+
+                  <div class="link-row">
+                    <a class="station-link" href="https://www.omio.com/train-stations/spain/madrid/madrid-chamartin">More about Madrid Chamartín</a>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </section>
+
+    <details class="audit">
+      <summary>Payload coverage audit</summary>
+      <div class="audit-body">
+        <p class="faq-answer">V2.1 uses current StationBoxes fields only. Route-station booking share should be used only for station-pair ordering and primary/secondary route rendering where available. Unsupported prototype fields stay out of the production copy: UIC codes, platform guidance, entrance notes, ticket prices, taxi estimates, lounge details, assistance-service rules and extra Barcelona departure stations.</p>
+        <div class="audit-grid">
+          <section class="audit-card">
+            <h3>Station-to-station intro link</h3>
+            <p>The component intro now carries the primary station-to-station answer and links to the station-pair route page when available.</p>
+            <p>Rendering rule: use route-station booking share for the primary pair claim. Do not use total station booking volume to decide the primary route pair.</p>
+          </section>
+          <section class="audit-card">
+            <h3>Proposal: mode-based transport panel</h3>
+            <p>Keep the two-panel station card structure: City-centre transport plus Station overview. This keeps the user experience compact while preserving Omio's route-station model.</p>
+            <p>Change the City-centre transport panel from one dense sentence into mode-based rows, for example: Metro, Bus and Train. This gives the panel Trainline-style readability without flattening the page into generic editorial copy.</p>
+            <p>Use only modes present in the station data. If a station has no transport connections, show the city-centre distance only.</p>
+          </section>
+          <section class="audit-card">
+            <h3>Implementation note: AI-generated transport answer</h3>
+            <p>Test an AI-generated version of the City-centre transport panel for V2.1. The generator should rewrite existing station fields into a useful answer, not create new transport facts.</p>
+            <p>Allowed inputs: route origin, route destination, direction, station name, city, address, distance to city centre and public transport connections.</p>
+            <p>Guardrails: do not invent travel times, prices, taxi costs, walking routes, line colours, airport links or best-way recommendations unless those values exist in the provided data. If transport connections are missing, use the city-centre distance only.</p>
+          </section>
+          <section class="audit-card">
+            <h3>Barcelona Sants</h3>
+            <p>Used: name, id, address, phone, link, ticket hours, transport, distance, Wi-Fi, luggage storage, parking, dining, ATM, taxi, toilets, accessibility, hotels, lost and found, ticket office, business, coordinates, bike parking, bike rental, car rental, information desk.</p>
+          </section>
+          <section class="audit-card">
+            <h3>Madrid-Puerta de Atocha-Almudena Grandes</h3>
+            <p>Used: name, id, address, phone, link, ticket hours, transport, distance, Wi-Fi, luggage storage, parking, dining, ATM, taxi, toilets, accessibility, hotels, lost and found, ticket office, businesses, coordinates, bike parking, bike rental, car rental, information desk.</p>
+          </section>
+          <section class="audit-card">
+            <h3>Madrid Chamartín</h3>
+            <p>Used: name, id, address, link, distance, parking, dining, ATM, taxi, toilets, accessibility, hotels, lost and found, ticket office, coordinates, bike parking, bike rental, car rental, information desk. Suppressed: null phone, transport detail, ticket hours, Wi-Fi, luggage storage and detailed facility notes.</p>
+          </section>
+        </div>
+      </div>
+    </details>
+  </main>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "FAQPage",
+        "@id": "https://www.omio.com/trains/barcelona/madrid#station-faqs",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Which Barcelona station do trains to Madrid leave from?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Trains from Barcelona to Madrid leave from Barcelona Sants. The station is 1 km from Barcelona city centre at Plaça dels Països Catalans, 1, 7, 08014 Barcelona, Spain. You can reach Barcelona Sants by metro lines L3 and L5, bus lines A1 and A2, and regional and long-distance train services."
+            },
+            "about": {
+              "@id": "https://www.omio.com/train-stations/spain/barcelona/barcelona-sants"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Which Madrid station do trains from Barcelona arrive at?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Trains from Barcelona arrive at Madrid-Puerta de Atocha-Almudena Grandes. Madrid Chamartín is also shown as a Madrid station for this route. Madrid-Puerta de Atocha-Almudena Grandes is 1 km from Madrid city centre, while Madrid Chamartín is 6 km from Madrid city centre."
+            },
+            "about": [
+              {
+                "@id": "https://www.omio.com/train-stations/spain/madrid/madrid-puerta-de-atocha"
+              },
+              {
+                "@id": "https://www.omio.com/train-stations/spain/madrid/madrid-chamartin"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "@type": "TrainStation",
+        "@id": "https://www.omio.com/train-stations/spain/barcelona/barcelona-sants",
+        "name": "Barcelona Sants",
+        "address": "Plaça dels Països Catalans, 1, 7, 08014 Barcelona, Spain",
+        "telephone": "+34 934956020",
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 41.378998234320456,
+          "longitude": 2.1399138851633097
+        }
+      },
+      {
+        "@type": "TrainStation",
+        "@id": "https://www.omio.com/train-stations/spain/madrid/madrid-puerta-de-atocha",
+        "name": "Madrid-Puerta de Atocha-Almudena Grandes",
+        "address": "Glorieta Emperador Carlos V, 28045 Madrid, Spain",
+        "telephone": "+34 912432343",
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 40.405016320398104,
+          "longitude": -3.688253843665168
+        }
+      },
+      {
+        "@type": "TrainStation",
+        "@id": "https://www.omio.com/train-stations/spain/madrid/madrid-chamartin",
+        "name": "Madrid Chamartín",
+        "address": "28036 Madrid, Spain",
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 40.47231847704002,
+          "longitude": -3.6825012281723275
+        }
+      }
+    ]
+  }
+  </script>
+
+  <script>
+    document.querySelectorAll(".station-summary").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".station-card");
+        const isOpen = card.dataset.open === "true";
+        card.dataset.open = isOpen ? "false" : "true";
+        button.setAttribute("aria-expanded", String(!isOpen));
+      });
+    });
+  </script>
+</body>
+</html>
