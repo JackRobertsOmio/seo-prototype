@@ -1,0 +1,1799 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Omio GEO Linking Prototype</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #111827;
+        --muted: #5b6675;
+        --soft: #eef2f7;
+        --line: #d9e0ea;
+        --bg: #f7f9fb;
+        --panel: #ffffff;
+        --brand: #e9005a;
+        --brand-dark: #ba0048;
+        --brand-soft: #ffe5ef;
+        --teal: #007f7a;
+        --teal-soft: #dff8f4;
+        --blue: #2555a6;
+        --blue-soft: #e8efff;
+        --gold: #a76500;
+        --gold-soft: #fff0d4;
+        --green: #177245;
+        --green-soft: #ddf7e8;
+        --red: #a33232;
+        --red-soft: #ffe7e7;
+        --shadow: 0 10px 32px rgba(17, 24, 39, 0.08);
+        --radius: 8px;
+        --max: 1180px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+      }
+
+      a {
+        color: inherit;
+        text-decoration-color: rgba(233, 0, 90, 0.35);
+        text-decoration-thickness: 1px;
+        text-underline-offset: 3px;
+      }
+
+      button,
+      select,
+      input {
+        font: inherit;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(14px);
+      }
+
+      .topbar-inner {
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 12px 20px;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 16px;
+        align-items: center;
+      }
+
+      .brand {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        min-width: 150px;
+      }
+
+      .brand-mark {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: white;
+        font-weight: 800;
+        background: var(--brand);
+      }
+
+      .brand span {
+        display: block;
+      }
+
+      .brand-title {
+        font-weight: 800;
+        line-height: 1;
+      }
+
+      .brand-subtitle {
+        margin-top: 3px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+        align-items: end;
+      }
+
+      .field label {
+        display: block;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0;
+        margin-bottom: 4px;
+      }
+
+      .field select,
+      .field input {
+        width: 100%;
+        min-height: 38px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: white;
+        color: var(--ink);
+        padding: 0 10px;
+      }
+
+      .status-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        height: 38px;
+        padding: 0 12px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .status-chip.indexable {
+        color: var(--green);
+        background: var(--green-soft);
+      }
+
+      .status-chip.limited {
+        color: var(--gold);
+        background: var(--gold-soft);
+      }
+
+      .status-chip.not-eligible {
+        color: var(--red);
+        background: var(--red-soft);
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+
+      .page-shell {
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 22px 20px 56px;
+      }
+
+      .qa-strip {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 8px;
+        margin-bottom: 18px;
+      }
+
+      .qa-item {
+        min-height: 66px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 10px 12px;
+      }
+
+      .qa-item span {
+        display: block;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .qa-item strong {
+        display: block;
+        margin-top: 6px;
+        font-size: 14px;
+        line-height: 1.25;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 420px;
+        gap: 28px;
+        align-items: stretch;
+        padding: 30px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+      }
+
+      .breadcrumbs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        color: var(--muted);
+        font-size: 13px;
+        margin-bottom: 18px;
+      }
+
+      .breadcrumbs a {
+        color: var(--muted);
+      }
+
+      h1 {
+        margin: 0;
+        max-width: 720px;
+        font-size: clamp(34px, 5vw, 60px);
+        line-height: 1.02;
+        letter-spacing: 0;
+      }
+
+      .hero-copy {
+        max-width: 650px;
+        margin: 18px 0 0;
+        color: #394456;
+        font-size: 18px;
+        line-height: 1.55;
+      }
+
+      .quick-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 22px;
+      }
+
+      .quick-links a {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        min-height: 34px;
+        padding: 0 11px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: #fff;
+        color: #2f3a4a;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+      }
+
+      .search-box {
+        display: grid;
+        gap: 10px;
+        padding: 16px;
+        background: #101828;
+        border-radius: var(--radius);
+        color: white;
+      }
+
+      .search-box h2 {
+        margin: 0;
+        font-size: 17px;
+        letter-spacing: 0;
+      }
+
+      .search-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .search-box label {
+        display: block;
+        margin-bottom: 5px;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .search-box input {
+        width: 100%;
+        height: 42px;
+        border: 0;
+        border-radius: var(--radius);
+        padding: 0 11px;
+      }
+
+      .primary-action {
+        height: 44px;
+        border: 0;
+        border-radius: var(--radius);
+        color: #fff;
+        background: var(--brand);
+        font-weight: 900;
+        cursor: pointer;
+      }
+
+      .primary-action:hover {
+        background: var(--brand-dark);
+      }
+
+      .content-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 330px;
+        gap: 18px;
+        margin-top: 18px;
+        align-items: start;
+      }
+
+      .section {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 22px;
+        margin-bottom: 18px;
+      }
+
+      .section-heading {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        align-items: start;
+        margin-bottom: 16px;
+      }
+
+      .section-heading h2 {
+        margin: 0;
+        font-size: 24px;
+        line-height: 1.2;
+        letter-spacing: 0;
+      }
+
+      .section-heading p {
+        margin: 5px 0 0;
+        color: var(--muted);
+        line-height: 1.45;
+      }
+
+      .module-tag {
+        flex: 0 0 auto;
+        display: inline-flex;
+        height: 28px;
+        align-items: center;
+        border-radius: 999px;
+        padding: 0 10px;
+        background: var(--blue-soft);
+        color: var(--blue);
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .map-layout {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 20px;
+      }
+
+      .map-panel {
+        min-height: 390px;
+        display: grid;
+        align-items: center;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.96)),
+          radial-gradient(circle at 60% 36%, rgba(233, 0, 90, 0.12), transparent 30%),
+          #f3f6fa;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 18px;
+      }
+
+      .coverage-map {
+        width: 100%;
+        height: auto;
+      }
+
+      .country-shape {
+        stroke: white;
+        stroke-width: 2;
+        transition: filter 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+        transform-origin: center;
+      }
+
+      .country-shape.priority {
+        fill: var(--brand);
+      }
+
+      .country-shape.bookable {
+        fill: #ff7daa;
+      }
+
+      .country-shape.limited {
+        fill: #f7cadd;
+      }
+
+      .country-shape.ineligible {
+        fill: #cfd8e3;
+        opacity: 0.65;
+      }
+
+      .country-shape:hover {
+        filter: drop-shadow(0 8px 12px rgba(17, 24, 39, 0.18));
+        transform: translateY(-3px);
+      }
+
+      .map-label {
+        font-size: 11px;
+        font-weight: 900;
+        fill: #1f2937;
+        pointer-events: none;
+      }
+
+      .map-links {
+        display: grid;
+        gap: 10px;
+      }
+
+      .legend {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .swatch {
+        width: 14px;
+        height: 14px;
+        border-radius: 4px;
+      }
+
+      .swatch.priority {
+        background: var(--brand);
+      }
+
+      .swatch.bookable {
+        background: #ff7daa;
+      }
+
+      .swatch.limited {
+        background: #f7cadd;
+      }
+
+      .swatch.ineligible {
+        background: #cfd8e3;
+      }
+
+      .link-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .link-list a,
+      .data-card a {
+        display: flex;
+        min-height: 38px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 8px 10px;
+        background: #fff;
+        text-decoration: none;
+      }
+
+      .link-list a:hover,
+      .data-card a:hover {
+        border-color: rgba(233, 0, 90, 0.35);
+        box-shadow: 0 8px 20px rgba(17, 24, 39, 0.08);
+      }
+
+      .link-list small,
+      .data-card small {
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .data-card {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: #fff;
+        padding: 14px;
+      }
+
+      .data-card h3 {
+        margin: 0 0 8px;
+        font-size: 16px;
+        line-height: 1.25;
+      }
+
+      .data-card p {
+        margin: 0 0 12px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .metric-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 10px;
+      }
+
+      .metric {
+        display: inline-flex;
+        align-items: center;
+        min-height: 26px;
+        padding: 0 8px;
+        border-radius: 999px;
+        background: var(--soft);
+        color: #384253;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .country-routes {
+        display: grid;
+        gap: 6px;
+        margin: 10px 0 12px;
+        padding: 0;
+        list-style: none;
+      }
+
+      .country-routes a {
+        min-height: 30px;
+        font-size: 12px;
+      }
+
+      .route-table {
+        display: grid;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+
+      .route-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1.3fr) 0.8fr 0.8fr 88px;
+        gap: 12px;
+        align-items: center;
+        min-height: 56px;
+        padding: 10px 12px;
+        background: #fff;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .route-row:last-child {
+        border-bottom: 0;
+      }
+
+      .route-row.header {
+        min-height: 40px;
+        background: #f6f8fb;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .route-name {
+        font-weight: 900;
+      }
+
+      .route-meta {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .arrow-link {
+        justify-self: end;
+        display: inline-grid;
+        width: 34px;
+        height: 34px;
+        place-items: center;
+        border-radius: 50%;
+        color: white;
+        background: var(--ink);
+        text-decoration: none;
+        font-size: 20px;
+        line-height: 1;
+      }
+
+      .two-col {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .manual-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .operator-list,
+      .faq-list,
+      .spec-list {
+        display: grid;
+        gap: 10px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .operator-item,
+      .faq-item,
+      .spec-item {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: #fff;
+        padding: 13px;
+      }
+
+      .operator-item strong,
+      .faq-item strong,
+      .spec-item strong {
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      .operator-item span,
+      .faq-item span,
+      .spec-item span {
+        display: block;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.4;
+      }
+
+      .manual-card {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: #fff;
+        padding: 14px;
+      }
+
+      .manual-card small {
+        display: inline-flex;
+        margin-bottom: 8px;
+        min-height: 24px;
+        align-items: center;
+        border-radius: 999px;
+        padding: 0 8px;
+        background: var(--gold-soft);
+        color: var(--gold);
+        font-size: 11px;
+        font-weight: 900;
+      }
+
+      .manual-card h3 {
+        margin: 0 0 8px;
+        font-size: 16px;
+        line-height: 1.25;
+      }
+
+      .manual-card p {
+        margin: 0 0 12px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .side-panel {
+        position: sticky;
+        top: 88px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .side-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 16px;
+      }
+
+      .side-card h2 {
+        margin: 0 0 12px;
+        font-size: 17px;
+        line-height: 1.25;
+      }
+
+      .eligibility-meter {
+        display: grid;
+        gap: 10px;
+      }
+
+      .check {
+        display: grid;
+        grid-template-columns: 22px 1fr;
+        gap: 8px;
+        align-items: start;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.35;
+      }
+
+      .check-icon {
+        display: grid;
+        width: 22px;
+        height: 22px;
+        place-items: center;
+        border-radius: 50%;
+        color: #fff;
+        background: var(--green);
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      .check.miss .check-icon {
+        background: var(--red);
+      }
+
+      .check.warn .check-icon {
+        background: var(--gold);
+      }
+
+      .competitor {
+        border-left: 4px solid var(--brand);
+        padding: 2px 0 2px 12px;
+      }
+
+      .competitor + .competitor {
+        margin-top: 12px;
+      }
+
+      .competitor strong {
+        display: block;
+        font-size: 14px;
+      }
+
+      .competitor span {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.4;
+      }
+
+      .suppressed {
+        border-color: #f0c2c2;
+        background: linear-gradient(135deg, #fff, #fff5f5);
+      }
+
+      .suppressed h2,
+      .suppressed h3 {
+        color: var(--red);
+      }
+
+      .footer-note {
+        margin: 22px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      @media (max-width: 980px) {
+        .topbar-inner {
+          grid-template-columns: 1fr;
+        }
+
+        .controls,
+        .qa-strip,
+        .hero,
+        .content-grid,
+        .map-layout,
+        .cards,
+        .manual-grid,
+        .two-col {
+          grid-template-columns: 1fr;
+        }
+
+        .side-panel {
+          position: static;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .page-shell {
+          padding: 14px 12px 38px;
+        }
+
+        .topbar-inner {
+          padding: 10px 12px;
+        }
+
+        .hero,
+        .section {
+          padding: 18px;
+        }
+
+        .search-row,
+        .link-list,
+        .legend {
+          grid-template-columns: 1fr;
+        }
+
+        .route-row,
+        .route-row.header {
+          grid-template-columns: 1fr;
+        }
+
+        .arrow-link {
+          justify-self: start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand" aria-label="Omio">
+          <span class="brand-mark">O</span>
+          <span>
+            <span class="brand-title">Omio</span>
+            <span class="brand-subtitle">GEO Linking Prototype</span>
+          </span>
+        </div>
+
+        <form class="controls" aria-label="Prototype controls">
+          <div class="field">
+            <label for="domainSelect">Domain</label>
+            <select id="domainSelect">
+              <option value="com">www.omio.com</option>
+              <option value="co-uk">www.omio.co.uk</option>
+              <option value="es">www.omio.es</option>
+              <option value="com-br">www.omio.com.br</option>
+              <option value="jp">www.omio.jp</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="modeSelect">Mode</label>
+            <select id="modeSelect">
+              <option value="trains">Trains</option>
+              <option value="buses">Buses</option>
+              <option value="flights">Flights</option>
+              <option value="ferries">Ferries</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="continentSelect">Continent</label>
+            <select id="continentSelect">
+              <option value="europe">Europe</option>
+              <option value="asia">Asia</option>
+              <option value="north-america">North America</option>
+              <option value="south-america">South America</option>
+              <option value="africa">Africa</option>
+              <option value="oceania">Oceania</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="stateSelect">Page state</label>
+            <select id="stateSelect">
+              <option value="auto">Auto eligibility</option>
+              <option value="strong">Force eligible</option>
+              <option value="below">Force below threshold</option>
+            </select>
+          </div>
+        </form>
+
+        <div class="status-chip indexable" id="pageStatus">
+          <span class="dot"></span>
+          <span>Indexable</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="page-shell">
+      <section class="qa-strip" aria-label="SEO validation">
+        <div class="qa-item">
+          <span>URL</span>
+          <strong id="qaUrl">/trains/europe</strong>
+        </div>
+        <div class="qa-item">
+          <span>Canonical</span>
+          <strong id="qaCanonical">Self-canonical</strong>
+        </div>
+        <div class="qa-item">
+          <span>Creation rule</span>
+          <strong id="qaSitemap">Inventory-based</strong>
+        </div>
+        <div class="qa-item">
+          <span>Internal links</span>
+          <strong id="qaLinks">42 eligible links</strong>
+        </div>
+        <div class="qa-item">
+          <span>Page type</span>
+          <strong>continent_page</strong>
+        </div>
+      </section>
+
+      <section class="hero" id="hero">
+        <div>
+          <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <a href="#">Home</a>
+            <span>/</span>
+            <a href="#" id="crumbMode">Trains</a>
+            <span>/</span>
+            <span id="crumbContinent">Europe</span>
+          </nav>
+          <h1 id="pageH1">Trains in Europe</h1>
+          <p class="hero-copy" id="heroCopy">
+            Compare and book train tickets across Europe, then explore eligible
+            countries, routes, stations and providers from one continent-level hub.
+          </p>
+          <div class="quick-links" id="quickLinks"></div>
+        </div>
+
+        <aside class="search-box" aria-label="Travel search">
+          <h2 id="searchTitle">Search European trains</h2>
+          <div class="search-row">
+            <div>
+              <label for="fromInput">From</label>
+              <input id="fromInput" value="London" />
+            </div>
+            <div>
+              <label for="toInput">To</label>
+              <input id="toInput" value="Paris" />
+            </div>
+          </div>
+          <div class="search-row">
+            <div>
+              <label for="dateInput">Departure</label>
+              <input id="dateInput" value="Fri 19 Jun" />
+            </div>
+            <div>
+              <label for="passengerInput">Passengers</label>
+              <input id="passengerInput" value="1 adult" />
+            </div>
+          </div>
+          <button class="primary-action" type="button">Find tickets</button>
+        </aside>
+      </section>
+
+      <div class="content-grid">
+        <div>
+          <section class="section" id="mapSection">
+            <div class="section-heading">
+              <div>
+                <h2 id="mapTitle">Train coverage in Europe</h2>
+                <p id="mapIntro">
+                  Supported countries are linked through crawlable HTML and shown
+                  visually on the coverage map.
+                </p>
+              </div>
+              <span class="module-tag">Reusable map</span>
+            </div>
+            <div class="map-layout">
+              <div class="map-panel" aria-label="Coverage map">
+                <svg
+                  class="coverage-map"
+                  viewBox="0 0 720 430"
+                  role="img"
+                  aria-labelledby="mapSvgTitle"
+                >
+                  <title id="mapSvgTitle">Mode-continent coverage map</title>
+                  <rect x="0" y="0" width="720" height="430" rx="10" fill="#f4f7fb" />
+                  <g id="mapShapes"></g>
+                </svg>
+              </div>
+              <div class="map-links">
+                <div class="legend" aria-label="Coverage legend">
+                  <span class="legend-item"><span class="swatch priority"></span>Priority</span>
+                  <span class="legend-item"><span class="swatch bookable"></span>Bookable</span>
+                  <span class="legend-item"><span class="swatch limited"></span>Limited</span>
+                  <span class="legend-item"><span class="swatch ineligible"></span>Not linked</span>
+                </div>
+                <ul class="link-list" id="countryLinks"></ul>
+              </div>
+            </div>
+          </section>
+
+          <section class="section" id="introSection">
+            <div class="section-heading">
+              <div>
+                <h2 id="introTitle">Manual introduction</h2>
+                <p id="introCopy">
+                  SEO-owned intro copy explains the continent-level travel proposition and links users into the strongest country fact sheets.
+                </p>
+              </div>
+              <span class="module-tag">manual_content_sections.intro</span>
+            </div>
+            <div class="data-card">
+              <h3>Purpose</h3>
+              <p>
+                This section is manually configured or AI-drafted and SEO-reviewed. It should not be generated from route aggregations.
+              </p>
+              <div class="metric-row" id="introTags">
+                <span class="metric">SEO-owned</span>
+                <span class="metric">Localised</span>
+                <span class="metric">Portable by domain</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="section" id="countrySection">
+            <div class="section-heading">
+              <div>
+                <h2 id="countryTitle">Country train fact sheets</h2>
+                <p id="countryIntro">
+                  Priority countries include top routes, providers, destinations and transport nodes.
+                </p>
+              </div>
+              <span class="module-tag">Country layer</span>
+            </div>
+            <div class="cards" id="countryCards"></div>
+          </section>
+
+          <section class="section" id="contentSection">
+            <div class="section-heading">
+              <div>
+                <h2 id="contentTitle">Manual train strategic sections</h2>
+                <p id="contentIntro">
+                  SEO-owned strategic sections are configured separately from generated country fact sheets.
+                </p>
+              </div>
+              <span class="module-tag">Manual config</span>
+            </div>
+            <div class="manual-grid" id="manualSections"></div>
+            <div class="data-card">
+              <h3 id="guideTitle">Booking guidance</h3>
+              <p id="guideCopy">
+                Book high-speed and cross-border trains early for the widest
+                choice of fares. Regional trains can often be bought closer to departure.
+              </p>
+              <div class="metric-row" id="guideTags"></div>
+            </div>
+          </section>
+
+          <section class="section" id="routeSection">
+            <div class="section-heading">
+              <div>
+                <h2 id="routeTitle">Cross-border and regional train routes</h2>
+                <p id="routeIntro">
+                  Route links are curated from inventory depth, demand and commercial value.
+                </p>
+              </div>
+              <span class="module-tag">Route discovery</span>
+            </div>
+            <div class="route-table" id="routeTable"></div>
+          </section>
+
+          <section class="section" id="relatedSection">
+            <div class="section-heading">
+              <div>
+                <h2 id="relatedTitle">Related page links</h2>
+                <p id="relatedIntro">
+                  Continent pages should be added to parent modules, breadcrumbs and related linkboxes where they are eligible.
+                </p>
+              </div>
+              <span class="module-tag">Internal linking</span>
+            </div>
+            <div class="two-col">
+              <ul class="operator-list" id="parentLinkList"></ul>
+              <ul class="operator-list" id="entityLinkList"></ul>
+            </div>
+          </section>
+
+          <section class="section" id="faqSection">
+            <div class="section-heading">
+              <div>
+                <h2 id="faqTitle">FAQ</h2>
+                <p id="faqIntro">
+                  Short practical answers support users and crawler interpretation without becoming the main page content.
+                </p>
+              </div>
+              <span class="module-tag">Structured content</span>
+            </div>
+            <ul class="faq-list" id="faqList"></ul>
+          </section>
+        </div>
+
+        <aside class="side-panel">
+          <section class="side-card" id="eligibilityCard">
+            <h2>Eligibility</h2>
+            <div class="eligibility-meter" id="eligibilityList"></div>
+          </section>
+
+          <section class="side-card">
+            <h2>Data contract</h2>
+            <ul class="spec-list">
+              <li class="spec-item">
+                <strong>Domain-aware</strong>
+                <span>Every locale evaluates its own inventory, copy and link targets.</span>
+              </li>
+              <li class="spec-item">
+                <strong>Config-driven</strong>
+                <span>Country fact sheets come from data; intro and strategic content come from manual config.</span>
+              </li>
+              <li class="spec-item">
+                <strong>Creation-aware</strong>
+                <span>Only created pages enter parent modules, breadcrumbs and related linkboxes.</span>
+              </li>
+            </ul>
+          </section>
+
+          <section class="side-card">
+            <h2>Competitor patterns</h2>
+            <div class="competitor">
+              <strong>Trainline</strong>
+              <span>Full Europe train hub with tickets, map, train types, routes and FAQs.</span>
+            </div>
+            <div class="competitor">
+              <strong>Rail Europe</strong>
+              <span>Coverage map plus country links and popular journey paths.</span>
+            </div>
+            <div class="competitor">
+              <strong>Direct Ferries</strong>
+              <span>Ferry continent page built around routes, ports, destinations and operators.</span>
+            </div>
+            <div class="competitor">
+              <strong>12Go / Seat61</strong>
+              <span>Asia discovery is route and country-led because generic continent demand is weaker.</span>
+            </div>
+          </section>
+        </aside>
+      </div>
+
+      <p class="footer-note">
+        Prototype file only. Example URLs and metrics represent the intended page contract:
+        links must be validated against live, canonical and indexable targets before publication.
+      </p>
+    </main>
+
+    <script>
+      const DOMAINS = {
+        com: { host: "www.omio.com", label: "Global", defaultFrom: "London", defaultTo: "Paris" },
+        "co-uk": { host: "www.omio.co.uk", label: "United Kingdom", defaultFrom: "London", defaultTo: "Amsterdam" },
+        es: { host: "www.omio.es", label: "Spain", defaultFrom: "Madrid", defaultTo: "Barcelona" },
+        "com-br": { host: "www.omio.com.br", label: "Brazil", defaultFrom: "Sao Paulo", defaultTo: "Rio de Janeiro" },
+        jp: { host: "www.omio.jp", label: "Japan", defaultFrom: "Tokyo", defaultTo: "Kyoto" }
+      };
+
+      const LOCALIZED_PATH_HINTS = {
+        com: { mode: "existing English mode path", continent: "English continent slug" },
+        "co-uk": { mode: "existing UK mode path", continent: "UK/localised continent slug" },
+        es: { mode: "existing Spanish mode path", continent: "Spanish/localised continent slug" },
+        "com-br": { mode: "existing Brazilian Portuguese mode path", continent: "Portuguese/localised continent slug" },
+        jp: { mode: "existing Japanese mode path", continent: "Japanese/localised continent slug" }
+      };
+
+      const MODES = {
+        trains: {
+          singular: "train",
+          title: "Trains",
+          nodeLabel: "stations",
+          providerLabel: "train providers",
+          searchLabel: "Search",
+          guideTitle: "Booking guidance",
+          guide: "Book high-speed and cross-border trains early for the widest choice of fares. Regional trains can often be bought closer to departure.",
+          tags: ["High-speed trains", "Night trains", "Train companies", "Major stations", "Cheap tickets"],
+          providerExamples: ["Eurostar", "Trenitalia", "SNCF", "Deutsche Bahn", "Renfe", "SBB"],
+          nodeExamples: ["Paris Gare du Nord", "Milano Centrale", "Berlin Hbf", "Madrid Atocha", "Amsterdam Centraal", "Zurich HB"]
+        },
+        buses: {
+          singular: "bus",
+          title: "Buses",
+          nodeLabel: "bus stations",
+          providerLabel: "bus providers",
+          searchLabel: "Search",
+          guideTitle: "Bus ticket guidance",
+          guide: "Long-distance bus pages should highlight affordable routes, cross-border operators and station coverage where Omio has bookable inventory.",
+          tags: ["Long-distance buses", "Overnight buses", "Bus companies", "Bus stations", "Cheap tickets"],
+          providerExamples: ["FlixBus", "BlaBlaCar Bus", "ALSA", "National Express", "Itabus", "RegioJet"],
+          nodeExamples: ["London Victoria Coach Station", "Paris Bercy Seine", "Milan Lampugnano", "Barcelona Nord", "Berlin ZOB", "Prague Florenc"]
+        },
+        flights: {
+          singular: "flight",
+          title: "Flights",
+          nodeLabel: "airports",
+          providerLabel: "airlines",
+          searchLabel: "Search",
+          guideTitle: "Flight discovery guidance",
+          guide: "Flight continent pages should connect country, airport, airline and route discovery, with clear cheap-flight and international travel guidance.",
+          tags: ["Cheap flights", "Low-cost airlines", "Major airports", "International routes"],
+          providerExamples: ["Ryanair", "easyJet", "Lufthansa", "British Airways", "Air France", "Iberia"],
+          nodeExamples: ["London Heathrow", "Paris CDG", "Madrid Barajas", "Rome Fiumicino", "Frankfurt Airport", "Amsterdam Schiphol"]
+        },
+        ferries: {
+          singular: "ferry",
+          title: "Ferries",
+          nodeLabel: "ports",
+          providerLabel: "ferry operators",
+          searchLabel: "Search",
+          guideTitle: "Ferry route guidance",
+          guide: "Ferry continent pages should prioritise ports, islands, operators and seasonal route coverage rather than copying train-page content.",
+          tags: ["Ferry ports", "Island routes", "Ferry operators", "Overnight ferries", "Seasonal routes"],
+          providerExamples: ["Balearia", "GNV", "Minoan Lines", "DFDS", "Stena Line", "Irish Ferries"],
+          nodeExamples: ["Dover Port", "Calais Port", "Piraeus Port", "Barcelona Port", "Naples Port", "Dublin Port"]
+        }
+      };
+
+      const CONTINENTS = {
+        europe: {
+          label: "Europe",
+          baseCountries: ["France", "Italy", "Spain", "Germany", "United Kingdom", "Netherlands", "Belgium", "Switzerland"],
+          secondaryCountries: ["Austria", "Portugal", "Poland", "Sweden", "Czech Republic", "Denmark"],
+          routeExamples: [
+            ["London to Paris", "Cross-border", "2h 16m"],
+            ["Paris to Amsterdam", "Cross-border", "3h 20m"],
+            ["Madrid to Barcelona", "Domestic", "2h 30m"],
+            ["Rome to Florence", "Domestic", "1h 32m"],
+            ["Zurich to Milan", "Cross-border", "3h 17m"]
+          ],
+          map: "europe"
+        },
+        asia: {
+          label: "Asia",
+          baseCountries: ["Japan", "South Korea", "Thailand", "Vietnam", "Malaysia", "Indonesia"],
+          secondaryCountries: ["Singapore", "Cambodia", "India", "Taiwan", "China", "Philippines"],
+          routeExamples: [
+            ["Tokyo to Kyoto", "Domestic", "2h 15m"],
+            ["Seoul to Busan", "Domestic", "2h 40m"],
+            ["Bangkok to Chiang Mai", "Domestic", "10h 25m"],
+            ["Kuala Lumpur to Singapore", "Cross-border", "5h 15m"],
+            ["Hanoi to Da Nang", "Domestic", "15h 30m"]
+          ],
+          map: "asia"
+        },
+        "north-america": {
+          label: "North America",
+          baseCountries: ["United States", "Canada", "Mexico"],
+          secondaryCountries: ["Cuba", "Dominican Republic", "Jamaica", "Costa Rica", "Panama"],
+          routeExamples: [
+            ["New York to Washington DC", "Domestic", "2h 55m"],
+            ["Los Angeles to San Diego", "Domestic", "2h 50m"],
+            ["Toronto to Montreal", "Domestic", "5h 05m"],
+            ["Seattle to Vancouver", "Cross-border", "4h 00m"],
+            ["Mexico City to Puebla", "Domestic", "2h 00m"]
+          ],
+          map: "north-america"
+        },
+        "south-america": {
+          label: "South America",
+          baseCountries: ["Brazil", "Argentina", "Chile", "Peru", "Colombia"],
+          secondaryCountries: ["Uruguay", "Ecuador", "Bolivia", "Paraguay"],
+          routeExamples: [
+            ["Sao Paulo to Rio de Janeiro", "Domestic", "6h 30m"],
+            ["Buenos Aires to Rosario", "Domestic", "4h 00m"],
+            ["Santiago to Valparaiso", "Domestic", "1h 45m"],
+            ["Lima to Cusco", "Domestic", "1h 25m"],
+            ["Bogota to Medellin", "Domestic", "1h 00m"]
+          ],
+          map: "south-america"
+        },
+        africa: {
+          label: "Africa",
+          baseCountries: ["Morocco", "South Africa", "Egypt", "Kenya"],
+          secondaryCountries: ["Tunisia", "Tanzania", "Nigeria", "Ghana"],
+          routeExamples: [
+            ["Marrakesh to Casablanca", "Domestic", "2h 40m"],
+            ["Cairo to Alexandria", "Domestic", "2h 30m"],
+            ["Johannesburg to Cape Town", "Domestic", "2h 10m"],
+            ["Nairobi to Mombasa", "Domestic", "5h 00m"],
+            ["Tangier to Rabat", "Domestic", "1h 20m"]
+          ],
+          map: "africa"
+        },
+        oceania: {
+          label: "Oceania",
+          baseCountries: ["Australia", "New Zealand"],
+          secondaryCountries: ["Fiji", "Papua New Guinea"],
+          routeExamples: [
+            ["Sydney to Melbourne", "Domestic", "1h 35m"],
+            ["Brisbane to Gold Coast", "Domestic", "1h 20m"],
+            ["Auckland to Wellington", "Domestic", "1h 10m"],
+            ["Melbourne to Geelong", "Domestic", "1h 05m"],
+            ["Perth to Fremantle", "Domestic", "30m"]
+          ],
+          map: "oceania"
+        }
+      };
+
+      const STRONG_COMBOS = new Set([
+        "com|trains|europe",
+        "com|trains|asia",
+        "com|buses|europe",
+        "com|flights|europe",
+        "com|ferries|europe",
+        "co-uk|trains|europe",
+        "co-uk|buses|europe",
+        "es|trains|europe",
+        "es|buses|europe",
+        "jp|trains|asia",
+        "jp|buses|asia",
+        "com-br|buses|south-america",
+        "com-br|flights|south-america"
+      ]);
+
+      const MANUAL_SECTIONS = {
+        trains: [
+          ["intro", "Manual intro", "A reviewed SEO introduction explains how train travel works across the continent and points users into the strongest country fact sheets."],
+          ["night_trains", "Night trains", "Manual or AI-drafted content can summarise sleeper train coverage, key countries, providers and routes, then link to the night trains hub."],
+          ["high_speed_rail", "High-speed rail", "Manual or AI-drafted content can explain high-speed train networks, countries and providers such as Eurostar, SNCF, DB, Renfe and Italo."]
+        ],
+        buses: [
+          ["intro", "Manual intro", "A reviewed SEO introduction explains long-distance bus coverage across the continent and directs users to the strongest countries."],
+          ["overnight_buses", "Overnight buses", "Manual content can summarise where overnight bus inventory is useful and link to relevant route/provider pages."],
+          ["cheap_bus_tickets", "Cheap bus tickets", "Manual content can cover booking tips, demand patterns and cheap ticket discovery."]
+        ],
+        flights: [
+          ["intro", "Manual intro", "A reviewed SEO introduction explains flight coverage across the continent and links to country, airport and airline discovery."],
+          ["low_cost_airlines", "Low-cost airlines", "Manual content can highlight low-cost airline coverage and link to airline/provider pages."],
+          ["major_airports", "Major airports", "Manual content can summarise important airport hubs and link into airport pages."]
+        ],
+        ferries: [
+          ["intro", "Manual intro", "A reviewed SEO introduction explains ferry coverage across the continent and links to country, port and island coverage."],
+          ["overnight_ferries", "Overnight ferries", "Manual content can summarise overnight ferry options and link to relevant ferry route/provider pages."],
+          ["ferry_ports", "Ferry ports", "Manual content can describe major ferry ports and link to port pages."]
+        ]
+      };
+
+      const COUNTRY_ROUTE_EXAMPLES = {
+        France: ["Paris to Lyon", "Paris to Marseille", "Paris to Amsterdam"],
+        Italy: ["Rome to Florence", "Milan to Venice", "Milan to Rome"],
+        Spain: ["Madrid to Barcelona", "Madrid to Seville", "Madrid to Valencia"],
+        Germany: ["Berlin to Munich", "Hamburg to Berlin", "Cologne to Frankfurt"],
+        "United Kingdom": ["London to Manchester", "London to Edinburgh", "London to Paris"],
+        Switzerland: ["Zurich to Geneva", "Zurich to Milan", "Basel to Paris"],
+        Austria: ["Vienna to Salzburg", "Vienna to Munich", "Vienna to Prague"],
+        Netherlands: ["Amsterdam to Rotterdam", "Amsterdam to Paris", "Amsterdam to Brussels"],
+        Belgium: ["Brussels to Bruges", "Brussels to Amsterdam", "Brussels to Paris"],
+        Japan: ["Tokyo to Kyoto", "Tokyo to Osaka", "Osaka to Kyoto"],
+        Vietnam: ["Hanoi to Da Nang", "Ho Chi Minh City to Nha Trang", "Hanoi to Sapa"],
+        Malaysia: ["Kuala Lumpur to Penang", "Kuala Lumpur to Singapore", "Kuala Lumpur to Ipoh"],
+        Thailand: ["Bangkok to Chiang Mai", "Bangkok to Pattaya", "Bangkok to Phuket"],
+        Singapore: ["Singapore to Kuala Lumpur", "Singapore to Johor Bahru", "Singapore to Malacca"],
+        Indonesia: ["Jakarta to Bandung", "Jakarta to Yogyakarta", "Bali to Lombok"],
+        Brazil: ["Sao Paulo to Rio de Janeiro", "Sao Paulo to Curitiba", "Rio de Janeiro to Belo Horizonte"],
+        "United States": ["New York to Washington DC", "Los Angeles to San Diego", "Boston to New York"],
+        Canada: ["Toronto to Montreal", "Vancouver to Seattle", "Ottawa to Toronto"],
+        Mexico: ["Mexico City to Puebla", "Mexico City to Guadalajara", "Cancun to Tulum"],
+        Greece: ["Athens to Santorini", "Athens to Mykonos", "Piraeus to Crete"],
+        Croatia: ["Split to Dubrovnik", "Zadar to Pula", "Split to Hvar"]
+      };
+
+      const LIMITED_COMBOS = new Set([
+        "com|buses|asia",
+        "com|flights|asia",
+        "com|trains|north-america",
+        "co-uk|flights|europe",
+        "es|flights|europe",
+        "jp|flights|asia",
+        "com-br|trains|south-america",
+        "com-br|ferries|south-america"
+      ]);
+
+      const shapeSets = {
+        europe: [
+          ["France", "M350,205 l70,-28 l58,35 l-12,84 l-86,35 l-58,-52 z", "priority", 385, 252],
+          ["Spain", "M242,305 l125,-18 l40,66 l-95,44 l-98,-40 z", "priority", 300, 350],
+          ["Italy", "M477,292 l39,28 l15,78 l58,8 l-38,-59 l13,-48 l-45,-31 z", "priority", 520, 345],
+          ["Germany", "M435,130 l88,-5 l43,73 l-64,57 l-78,-38 z", "priority", 480, 185],
+          ["United Kingdom", "M238,102 l62,-28 l57,49 l-34,62 l-76,-10 z", "priority", 285, 130],
+          ["Netherlands", "M492,89 l42,11 l-14,35 l-41,-9 z", "bookable", 504, 112],
+          ["Belgium", "M459,145 l52,-6 l5,42 l-47,18 z", "bookable", 483, 169],
+          ["Switzerland", "M438,242 l59,-11 l20,36 l-50,22 z", "bookable", 465, 260],
+          ["Portugal", "M193,310 l50,-5 l-18,71 l-44,-16 z", "limited", 213, 344],
+          ["Poland", "M556,126 l73,18 l23,69 l-80,28 l-42,-52 z", "limited", 590, 176],
+          ["Scandinavia", "M514,26 l68,-13 l51,43 l-40,96 l-74,-38 z", "limited", 560, 73],
+          ["Balkans", "M538,267 l84,-8 l41,73 l-63,46 l-55,-48 z", "ineligible", 592, 318]
+        ],
+        asia: [
+          ["Japan", "M572,190 l39,-28 l32,45 l-18,79 l-55,5 l-22,-49 z", "priority", 594, 230],
+          ["South Korea", "M528,207 l33,-14 l23,35 l-22,40 l-38,-16 z", "bookable", 548, 230],
+          ["Thailand", "M335,260 l55,-10 l32,62 l-28,66 l-55,-38 z", "bookable", 370, 315],
+          ["Vietnam", "M430,271 l27,9 l23,116 l-33,-2 l-35,-87 z", "bookable", 445, 334],
+          ["Malaysia", "M363,361 l72,5 l16,35 l-85,4 z", "limited", 405, 383],
+          ["Indonesia", "M452,380 l134,14 l50,25 l-151,1 z", "limited", 520, 407],
+          ["India", "M211,221 l94,-30 l64,65 l-35,101 l-88,0 l-54,-73 z", "ineligible", 278, 280],
+          ["China", "M317,100 l184,-26 l90,98 l-63,83 l-153,-17 l-82,-71 z", "limited", 440, 160],
+          ["Central Asia", "M116,120 l173,-36 l55,76 l-122,79 l-110,-39 z", "ineligible", 210, 165],
+          ["Middle East", "M107,247 l99,-24 l43,71 l-70,54 l-84,-31 z", "ineligible", 160, 285]
+        ],
+        "north-america": [
+          ["United States", "M198,214 l270,-22 l78,91 l-121,75 l-210,-22 l-73,-64 z", "priority", 335, 275],
+          ["Canada", "M147,83 l280,-42 l147,75 l-102,87 l-301,4 l-84,-62 z", "bookable", 320, 125],
+          ["Mexico", "M260,348 l145,22 l46,60 l-111,-6 l-99,-42 z", "limited", 340, 392],
+          ["Central America", "M432,380 l102,21 l42,26 l-126,-7 z", "ineligible", 496, 405],
+          ["Caribbean", "M529,309 l94,-15 l44,25 l-86,24 z", "ineligible", 590, 322]
+        ],
+        "south-america": [
+          ["Brazil", "M344,116 l142,56 l55,123 l-83,96 l-117,-18 l-56,-132 z", "priority", 410, 250],
+          ["Argentina", "M301,286 l86,38 l-5,157 l-58,17 l-55,-132 z", "bookable", 335, 390],
+          ["Chile", "M251,250 l31,22 l-32,222 l-30,-11 l10,-177 z", "bookable", 250, 370],
+          ["Peru", "M219,179 l83,14 l-4,87 l-69,37 l-62,-57 z", "limited", 240, 245],
+          ["Colombia", "M232,84 l91,19 l-17,70 l-88,-5 l-40,-45 z", "limited", 250, 130],
+          ["Uruguay", "M390,405 l54,2 l-19,47 l-47,-8 z", "ineligible", 410, 431]
+        ],
+        africa: [
+          ["Morocco", "M201,80 l123,-6 l38,57 l-93,56 l-90,-31 z", "priority", 255, 125],
+          ["Egypt", "M410,95 l90,22 l18,70 l-89,16 l-44,-55 z", "bookable", 450, 150],
+          ["Kenya", "M432,245 l68,10 l26,77 l-61,50 l-50,-74 z", "bookable", 465, 310],
+          ["South Africa", "M328,376 l125,11 l38,67 l-93,45 l-95,-40 z", "limited", 390, 430],
+          ["West Africa", "M177,191 l152,8 l51,104 l-128,62 l-98,-66 z", "limited", 255, 275],
+          ["Central Africa", "M343,198 l88,31 l-13,135 l-103,-38 l-20,-86 z", "ineligible", 365, 275],
+          ["East Africa", "M506,182 l71,38 l-29,144 l-48,-34 l-30,-91 z", "ineligible", 525, 260]
+        ],
+        oceania: [
+          ["Australia", "M214,178 l239,-22 l123,83 l-44,126 l-190,30 l-154,-88 z", "priority", 365, 275],
+          ["New Zealand", "M574,331 l65,30 l-34,60 l-60,-40 z", "bookable", 592, 375],
+          ["Fiji", "M604,144 l42,8 l-18,31 l-38,-6 z", "limited", 618, 165],
+          ["Papua New Guinea", "M461,92 l108,14 l30,48 l-119,11 z", "ineligible", 525, 130]
+        ]
+      };
+
+      const els = {
+        domain: document.getElementById("domainSelect"),
+        mode: document.getElementById("modeSelect"),
+        continent: document.getElementById("continentSelect"),
+        state: document.getElementById("stateSelect"),
+        status: document.getElementById("pageStatus"),
+        qaUrl: document.getElementById("qaUrl"),
+        qaCanonical: document.getElementById("qaCanonical"),
+        qaSitemap: document.getElementById("qaSitemap"),
+        qaLinks: document.getElementById("qaLinks"),
+        crumbMode: document.getElementById("crumbMode"),
+        crumbContinent: document.getElementById("crumbContinent"),
+        h1: document.getElementById("pageH1"),
+        heroCopy: document.getElementById("heroCopy"),
+        quickLinks: document.getElementById("quickLinks"),
+        searchTitle: document.getElementById("searchTitle"),
+        from: document.getElementById("fromInput"),
+        to: document.getElementById("toInput"),
+        mapTitle: document.getElementById("mapTitle"),
+        mapIntro: document.getElementById("mapIntro"),
+        mapShapes: document.getElementById("mapShapes"),
+        countryLinks: document.getElementById("countryLinks"),
+        countryTitle: document.getElementById("countryTitle"),
+        countryIntro: document.getElementById("countryIntro"),
+        countryCards: document.getElementById("countryCards"),
+        routeTitle: document.getElementById("routeTitle"),
+        routeIntro: document.getElementById("routeIntro"),
+        routeTable: document.getElementById("routeTable"),
+        introTitle: document.getElementById("introTitle"),
+        introCopy: document.getElementById("introCopy"),
+        relatedTitle: document.getElementById("relatedTitle"),
+        relatedIntro: document.getElementById("relatedIntro"),
+        parentLinkList: document.getElementById("parentLinkList"),
+        entityLinkList: document.getElementById("entityLinkList"),
+        contentTitle: document.getElementById("contentTitle"),
+        contentIntro: document.getElementById("contentIntro"),
+        manualSections: document.getElementById("manualSections"),
+        guideTitle: document.getElementById("guideTitle"),
+        guideCopy: document.getElementById("guideCopy"),
+        guideTags: document.getElementById("guideTags"),
+        faqList: document.getElementById("faqList"),
+        eligibility: document.getElementById("eligibilityList"),
+        eligibilityCard: document.getElementById("eligibilityCard"),
+        mapSection: document.getElementById("mapSection"),
+        introSection: document.getElementById("introSection"),
+        countrySection: document.getElementById("countrySection"),
+        contentSection: document.getElementById("contentSection"),
+        routeSection: document.getElementById("routeSection"),
+        relatedSection: document.getElementById("relatedSection"),
+        faqSection: document.getElementById("faqSection")
+      };
+
+      function titleCase(value) {
+        return value.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+      }
+
+      function slugCountry(country) {
+        return country
+          .toLowerCase()
+          .replace(/united kingdom/g, "uk")
+          .replace(/united states/g, "united-states")
+          .replace(/south korea/g, "south-korea")
+          .replace(/czech republic/g, "czech-republic")
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-|-$/g, "");
+      }
+
+      function routeSlug(route) {
+        return route.toLowerCase().replace(/ to /g, "-to-").replace(/[^a-z0-9-]+/g, "-");
+      }
+
+      function pageState(domain, mode, continent, override) {
+        if (override === "strong") return "indexable";
+        if (override === "below") return "not-eligible";
+        const key = `${domain}|${mode}|${continent}`;
+        if (STRONG_COMBOS.has(key)) return "indexable";
+        if (LIMITED_COMBOS.has(key)) return "limited";
+        return "not-eligible";
+      }
+
+      function linkFor(domain, mode, target) {
+        return `https://${DOMAINS[domain].host}/${mode}/${target}`;
+      }
+
+      function continentPathLabel(domain, mode, continent) {
+        if (domain === "com" || domain === "co-uk") {
+          return `/${mode}/${continent}`;
+        }
+        const hints = LOCALIZED_PATH_HINTS[domain];
+        return `/{${hints.mode}}/{${hints.continent}}`;
+      }
+
+      function renderMap(continent, eligibleCountries, state) {
+        const shapes = shapeSets[CONTINENTS[continent].map];
+        els.mapShapes.innerHTML = "";
+        shapes.forEach(([name, d, baseState, x, y]) => {
+          const isLinked = eligibleCountries.includes(name);
+          const className = state === "not-eligible" || !isLinked ? "ineligible" : baseState;
+          const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          path.setAttribute("d", d);
+          path.setAttribute("class", `country-shape ${className}`);
+          path.setAttribute("tabindex", "0");
+          path.setAttribute("aria-label", `${name}: ${isLinked ? className : "not linked"}`);
+          els.mapShapes.appendChild(path);
+
+          const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          label.setAttribute("x", x);
+          label.setAttribute("y", y);
+          label.setAttribute("text-anchor", "middle");
+          label.setAttribute("class", "map-label");
+          label.textContent = name.length > 13 ? name.split(" ")[0] : name;
+          els.mapShapes.appendChild(label);
+        });
+      }
+
+      function renderCountryLinks(domain, mode, countries, state) {
+        els.countryLinks.innerHTML = countries
+          .map((country, index) => {
+            const status = state === "not-eligible" ? "Omitted" : index < 6 ? "Indexable" : "Limited";
+            const href = linkFor(domain, mode, slugCountry(country));
+            return `<li><a href="${href}"><span>${country}</span><small>${status}</small></a></li>`;
+          })
+          .join("");
+
+        els.countryCards.innerHTML = countries.slice(0, 6).map((country, index) => {
+          const href = linkFor(domain, mode, slugCountry(country));
+          const sessions = state === "not-eligible" ? "below threshold" : `${(index + 3) * 8}k sessions`;
+          const inventory = state === "not-eligible" ? "limited inventory" : `${(index + 2) * 14} routes`;
+          const providers = MODES[mode].providerExamples.slice(index % 3, index % 3 + 2);
+          const nodes = MODES[mode].nodeExamples.slice(index % 3, index % 3 + 2);
+          const destinations = COUNTRY_ROUTE_EXAMPLES[country]?.map((route) => route.split(" to ")[1]).filter(Boolean).slice(0, 3) || [
+            `${country} capital`,
+            `${country} hub`
+          ];
+          const routes = COUNTRY_ROUTE_EXAMPLES[country] || [
+            `${country} capital route`,
+            `${country} airport connection`,
+            `${country} cross-border route`
+          ];
+          return `
+            <article class="data-card">
+              <h3>${country}</h3>
+              <p>${MODES[mode].title} country page with eligible ${MODES[mode].singular} routes, ${MODES[mode].providerLabel} and ${MODES[mode].nodeLabel}.</p>
+              <ul class="country-routes">
+                ${routes.slice(0, 3).map((route) => `<li><a href="https://${DOMAINS[domain].host}/${routeSlug(route)}"><span>${route}</span><small>route</small></a></li>`).join("")}
+              </ul>
+              <p><strong>Providers:</strong> ${providers.join(", ")}<br><strong>Destinations:</strong> ${destinations.join(", ")}<br><strong>${MODES[mode].nodeLabel}:</strong> ${nodes.join(", ")}</p>
+              <a href="${href}"><span>View ${country}</span><small>${state === "not-eligible" ? "not created" : "_200"}</small></a>
+              <div class="metric-row">
+                <span class="metric">${inventory}</span>
+                <span class="metric">${sessions}</span>
+              </div>
+            </article>`;
+        }).join("");
+      }
+
+      function renderRoutes(domain, mode, continent, state) {
+        const routes = CONTINENTS[continent].routeExamples;
+        els.routeTable.innerHTML = `
+          <div class="route-row header">
+            <span>Route</span>
+            <span>Type</span>
+            <span>Typical journey</span>
+            <span>Link</span>
+          </div>
+          ${routes.map(([route, type, time]) => `
+            <div class="route-row">
+              <div>
+                <div class="route-name">${route}</div>
+                <div class="route-meta">${MODES[mode].title} route page</div>
+              </div>
+              <span>${type}</span>
+              <span>${time}</span>
+              <a class="arrow-link" aria-label="${route}" href="https://${DOMAINS[domain].host}/${routeSlug(route)}">›</a>
+            </div>
+          `).join("")}
+        `;
+        if (state === "not-eligible") {
+          els.routeTable.querySelectorAll(".arrow-link").forEach((link) => {
+            link.style.background = "#8793a3";
+          });
+        }
+      }
+
+      function renderIntro(mode, continent, state) {
+        const intro = MANUAL_SECTIONS[mode].find(([id]) => id === "intro");
+        els.introTitle.textContent = `${MODES[mode].title} in ${CONTINENTS[continent].label}: manual introduction`;
+        els.introCopy.textContent = state === "not-eligible"
+          ? `This manual introduction is only published when the ${MODES[mode].singular}-${CONTINENTS[continent].label.toLowerCase()} page is created for the selected domain.`
+          : intro[2];
+      }
+
+      function renderRelatedLinks(domain, mode, continent, state) {
+        const host = DOMAINS[domain].host;
+        const modeData = MODES[mode];
+        const continentData = CONTINENTS[continent];
+        const continentPath = continentPathLabel(domain, mode, continent);
+        const statusText = state === "not-eligible" ? "Do not link until created" : "Eligible link target";
+        const parentLinks = [
+          [`${modeData.title} hub module`, `https://${host}/${mode}`, `Global mode hub links down to created ${continentData.label} pages.`],
+          ["Homepage coverage map", `https://${host}/`, "Homepage map can link into mode-continent pages where useful."],
+          ["Breadcrumb layer", `https://${host}${continentPath}`, `Country and route breadcrumbs can include ${continentData.label} when eligible.`],
+          ["Country pages", linkFor(domain, mode, slugCountry(continentData.baseCountries[0])), `Mode-country pages link back up to ${continentData.label}.`]
+        ];
+        const entityLinks = [
+          ["connection_page related linkbox", "#", "Add the relevant continent page where origin/destination logic supports it."],
+          ["mode_to_position_page related linkbox", "#", "Add the relevant continent page for destination and mode context."],
+          ["Provider HTML sitemap hub", "#", "Link to the relevant company/provider hub, especially company_hub_page, for broader provider discovery."],
+          [`${modeData.nodeLabel} HTML sitemap hub`, "#", "Link to the relevant station hub, especially station_hub_page for station discovery where the mode supports it."],
+          ["Priority entity pages", "#", `Also link selected provider and ${modeData.nodeLabel} pages when coverage is meaningful on ${continentData.label}.`],
+          ["Manual discovery pages", "#", `Connect topics such as ${modeData.tags.slice(0, 3).join(", ")} to this page.`]
+        ];
+
+        els.parentLinkList.innerHTML = parentLinks.map(([label, href, detail]) => `
+          <li class="operator-item">
+            <strong><a href="${href}">${label}</a></strong>
+            <span>${detail} ${statusText}.</span>
+          </li>
+        `).join("");
+
+        els.entityLinkList.innerHTML = entityLinks.map(([label, href, detail]) => `
+          <li class="operator-item">
+            <strong><a href="${href}">${label}</a></strong>
+            <span>${detail}</span>
+          </li>
+        `).join("");
+      }
+
+      function renderManualSections(mode) {
+        els.manualSections.innerHTML = MANUAL_SECTIONS[mode].filter(([id]) => id !== "intro").map(([id, title, body]) => `
+          <article class="manual-card">
+            <small>manual_config.${id}</small>
+            <h3>${title}</h3>
+            <p>${body}</p>
+            <div class="metric-row">
+              <span class="metric">SEO reviewed</span>
+              <span class="metric">AI draft allowed</span>
+            </div>
+          </article>
+        `).join("");
+      }
+
+      function renderFaq(mode, continent) {
+        const modeName = MODES[mode].title.toLowerCase();
+        const continentName = CONTINENTS[continent].label;
+        const questions = [
+          [`Can I book ${modeName} in ${continentName} with Omio?`, `Yes, where Omio has bookable inventory and eligible route coverage for the selected domain.`],
+          [`Which ${modeName} routes are linked from this page?`, `Only live, canonical and indexable route pages should appear in the route module.`],
+          [`Why are some countries not linked?`, `Countries are omitted when inventory, content depth or indexable landing pages are below threshold.`]
+        ];
+        els.faqList.innerHTML = questions.map(([question, answer]) => `
+          <li class="faq-item">
+            <strong>${question}</strong>
+            <span>${answer}</span>
+          </li>
+        `).join("");
+      }
+
+      function renderEligibility(state, mode, continent) {
+        const strong = state === "indexable";
+        const limited = state === "limited";
+        const checks = [
+          ["Meaningful inventory", strong || limited, limited],
+          ["Enough eligible country links", strong || limited, limited],
+          ["Enough eligible route links", strong, limited],
+          [`Provider/operator or ${MODES[mode].nodeLabel} module`, strong || limited, false],
+          ["Unique localised content", strong, limited],
+          ["Self-canonical + linkable target", strong, limited]
+        ];
+        els.eligibility.innerHTML = checks.map(([label, pass, warn]) => {
+          const cls = pass ? warn ? "check warn" : "check" : "check miss";
+          const icon = pass ? warn ? "!" : "✓" : "×";
+          return `<div class="${cls}"><span class="check-icon">${icon}</span><span>${label}</span></div>`;
+        }).join("");
+      }
+
+      function update() {
+        const domain = els.domain.value;
+        const mode = els.mode.value;
+        const continent = els.continent.value;
+        const state = pageState(domain, mode, continent, els.state.value);
+        const modeData = MODES[mode];
+        const continentData = CONTINENTS[continent];
+        const domainData = DOMAINS[domain];
+        const title = `${modeData.title} in ${continentData.label}`;
+        const url = continentPathLabel(domain, mode, continent);
+        const countryPool = state === "not-eligible"
+          ? continentData.baseCountries.slice(0, 3)
+          : [...continentData.baseCountries, ...continentData.secondaryCountries].slice(0, state === "limited" ? 7 : 12);
+        const eligibleLinks = state === "indexable" ? 42 : state === "limited" ? 19 : 7;
+
+        els.status.className = `status-chip ${state}`;
+        els.status.innerHTML = `<span class="dot"></span><span>${state === "indexable" ? "Indexable" : state === "limited" ? "Limited" : "Not created"}</span>`;
+        els.qaUrl.textContent = `${domainData.host}${url}`;
+        els.qaCanonical.textContent = state === "not-eligible" ? "Not created" : "Self-canonical";
+        els.qaSitemap.textContent = state === "indexable" ? "Created" : state === "limited" ? "Review" : "Not generated";
+        els.qaLinks.textContent = `${eligibleLinks} eligible links`;
+
+        els.crumbMode.textContent = modeData.title;
+        els.crumbContinent.textContent = continentData.label;
+        els.h1.textContent = title;
+        els.heroCopy.textContent = state === "not-eligible"
+          ? `${title} is supported by the page type, but this domain-state does not yet have enough inventory, routes and localised content to create a page.`
+          : `Compare and book ${modeData.singular} tickets across ${continentData.label}, then explore eligible countries, routes, ${modeData.nodeLabel} and ${modeData.providerLabel} from one continent-level hub.`;
+
+        els.searchTitle.textContent = `${modeData.searchLabel} ${continentData.label.toLowerCase()} ${modeData.title.toLowerCase()}`;
+        els.from.value = domainData.defaultFrom;
+        els.to.value = domainData.defaultTo;
+
+        els.quickLinks.innerHTML = countryPool.slice(0, 6).map((country) => `
+          <a href="${linkFor(domain, mode, slugCountry(country))}">${country}</a>
+        `).join("");
+
+        els.mapTitle.textContent = `${modeData.singular[0].toUpperCase()}${modeData.singular.slice(1)} coverage in ${continentData.label}`;
+        els.mapIntro.textContent = `Coverage states come from ${domainData.label} inventory, indexable country pages and eligible ${modeData.singular} route depth.`;
+        els.countryTitle.textContent = `Country ${modeData.singular} fact sheets`;
+        els.countryIntro.textContent = `Priority countries get rich content; all valid live ${modeData.singular} country pages remain linked through the compact country list.`;
+        els.contentTitle.textContent = `Manual ${modeData.singular} strategic sections`;
+        els.contentIntro.textContent = `SEO-owned sections such as ${modeData.tags.slice(0, 3).join(", ")} live in manual config and link to relevant hub pages.`;
+        els.routeTitle.textContent = `Cross-border and regional ${modeData.singular} routes in ${continentData.label}`;
+        els.routeIntro.textContent = `Separate corridor links are reserved for routes that connect countries or define regional travel patterns.`;
+        els.relatedTitle.textContent = `Related ${modeData.singular} page links`;
+        els.relatedIntro.textContent = `Eligible continent pages should be linked from parent modules and added back into breadcrumbs and related linkboxes.`;
+        els.guideTitle.textContent = modeData.guideTitle;
+        els.guideCopy.textContent = modeData.guide;
+        els.guideTags.innerHTML = modeData.tags.map((tag) => `<span class="metric">${tag}</span>`).join("");
+
+        [els.mapSection, els.introSection, els.countrySection, els.contentSection, els.routeSection, els.relatedSection, els.faqSection, els.eligibilityCard].forEach((section) => {
+          section.classList.toggle("suppressed", state === "not-eligible");
+        });
+
+        renderMap(continent, countryPool, state);
+        renderIntro(mode, continent, state);
+        renderCountryLinks(domain, mode, countryPool, state);
+        renderRoutes(domain, mode, continent, state);
+        renderRelatedLinks(domain, mode, continent, state);
+        renderManualSections(mode);
+        renderFaq(mode, continent);
+        renderEligibility(state, mode, continent);
+      }
+
+      [els.domain, els.mode, els.continent, els.state].forEach((control) => {
+        control.addEventListener("change", update);
+      });
+
+      update();
+    </script>
+  </body>
+</html>
